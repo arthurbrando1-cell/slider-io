@@ -2,58 +2,124 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Slider.io</title>
+<title>Slither.io TOP</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+/* CSS GERAL E TEMA */
 html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
   background: #0f0f14;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 canvas {
   display: block;
-  background: radial-gradient(circle, #1b1b28, #050509);
+  /* Fundo escuro com gradiente sutil */
+  background: radial-gradient(circle, #1b1b28 0%, #050509 100%); 
 }
 
+/* ESTILO DO MENU */
 #menu {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.85);
+  background: rgba(0,0,0,.9);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
+  transition: opacity 0.5s ease;
+}
+
+#menu.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 #menu div {
   background: #151522;
-  padding: 25px;
-  border-radius: 10px;
+  padding: 30px 40px;
+  border-radius: 12px;
   text-align: center;
   color: white;
+  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.15);
+}
+
+#menu h2 {
+    color: #00ffff;
+    margin-bottom: 20px;
 }
 
 #menu input {
   width: 200px;
-  padding: 8px;
+  padding: 10px;
   margin-top: 10px;
+  border: none;
+  border-radius: 5px;
+  background: #252535;
+  color: white;
 }
 
 #menu button {
-  margin-top: 10px;
-  padding: 8px 15px;
+  margin-top: 15px;
+  padding: 10px 25px;
   cursor: pointer;
+  background: #00ffff;
+  color: #151522;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background 0.3s;
 }
 
+#menu button:hover {
+    background: #00e0e0;
+}
+
+/* SELEÇÃO DE SKIN */
+#skin-selection {
+    margin: 20px 0;
+    padding: 10px;
+    border-radius: 5px;
+    background: #1e1e30;
+}
+
+#skin-selection p {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #aaa;
+}
+
+.skin-btn {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 4px solid transparent !important; 
+  margin: 0 5px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  padding: 0 !important; /* Sobrescreve o padding do #menu button */
+  background-color: var(--skin-color); /* Usado no JS */
+}
+
+.skin-btn.selected {
+  border-color: white !important; /* Borda branca para indicar seleção */
+  transform: scale(1.1);
+}
+
+/* PLACAR */
 #score {
   position: fixed;
   top: 10px;
   left: 10px;
-  color: white;
+  color: #00ffff;
+  background: rgba(0,0,0,0.5);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
 }
 </style>
 </head>
@@ -62,14 +128,24 @@ canvas {
 
 <div id="menu">
   <div>
-    <h2>Slider.io</h2>
-    <input id="nick" placeholder="Seu nick">
-    <br>
+    <h2>Slither.io TOP</h2>
+    <input id="nick" placeholder="Seu nick" value="Player">
+    
+    <div id="skin-selection">
+        <p>Selecione sua Skin:</p>
+        <button class="skin-btn" style="--skin-color: #00FF00;" data-color="#00FF00" title="Verde"></button>
+        <button class="skin-btn" style="--skin-color: #FF0000;" data-color="#FF0000" title="Vermelho"></button>
+        <button class="skin-btn" style="--skin-color: #0000FF;" data-color="#0000FF" title="Azul"></button>
+        <button class="skin-btn" style="--skin-color: #FFFF00;" data-color="#FFFF00" title="Amarelo"></button>
+        <button class="skin-btn" style="--skin-color: #FF00FF;" data-color="#FF00FF" title="Magenta"></button>
+        <button class="skin-btn" style="--skin-color: #00FFFF;" data-color="#00FFFF" title="Ciano"></button>
+    </div>
+    
     <button onclick="start()">Jogar</button>
   </div>
 </div>
 
-<div id="score">Score: 0</div>
+<div id="score">Score: 0 | Length: 30</div>
 <canvas id="game"></canvas>
 
 <script type="module">
@@ -78,7 +154,7 @@ import {
   getDatabase, ref, set, onValue, onDisconnect, remove
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-/* 🔥 FIREBASE */
+/* 🔥 FIREBASE - ATENÇÃO: Use suas próprias credenciais se for hospedar! */
 const firebaseConfig = {
   apiKey: "AIzaSyCfdgkO3WzaxXT-djAA6MsLC2m26c9optU",
   authDomain: "slider-io.firebaseapp.com",
@@ -103,124 +179,227 @@ function resize() {
 addEventListener("resize", resize);
 resize();
 
-/* VARS */
+/* VARS GLOBAIS E ESTADO DE JOGO */
 let id, me, players = {}, foods = {};
 let mouse = { x: canvas.width/2, y: canvas.height/2 };
-let playing = false;
+let gameState = 'MENU'; // Novo sistema de estado de jogo
+let selectedSkinColor = "#00FF00"; // Cor padrão (Verde)
+const INITIAL_LENGTH = 30; // 30 segmentos iniciais
+const INITIAL_RADIUS = 10; // Largura inicial da cobra (Raio)
 
-/* INPUT */
-addEventListener("mousemove", e => {
-  mouse.x = e.clientX;
-  mouse.y = e.clientY;
+/* LÓGICA DE SELEÇÃO DE SKIN (EXECUTA NO CARREGAMENTO) */
+document.querySelectorAll('.skin-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        // Remove a classe 'selected' de todos os botões
+        document.querySelectorAll('.skin-btn').forEach(btn => btn.classList.remove('selected'));
+        
+        // Adiciona a classe 'selected' ao botão clicado
+        this.classList.add('selected');
+        
+        // Armazena a cor selecionada
+        selectedSkinColor = this.getAttribute('data-color');
+    });
 });
+// Define a primeira skin como selecionada por padrão
+document.querySelector('.skin-btn').classList.add('selected');
 
-/* START */
+
+/* START GAME */
 window.start = () => {
-  const nick = document.getElementById("nick").value || "Player";
-  document.getElementById("menu").style.display = "none";
+    const nick = document.getElementById("nick").value || "Player";
+    document.getElementById("menu").classList.add("hidden"); // Esconde o menu com transição
 
-  id = Math.random().toString(36).slice(2);
-  me = {
-    nick,
-    x: Math.random()*2000-1000,
-    y: Math.random()*2000-1000,
-    size: 10,
-    score: 0,
-    color: "#" + Math.floor(Math.random()*16777215).toString(16)
-  };
+    id = Math.random().toString(36).slice(2);
+    
+    // OBJETO COBRA COM SEGMENTOS (Body)
+    me = {
+        nick,
+        x: Math.random()*2000-1000, // Posição X de sincronização
+        y: Math.random()*2000-1000, // Posição Y de sincronização
+        body: [], // Lista de {x, y} que formam a cobra
+        radius: INITIAL_RADIUS, // Raio (largura) atual da cobra
+        length: INITIAL_LENGTH, // Quantidade de segmentos no corpo
+        score: 0,
+        color: selectedSkinColor 
+    };
 
-  const myRef = ref(db, "players/"+id);
-  set(myRef, me);
-  onDisconnect(myRef).remove();
+    // Preenche o corpo inicial com segmentos no centro de onde a cobra nasceu
+    for (let i = 0; i < me.length; i++) {
+        me.body.push({ x: me.x, y: me.y });
+    }
 
-  onValue(ref(db, "players"), s => players = s.val() || {});
-  onValue(ref(db, "foods"), s => foods = s.val() || {});
+    const myRef = ref(db, "players/"+id);
+    // Sincroniza apenas as propriedades leves (sem o 'body')
+    set(myRef, {
+        nick: me.nick, x: me.x, y: me.y, radius: me.radius, length: me.length, score: me.score, color: me.color
+    });
+    onDisconnect(myRef).remove();
 
-  playing = true;
-  loop();
+    onValue(ref(db, "players"), s => players = s.val() || {});
+    onValue(ref(db, "foods"), s => foods = s.val() || {});
+
+    gameState = 'PLAYING';
+    loop();
 };
 
-/* SPAWN FOOD */
+/* SPAWN FOOD (A cada 0.8s) */
 setInterval(() => {
-  const fid = Math.random().toString(36).slice(2);
-  set(ref(db, "foods/"+fid), {
-    x: Math.random()*3000-1500,
-    y: Math.random()*3000-1500
-  });
+    if (gameState !== 'PLAYING') return;
+    const fid = Math.random().toString(36).slice(2);
+    set(ref(db, "foods/"+fid), {
+        x: Math.random()*3000-1500, // Área de spawn de comida maior que a inicial
+        y: Math.random()*3000-1500
+    });
 }, 800);
 
-/* GAME LOOP */
+/* UPDATE (LÓGICA DO JOGO) */
 function update() {
-  if (!playing) return;
+    if (gameState !== 'PLAYING') return;
 
-  const dx = mouse.x - canvas.width/2;
-  const dy = mouse.y - canvas.height/2;
-  const dist = Math.hypot(dx,dy) || 1;
+    const dx = mouse.x - canvas.width/2;
+    const dy = mouse.y - canvas.height/2;
+    const dist = Math.hypot(dx,dy) || 1;
 
-  me.x += dx/dist * 4;
-  me.y += dy/dist * 4;
+    // Velocidade Slither.io: Inverso da raiz quadrada do raio (maior = mais lento)
+    const speed = 6 / Math.sqrt(me.radius / INITIAL_RADIUS); 
 
-  /* COMER FOOD */
-  for (let f in foods) {
-    const food = foods[f];
-    if (Math.hypot(me.x-food.x, me.y-food.y) < me.size) {
-      me.size += 0.5;
-      me.score++;
-      remove(ref(db,"foods/"+f));
+    // 1. CALCULA NOVA POSIÇÃO DA CABEÇA
+    const newHead = {
+        x: me.body[0].x + (dx/dist * speed),
+        y: me.body[0].y + (dy/dist * speed)
+    };
+
+    // 2. ATUALIZA POSIÇÃO DE SINCRONIZAÇÃO E CENTRALIZAÇÃO DA TELA
+    me.x = newHead.x;
+    me.y = newHead.y;
+
+    // 3. MOVIMENTO: Adiciona a nova cabeça na frente da lista
+    me.body.unshift(newHead);
+
+    // 4. MANTÉM O TAMANHO: Remove o último segmento (simula movimento), a menos que esteja crescendo
+    let growing = false;
+
+    /* COMER FOOD */
+    for (let f in foods) {
+        const food = foods[f];
+        // Colisão com a cabeça (me.body[0])
+        if (Math.hypot(me.body[0].x-food.x, me.body[0].y-food.y) < me.radius + 3) {
+            // A bolinha gruda: marca para crescer
+            me.length += 3; // Aumenta o comprimento em 3 segmentos
+            me.radius += 0.05; // Aumenta um pouco o raio/massa
+            me.score++;
+            remove(ref(db,"foods/"+f));
+            growing = true; 
+        }
     }
-  }
-
-  /* COMER PLAYER */
-  for (let p in players) {
-    if (p === id) continue;
-    const o = players[p];
-    const d = Math.hypot(me.x-o.x, me.y-o.y);
-    if (d < me.size && me.size > o.size+3) {
-      me.size += o.size/2;
-      me.score += Math.floor(o.size);
-      remove(ref(db,"players/"+p));
+    
+    // Se não estiver crescendo, remove o último segmento para manter o comprimento
+    if (!growing && me.body.length > me.length) {
+        me.body.pop();
     }
-  }
 
-  document.getElementById("score").innerText = "Score: "+me.score;
-  set(ref(db,"players/"+id), me);
+    /* COMER PLAYER */
+    for (let p in players) {
+        if (p === id) continue;
+        const o = players[p];
+        
+        // Colisão simplificada (cabeça vs cabeça) - a do Slither.io é mais complexa!
+        const d = Math.hypot(me.x-o.x, me.y-o.y); 
+        
+        if (d < me.radius && me.radius > o.radius + 3) {
+            me.radius += o.radius/2;
+            me.length += Math.floor(o.length);
+            me.score += Math.floor(o.score);
+            remove(ref(db,"players/"+p));
+        }
+        
+        // **DETECÇÃO DE AUTO-COLISÃO (Simplificada)**
+        // Se a cabeça colidir com um dos segmentos mais distantes
+        for(let i = 5; i < me.body.length; i += 5) { // Começa a verificar do 5º segmento para não morrer instantaneamente
+            if (Math.hypot(me.body[0].x - me.body[i].x, me.body[0].y - me.body[i].y) < me.radius * 0.8) {
+                // VOCÊ MORREU! Implementar tela de Game Over aqui.
+                // alert("Você colidiu com você mesmo! Game Over.");
+                // location.reload(); 
+            }
+        }
+    }
+
+    document.getElementById("score").innerText = 
+        `Score: ${me.score} | Length: ${me.length.toFixed(0)} | Radius: ${me.radius.toFixed(1)}`;
+        
+    // SINCRONIZAÇÃO FIREBASE (Apenas dados essenciais)
+    set(ref(db,"players/"+id), {
+        nick: me.nick,
+        x: me.x, 
+        y: me.y,
+        radius: me.radius,
+        length: me.length,
+        score: me.score,
+        color: me.color
+    });
 }
 
+/* DRAW (DESENHO NA TELA) */
 function draw() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  ctx.save();
-  ctx.translate(canvas.width/2-me.x, canvas.height/2-me.y);
+    ctx.save();
+    // Centraliza a tela na posição da sua cobra
+    ctx.translate(canvas.width/2-me.x, canvas.height/2-me.y);
 
-  /* FOODS */
-  ctx.fillStyle = "#ffd166";
-  for (let f in foods) {
-    const food = foods[f];
-    ctx.beginPath();
-    ctx.arc(food.x, food.y, 3, 0, Math.PI*2);
-    ctx.fill();
-  }
+    /* FOODS */
+    ctx.fillStyle = "#ffd166"; // Cor da comida
+    for (let f in foods) {
+        const food = foods[f];
+        ctx.beginPath();
+        ctx.arc(food.x, food.y, 3, 0, Math.PI*2);
+        ctx.fill();
+    }
 
-  /* PLAYERS */
-  for (let p in players) {
-    const pl = players[p];
-    ctx.beginPath();
-    ctx.fillStyle = pl.color;
-    ctx.arc(pl.x, pl.y, pl.size, 0, Math.PI*2);
-    ctx.fill();
+    /* PLAYERS */
+    for (let p in players) {
+        const pl = players[p];
+        ctx.fillStyle = pl.color;
+        
+        // Para a minha cobra (id), desenha todos os segmentos do 'body'
+        if (p === id) {
+            const bodyLength = me.body.length;
+            for (let i = 0; i < bodyLength; i++) {
+                const seg = me.body[i];
+                // Faz os segmentos diminuírem de tamanho e opacidade no final
+                const radius_seg = pl.radius - (i / bodyLength) * (pl.radius/2); 
+                
+                ctx.beginPath();
+                ctx.arc(seg.x, seg.y, radius_seg, 0, Math.PI*2);
+                ctx.fill();
+            }
+        } else {
+            // Para outros jogadores, desenha apenas o círculo (cabeça)
+            // A sincronização do corpo inteiro é muito pesada para o Firebase em tempo real.
+            ctx.beginPath();
+            ctx.arc(pl.x, pl.y, pl.radius, 0, Math.PI*2);
+            ctx.fill();
+        }
 
-    ctx.fillStyle = "white";
-    ctx.font = "12px Arial";
-    ctx.fillText(pl.nick, pl.x-pl.size, pl.y-pl.size-5);
-  }
+        // DESENHA NICK (Acima da cabeça)
+        ctx.fillStyle = "white";
+        ctx.font = "14px Arial";
+        const currentRadius = (p === id) ? me.radius : pl.radius;
+        const headX = (p === id) ? me.body[0].x : pl.x;
+        const headY = (p === id) ? me.body[0].y : pl.y;
 
-  ctx.restore();
+        ctx.textAlign = 'center';
+        ctx.fillText(pl.nick, headX, headY - currentRadius - 8);
+    }
+
+    ctx.restore();
 }
 
+/* LOOP PRINCIPAL */
 function loop() {
-  update();
-  draw();
-  requestAnimationFrame(loop);
+    update();
+    draw();
+    requestAnimationFrame(loop);
 }
 </script>
 
