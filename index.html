@@ -2,16 +2,16 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Mini Slider.io</title>
+<title>Slider.io</title>
 
 <style>
   body {
     margin: 0;
     background: #0f0f14;
     overflow: hidden;
-    color: white;
     font-family: Arial, sans-serif;
   }
+
   canvas {
     display: block;
     margin: auto;
@@ -24,7 +24,7 @@
 <canvas id="game" width="800" height="500"></canvas>
 
 <script type="module">
-/* ================= FIREBASE ================= */
+/* ================= FIREBASE (SEM NPM) ================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getDatabase,
@@ -34,12 +34,14 @@ import {
   remove
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-/* COLE SUAS CHAVES AQUI */
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  databaseURL: "https://SEU_PROJETO.firebaseio.com",
-  projectId: "SEU_PROJETO"
+  apiKey: "AIzaSyCfdgkO3WzaxXT-djAA6MsLC2m26c9optU",
+  authDomain: "slider-io.firebaseapp.com",
+  databaseURL: "https://slider-io-default-rtdb.firebaseio.com",
+  projectId: "slider-io",
+  storageBucket: "slider-io.firebasestorage.app",
+  messagingSenderId: "395647141464",
+  appId: "1:395647141464:web:251cc58a3e0e90ca262c2d"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -58,6 +60,7 @@ let me = {
   size: 12
 };
 
+/* SALVA PLAYER */
 const myRef = ref(db, "players/" + playerId);
 set(myRef, me);
 
