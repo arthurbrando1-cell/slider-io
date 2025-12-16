@@ -2,124 +2,59 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Slither.io TOP</title>
+<title>Slither Clone</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* CSS GERAL E TEMA */
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background: #0f0f14;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+html,body{
+  margin:0;
+  padding:0;
+  overflow:hidden;
+  background:#0c0c14;
+  font-family:Arial, sans-serif;
 }
+canvas{display:block}
 
-canvas {
-  display: block;
-  /* Fundo escuro com gradiente sutil */
-  background: radial-gradient(circle, #1b1b28 0%, #050509 100%); 
+#menu{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
 }
-
-/* ESTILO DO MENU */
-#menu {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  transition: opacity 0.5s ease;
+#menu .box{
+  background:#151522;
+  padding:25px;
+  border-radius:12px;
+  text-align:center;
+  color:white;
 }
-
-#menu.hidden {
-  opacity: 0;
-  pointer-events: none;
+#menu input{
+  width:200px;
+  padding:8px;
+  margin:10px 0;
 }
-
-#menu div {
-  background: #151522;
-  padding: 30px 40px;
-  border-radius: 12px;
-  text-align: center;
-  color: white;
-  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.15);
+.skins{
+  display:flex;
+  justify-content:center;
+  gap:10px;
 }
-
-#menu h2 {
-    color: #00ffff;
-    margin-bottom: 20px;
+.skin{
+  width:25px;
+  height:25px;
+  border-radius:50%;
+  cursor:pointer;
+  border:2px solid transparent;
 }
+.skin.selected{border-color:white}
 
-#menu input {
-  width: 200px;
-  padding: 10px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 5px;
-  background: #252535;
-  color: white;
-}
-
-#menu button {
-  margin-top: 15px;
-  padding: 10px 25px;
-  cursor: pointer;
-  background: #00ffff;
-  color: #151522;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-  transition: background 0.3s;
-}
-
-#menu button:hover {
-    background: #00e0e0;
-}
-
-/* SELEÇÃO DE SKIN */
-#skin-selection {
-    margin: 20px 0;
-    padding: 10px;
-    border-radius: 5px;
-    background: #1e1e30;
-}
-
-#skin-selection p {
-    margin-bottom: 10px;
-    font-size: 14px;
-    color: #aaa;
-}
-
-.skin-btn {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  border: 4px solid transparent !important; 
-  margin: 0 5px;
-  cursor: pointer;
-  transition: border-color 0.2s;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
-  padding: 0 !important;
-  background-color: var(--skin-color);
-}
-
-.skin-btn.selected {
-  border-color: white !important; /* Borda branca para indicar seleção */
-  transform: scale(1.1);
-}
-
-/* PLACAR */
-#score {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  color: #00ffff;
-  background: rgba(0,0,0,0.5);
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-weight: bold;
+#score{
+  position:fixed;
+  top:10px;
+  left:10px;
+  color:white;
 }
 </style>
 </head>
@@ -127,284 +62,146 @@ canvas {
 <body>
 
 <div id="menu">
-  <div>
-    <h2>Slither.io TOP</h2>
-    <input id="nick" placeholder="Seu nick" value="Player">
-    
-    <div id="skin-selection">
-        <p>Selecione sua Skin:</p>
-        <button class="skin-btn" style="--skin-color: #00FF00;" data-color="#00FF00" title="Verde"></button>
-        <button class="skin-btn" style="--skin-color: #FF0000;" data-color="#FF0000" title="Vermelho"></button>
-        <button class="skin-btn" style="--skin-color: #0000FF;" data-color="#0000FF" title="Azul"></button>
-        <button class="skin-btn" style="--skin-color: #FFFF00;" data-color="#FFFF00" title="Amarelo"></button>
-        <button class="skin-btn" style="--skin-color: #FF00FF;" data-color="#FF00FF" title="Magenta"></button>
-    </div>
-    
+  <div class="box">
+    <h2>🐍 Slither.io</h2>
+    <input id="nick" placeholder="Seu nick"><br>
+    <div class="skins" id="skins"></div>
     <button onclick="start()">Jogar</button>
   </div>
 </div>
 
-<div id="score">Score: 0 | Length: 30 | Radius: 10.0</div>
+<div id="score">Score: 0</div>
 <canvas id="game"></canvas>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getDatabase, ref, set, onValue, onDisconnect, remove
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-/* 🔥 FIREBASE */
-const firebaseConfig = {
-  apiKey: "AIzaSyCfdgkO3WzaxXT-djAA6MsLC2m26c9optU",
-  authDomain: "slider-io.firebaseapp.com",
-  databaseURL: "https://slider-io-default-rtdb.firebaseio.com",
-  projectId: "slider-io",
-  storageBucket: "slider-io.firebasestorage.app",
-  messagingSenderId: "395647141464",
-  appId: "1:395647141464:web:251cc58a3e0e90ca262c2d"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-/* CANVAS */
+<script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+resize();
+addEventListener("resize", resize);
 
-function resize() {
+function resize(){
   canvas.width = innerWidth;
   canvas.height = innerHeight;
 }
-addEventListener("resize", resize);
-resize();
 
-/* VARS GLOBAIS E ESTADO DE JOGO */
-let id, me, players = {}, foods = {};
-let mouse = { x: canvas.width/2, y: canvas.height/2 };
-let gameState = 'MENU';
-let selectedSkinColor = "#00FF00";
-const INITIAL_LENGTH = 30; // 30 segmentos iniciais
-const INITIAL_RADIUS = 10; // Largura inicial da cobra (Raio)
+/* ===== MENU / SKINS ===== */
+const skinColors = ["#ff595e","#ffca3a","#8ac926","#1982c4","#6a4c93"];
+let selectedColor = skinColors[0];
 
-/* LÓGICA DE SELEÇÃO DE SKIN */
-document.querySelectorAll('.skin-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        // Remove a classe 'selected' de todos os botões
-        document.querySelectorAll('.skin-btn').forEach(btn => btn.classList.remove('selected'));
-        
-        // Adiciona a classe 'selected' ao botão clicado
-        this.classList.add('selected');
-        
-        // Armazena a cor selecionada
-        selectedSkinColor = this.getAttribute('data-color');
-    });
+const skinsDiv = document.getElementById("skins");
+skinColors.forEach(c=>{
+  const d=document.createElement("div");
+  d.className="skin";
+  d.style.background=c;
+  if(c===selectedColor)d.classList.add("selected");
+  d.onclick=()=>{
+    document.querySelectorAll(".skin").forEach(s=>s.classList.remove("selected"));
+    d.classList.add("selected");
+    selectedColor=c;
+  }
+  skinsDiv.appendChild(d);
 });
-// Define a primeira skin como selecionada por padrão
-document.querySelector('.skin-btn').classList.add('selected');
 
+/* ===== GAME VARS ===== */
+let snake = [];
+let foods = [];
+let playing = false;
+let mouse = {x:innerWidth/2,y:innerHeight/2};
+let speed = 3;
 
-/* START GAME */
-window.start = () => {
-    const nick = document.getElementById("nick").value || "Player";
-    document.getElementById("menu").classList.add("hidden");
+/* INPUT */
+addEventListener("mousemove",e=>{
+  mouse.x=e.clientX;
+  mouse.y=e.clientY;
+});
 
-    id = Math.random().toString(36).slice(2);
-    
-    // OBJETO COBRA COM SEGMENTOS (Body)
-    me = {
-        nick,
-        x: Math.random()*2000-1000, 
-        y: Math.random()*2000-1000, 
-        body: [], // Lista de {x, y} que formam a cobra
-        radius: INITIAL_RADIUS, // Raio (largura) atual da cobra
-        length: INITIAL_LENGTH, // Quantidade de segmentos no corpo
-        score: 0,
-        color: selectedSkinColor 
-    };
+/* START */
+function start(){
+  document.getElementById("menu").style.display="none";
+  playing=true;
 
-    // Inicializa o corpo (todos os segmentos começam no mesmo ponto)
-    for (let i = 0; i < me.length; i++) {
-        me.body.push({ x: me.x, y: me.y });
-    }
+  snake=[];
+  for(let i=0;i<10;i++){
+    snake.push({x:0-i*8,y:0});
+  }
 
-    const myRef = ref(db, "players/"+id);
-    // Sincroniza apenas as propriedades leves (sem o 'body')
-    set(myRef, {
-        nick: me.nick, x: me.x, y: me.y, radius: me.radius, length: me.length, score: me.score, color: me.color
-    });
-    onDisconnect(myRef).remove();
+  foods=[];
+  for(let i=0;i<200;i++)spawnFood();
 
-    onValue(ref(db, "players"), s => players = s.val() || {});
-    onValue(ref(db, "foods"), s => foods = s.val() || {});
-
-    gameState = 'PLAYING';
-    loop(); // Inicia o loop do jogo
-};
-
-/* SPAWN FOOD */
-setInterval(() => {
-    if (gameState !== 'PLAYING') return;
-    const fid = Math.random().toString(36).slice(2);
-    set(ref(db, "foods/"+fid), {
-        x: Math.random()*3000-1500, 
-        y: Math.random()*3000-1500
-    });
-}, 800);
-
-/* UPDATE (LÓGICA DO JOGO) */
-function update() {
-    if (gameState !== 'PLAYING') return;
-
-    const dx = mouse.x - canvas.width/2;
-    const dy = mouse.y - canvas.height/2;
-    const dist = Math.hypot(dx,dy) || 1;
-
-    // Velocidade Slither.io: Inverso da raiz quadrada do raio
-    const speed = 6 / Math.sqrt(me.radius / INITIAL_RADIUS); 
-
-    // 1. CALCULA NOVA POSIÇÃO DA CABEÇA
-    const newHead = {
-        x: me.body[0].x + (dx/dist * speed),
-        y: me.body[0].y + (dy/dist * speed)
-    };
-
-    // 2. ATUALIZA POSIÇÃO DE SINCRONIZAÇÃO
-    me.x = newHead.x;
-    me.y = newHead.y;
-
-    // 3. MOVIMENTO: Adiciona a nova cabeça na frente
-    me.body.unshift(newHead);
-
-    // 4. MANTÉM O TAMANHO
-    let growing = false;
-
-    /* COMER FOOD (COLETA DE BOLINHA E CRESCIMENTO) */
-    for (let f in foods) {
-        const food = foods[f];
-        // Colisão da cabeça (me.body[0])
-        if (Math.hypot(me.body[0].x-food.x, me.body[0].y-food.y) < me.radius + 3) {
-            // A bolinha gruda: aumenta o comprimento (massa) e o raio (largura)
-            me.length += 3; // Cresce 3 segmentos
-            me.radius += 0.05; 
-            me.score++;
-            remove(ref(db,"foods/"+f));
-            growing = true; 
-        }
-    }
-    
-    // Se NÃO estiver crescendo e o corpo for maior que o comprimento alvo, remove o último segmento.
-    // Isso simula o movimento da cauda seguindo a cabeça.
-    if (!growing && me.body.length > me.length) {
-        me.body.pop();
-    }
-
-    /* COMER PLAYER */
-    for (let p in players) {
-        if (p === id) continue;
-        const o = players[p];
-        
-        // Colisão simplificada (cabeça vs cabeça)
-        const d = Math.hypot(me.x-o.x, me.y-o.y); 
-        
-        if (d < me.radius && me.radius > o.radius + 3) {
-            me.radius += o.radius/2;
-            me.length += Math.floor(o.length);
-            me.score += Math.floor(o.score);
-            remove(ref(db,"players/"+p));
-        }
-        
-        // **DETECÇÃO DE AUTO-COLISÃO (Simplificada)**
-        // Se a cabeça colidir com um dos segmentos mais distantes
-        for(let i = 5; i < me.body.length; i += 5) { // Ignora os 5 primeiros segmentos
-            if (Math.hypot(me.body[0].x - me.body[i].x, me.body[0].y - me.body[i].y) < me.radius * 0.8) {
-                // VOCÊ MORREU!
-                // Implementar tela de Game Over aqui (por enquanto, recarrega a página)
-                // remove(ref(db,"players/"+id)); // Remove-se do jogo
-                // gameState = 'GAME_OVER'; 
-                // alert("Você colidiu com você mesmo! Game Over.");
-                // location.reload(); 
-            }
-        }
-    }
-
-    // Atualiza o placar
-    document.getElementById("score").innerText = 
-        `Score: ${me.score} | Length: ${me.length.toFixed(0)} | Radius: ${me.radius.toFixed(1)}`;
-        
-    // SINCRONIZAÇÃO FIREBASE (Apenas dados essenciais)
-    set(ref(db,"players/"+id), {
-        nick: me.nick,
-        x: me.x, 
-        y: me.y,
-        radius: me.radius,
-        length: me.length,
-        score: me.score,
-        color: me.color
-    });
+  loop();
 }
 
-/* DRAW (DESENHO NA TELA) */
-function draw() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    ctx.save();
-    // Centraliza a tela na posição da sua cobra
-    ctx.translate(canvas.width/2-me.x, canvas.height/2-me.y);
-
-    /* FOODS */
-    ctx.fillStyle = "#ffd166"; // Cor da comida
-    for (let f in foods) {
-        const food = foods[f];
-        ctx.beginPath();
-        ctx.arc(food.x, food.y, 3, 0, Math.PI*2);
-        ctx.fill();
-    }
-
-    /* PLAYERS */
-    for (let p in players) {
-        const pl = players[p];
-        ctx.fillStyle = pl.color;
-        
-        // **MINHA COBRA (Segments):** Desenha todos os segmentos do 'body'
-        if (p === id) {
-            const bodyLength = me.body.length;
-            for (let i = 0; i < bodyLength; i++) {
-                const seg = me.body[i];
-                // Faz os segmentos diminuírem de tamanho no final para o efeito de cauda
-                const radius_seg = pl.radius - (i / bodyLength) * (pl.radius/2); 
-                
-                ctx.beginPath();
-                ctx.arc(seg.x, seg.y, radius_seg, 0, Math.PI*2);
-                ctx.fill();
-            }
-        } else {
-            // **OUTROS JOGADORES (Head):** Desenha apenas a cabeça (para economizar sincronização)
-            ctx.beginPath();
-            ctx.arc(pl.x, pl.y, pl.radius, 0, Math.PI*2);
-            ctx.fill();
-        }
-
-        // DESENHA NICK (Acima da cabeça)
-        ctx.fillStyle = "white";
-        ctx.font = "14px Arial";
-        const currentRadius = (p === id) ? me.radius : pl.radius;
-        const headX = (p === id) ? me.body[0].x : pl.x;
-        const headY = (p === id) ? me.body[0].y : pl.y;
-
-        ctx.textAlign = 'center';
-        ctx.fillText(pl.nick, headX, headY - currentRadius - 8);
-    }
-
-    ctx.restore();
+/* FOOD */
+function spawnFood(){
+  foods.push({
+    x:Math.random()*4000-2000,
+    y:Math.random()*4000-2000
+  });
 }
 
-/* LOOP PRINCIPAL */
-function loop() {
-    if (gameState === 'PLAYING') {
-        update();
-        draw();
+/* UPDATE */
+function update(){
+  if(!playing)return;
+
+  const head = snake[0];
+  const dx = mouse.x - canvas.width/2;
+  const dy = mouse.y - canvas.height/2;
+  const d = Math.hypot(dx,dy)||1;
+
+  const nx = head.x + dx/d*speed;
+  const ny = head.y + dy/d*speed;
+
+  snake.unshift({x:nx,y:ny});
+
+  /* EAT FOOD → VIRA CORPO */
+  let ate=false;
+  foods = foods.filter(f=>{
+    if(Math.hypot(nx-f.x,ny-f.y)<8){
+      ate=true;
+      document.getElementById("score").innerText="Score: "+snake.length;
+      return false;
     }
-    requestAnimationFrame(loop);
+    return true;
+  });
+
+  if(!ate) snake.pop();
+  if(foods.length<150)spawnFood();
+}
+
+/* DRAW */
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const camX = canvas.width/2 - snake[0].x;
+  const camY = canvas.height/2 - snake[0].y;
+
+  ctx.save();
+  ctx.translate(camX,camY);
+
+  /* FOOD */
+  ctx.fillStyle="#ffd166";
+  foods.forEach(f=>{
+    ctx.beginPath();
+    ctx.arc(f.x,f.y,3,0,Math.PI*2);
+    ctx.fill();
+  });
+
+  /* SNAKE */
+  ctx.fillStyle=selectedColor;
+  snake.forEach((s,i)=>{
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,i===0?7:6,0,Math.PI*2);
+    ctx.fill();
+  });
+
+  ctx.restore();
+}
+
+/* LOOP */
+function loop(){
+  update();
+  draw();
+  requestAnimationFrame(loop);
 }
 </script>
 
