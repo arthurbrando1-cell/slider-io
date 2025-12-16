@@ -101,8 +101,8 @@ canvas {
   cursor: pointer;
   transition: border-color 0.2s;
   box-shadow: 0 0 10px rgba(0,0,0,0.5);
-  padding: 0 !important; /* Sobrescreve o padding do #menu button */
-  background-color: var(--skin-color); /* Usado no JS */
+  padding: 0 !important;
+  background-color: var(--skin-color);
 }
 
 .skin-btn.selected {
@@ -138,14 +138,13 @@ canvas {
         <button class="skin-btn" style="--skin-color: #0000FF;" data-color="#0000FF" title="Azul"></button>
         <button class="skin-btn" style="--skin-color: #FFFF00;" data-color="#FFFF00" title="Amarelo"></button>
         <button class="skin-btn" style="--skin-color: #FF00FF;" data-color="#FF00FF" title="Magenta"></button>
-        <button class="skin-btn" style="--skin-color: #00FFFF;" data-color="#00FFFF" title="Ciano"></button>
     </div>
     
     <button onclick="start()">Jogar</button>
   </div>
 </div>
 
-<div id="score">Score: 0 | Length: 30</div>
+<div id="score">Score: 0 | Length: 30 | Radius: 10.0</div>
 <canvas id="game"></canvas>
 
 <script type="module">
@@ -154,7 +153,7 @@ import {
   getDatabase, ref, set, onValue, onDisconnect, remove
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-/* 🔥 FIREBASE - ATENÇÃO: Use suas próprias credenciais se for hospedar! */
+/* 🔥 FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyCfdgkO3WzaxXT-djAA6MsLC2m26c9optU",
   authDomain: "slider-io.firebaseapp.com",
@@ -182,12 +181,12 @@ resize();
 /* VARS GLOBAIS E ESTADO DE JOGO */
 let id, me, players = {}, foods = {};
 let mouse = { x: canvas.width/2, y: canvas.height/2 };
-let gameState = 'MENU'; // Novo sistema de estado de jogo
-let selectedSkinColor = "#00FF00"; // Cor padrão (Verde)
+let gameState = 'MENU';
+let selectedSkinColor = "#00FF00";
 const INITIAL_LENGTH = 30; // 30 segmentos iniciais
 const INITIAL_RADIUS = 10; // Largura inicial da cobra (Raio)
 
-/* LÓGICA DE SELEÇÃO DE SKIN (EXECUTA NO CARREGAMENTO) */
+/* LÓGICA DE SELEÇÃO DE SKIN */
 document.querySelectorAll('.skin-btn').forEach(button => {
     button.addEventListener('click', function() {
         // Remove a classe 'selected' de todos os botões
@@ -207,15 +206,15 @@ document.querySelector('.skin-btn').classList.add('selected');
 /* START GAME */
 window.start = () => {
     const nick = document.getElementById("nick").value || "Player";
-    document.getElementById("menu").classList.add("hidden"); // Esconde o menu com transição
+    document.getElementById("menu").classList.add("hidden");
 
     id = Math.random().toString(36).slice(2);
     
     // OBJETO COBRA COM SEGMENTOS (Body)
     me = {
         nick,
-        x: Math.random()*2000-1000, // Posição X de sincronização
-        y: Math.random()*2000-1000, // Posição Y de sincronização
+        x: Math.random()*2000-1000, 
+        y: Math.random()*2000-1000, 
         body: [], // Lista de {x, y} que formam a cobra
         radius: INITIAL_RADIUS, // Raio (largura) atual da cobra
         length: INITIAL_LENGTH, // Quantidade de segmentos no corpo
@@ -223,7 +222,7 @@ window.start = () => {
         color: selectedSkinColor 
     };
 
-    // Preenche o corpo inicial com segmentos no centro de onde a cobra nasceu
+    // Inicializa o corpo (todos os segmentos começam no mesmo ponto)
     for (let i = 0; i < me.length; i++) {
         me.body.push({ x: me.x, y: me.y });
     }
@@ -239,15 +238,15 @@ window.start = () => {
     onValue(ref(db, "foods"), s => foods = s.val() || {});
 
     gameState = 'PLAYING';
-    loop();
+    loop(); // Inicia o loop do jogo
 };
 
-/* SPAWN FOOD (A cada 0.8s) */
+/* SPAWN FOOD */
 setInterval(() => {
     if (gameState !== 'PLAYING') return;
     const fid = Math.random().toString(36).slice(2);
     set(ref(db, "foods/"+fid), {
-        x: Math.random()*3000-1500, // Área de spawn de comida maior que a inicial
+        x: Math.random()*3000-1500, 
         y: Math.random()*3000-1500
     });
 }, 800);
@@ -260,7 +259,7 @@ function update() {
     const dy = mouse.y - canvas.height/2;
     const dist = Math.hypot(dx,dy) || 1;
 
-    // Velocidade Slither.io: Inverso da raiz quadrada do raio (maior = mais lento)
+    // Velocidade Slither.io: Inverso da raiz quadrada do raio
     const speed = 6 / Math.sqrt(me.radius / INITIAL_RADIUS); 
 
     // 1. CALCULA NOVA POSIÇÃO DA CABEÇA
@@ -269,31 +268,32 @@ function update() {
         y: me.body[0].y + (dy/dist * speed)
     };
 
-    // 2. ATUALIZA POSIÇÃO DE SINCRONIZAÇÃO E CENTRALIZAÇÃO DA TELA
+    // 2. ATUALIZA POSIÇÃO DE SINCRONIZAÇÃO
     me.x = newHead.x;
     me.y = newHead.y;
 
-    // 3. MOVIMENTO: Adiciona a nova cabeça na frente da lista
+    // 3. MOVIMENTO: Adiciona a nova cabeça na frente
     me.body.unshift(newHead);
 
-    // 4. MANTÉM O TAMANHO: Remove o último segmento (simula movimento), a menos que esteja crescendo
+    // 4. MANTÉM O TAMANHO
     let growing = false;
 
-    /* COMER FOOD */
+    /* COMER FOOD (COLETA DE BOLINHA E CRESCIMENTO) */
     for (let f in foods) {
         const food = foods[f];
-        // Colisão com a cabeça (me.body[0])
+        // Colisão da cabeça (me.body[0])
         if (Math.hypot(me.body[0].x-food.x, me.body[0].y-food.y) < me.radius + 3) {
-            // A bolinha gruda: marca para crescer
-            me.length += 3; // Aumenta o comprimento em 3 segmentos
-            me.radius += 0.05; // Aumenta um pouco o raio/massa
+            // A bolinha gruda: aumenta o comprimento (massa) e o raio (largura)
+            me.length += 3; // Cresce 3 segmentos
+            me.radius += 0.05; 
             me.score++;
             remove(ref(db,"foods/"+f));
             growing = true; 
         }
     }
     
-    // Se não estiver crescendo, remove o último segmento para manter o comprimento
+    // Se NÃO estiver crescendo e o corpo for maior que o comprimento alvo, remove o último segmento.
+    // Isso simula o movimento da cauda seguindo a cabeça.
     if (!growing && me.body.length > me.length) {
         me.body.pop();
     }
@@ -303,7 +303,7 @@ function update() {
         if (p === id) continue;
         const o = players[p];
         
-        // Colisão simplificada (cabeça vs cabeça) - a do Slither.io é mais complexa!
+        // Colisão simplificada (cabeça vs cabeça)
         const d = Math.hypot(me.x-o.x, me.y-o.y); 
         
         if (d < me.radius && me.radius > o.radius + 3) {
@@ -315,15 +315,19 @@ function update() {
         
         // **DETECÇÃO DE AUTO-COLISÃO (Simplificada)**
         // Se a cabeça colidir com um dos segmentos mais distantes
-        for(let i = 5; i < me.body.length; i += 5) { // Começa a verificar do 5º segmento para não morrer instantaneamente
+        for(let i = 5; i < me.body.length; i += 5) { // Ignora os 5 primeiros segmentos
             if (Math.hypot(me.body[0].x - me.body[i].x, me.body[0].y - me.body[i].y) < me.radius * 0.8) {
-                // VOCÊ MORREU! Implementar tela de Game Over aqui.
+                // VOCÊ MORREU!
+                // Implementar tela de Game Over aqui (por enquanto, recarrega a página)
+                // remove(ref(db,"players/"+id)); // Remove-se do jogo
+                // gameState = 'GAME_OVER'; 
                 // alert("Você colidiu com você mesmo! Game Over.");
                 // location.reload(); 
             }
         }
     }
 
+    // Atualiza o placar
     document.getElementById("score").innerText = 
         `Score: ${me.score} | Length: ${me.length.toFixed(0)} | Radius: ${me.radius.toFixed(1)}`;
         
@@ -361,12 +365,12 @@ function draw() {
         const pl = players[p];
         ctx.fillStyle = pl.color;
         
-        // Para a minha cobra (id), desenha todos os segmentos do 'body'
+        // **MINHA COBRA (Segments):** Desenha todos os segmentos do 'body'
         if (p === id) {
             const bodyLength = me.body.length;
             for (let i = 0; i < bodyLength; i++) {
                 const seg = me.body[i];
-                // Faz os segmentos diminuírem de tamanho e opacidade no final
+                // Faz os segmentos diminuírem de tamanho no final para o efeito de cauda
                 const radius_seg = pl.radius - (i / bodyLength) * (pl.radius/2); 
                 
                 ctx.beginPath();
@@ -374,8 +378,7 @@ function draw() {
                 ctx.fill();
             }
         } else {
-            // Para outros jogadores, desenha apenas o círculo (cabeça)
-            // A sincronização do corpo inteiro é muito pesada para o Firebase em tempo real.
+            // **OUTROS JOGADORES (Head):** Desenha apenas a cabeça (para economizar sincronização)
             ctx.beginPath();
             ctx.arc(pl.x, pl.y, pl.radius, 0, Math.PI*2);
             ctx.fill();
@@ -397,8 +400,10 @@ function draw() {
 
 /* LOOP PRINCIPAL */
 function loop() {
-    update();
-    draw();
+    if (gameState === 'PLAYING') {
+        update();
+        draw();
+    }
     requestAnimationFrame(loop);
 }
 </script>
