@@ -15,26 +15,14 @@ html,body{
   color:white;
 }
 
-/* ===== FUNDO HEX ===== */
+/* ===== FUNDO ===== */
 #bg{
   position:fixed;
   inset:0;
   background:
     radial-gradient(circle at center, #10182a 0%, #06080f 70%),
-    repeating-linear-gradient(
-      60deg,
-      rgba(255,255,255,.03) 0,
-      rgba(255,255,255,.03) 1px,
-      transparent 1px,
-      transparent 40px
-    ),
-    repeating-linear-gradient(
-      -60deg,
-      rgba(255,255,255,.03) 0,
-      rgba(255,255,255,.03) 1px,
-      transparent 1px,
-      transparent 40px
-    );
+    repeating-linear-gradient(60deg, rgba(255,255,255,.03) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(-60deg, rgba(255,255,255,.03) 0 1px, transparent 1px 40px);
   z-index:-1;
 }
 
@@ -95,7 +83,7 @@ button{
   margin:8px;
 }
 
-/* ===== CANVAS ===== */
+/* ===== GAME ===== */
 #game{
   display:none;
 }
@@ -109,6 +97,7 @@ canvas{
   top:10px;
   left:10px;
   z-index:5;
+  font-size:16px;
   display:none;
 }
 
@@ -175,7 +164,7 @@ canvas{
   <canvas id="c"></canvas>
 
   <div id="hud">
-    <div id="score">0</div>
+    🐍 Score: <span id="score">0</span>
   </div>
 
   <button id="boostBtn">BOOST</button>
@@ -185,10 +174,7 @@ canvas{
   </div>
 </div>
 
-<!-- ===== SCRIPTS ===== -->
-<script src="game.js"></script>
-<script src="ui.js"></script>
-
+<!-- ===== START ===== -->
 <script>
 function startGame(){
   const n = document.getElementById("nick").value.trim()
@@ -196,10 +182,20 @@ function startGame(){
 
   document.getElementById("lobby").style.display="none"
   document.getElementById("game").style.display="block"
+  document.getElementById("hud").style.display="block"
+
+  // mobile detect
+  if(/Mobi|Android/i.test(navigator.userAgent)){
+    document.getElementById("joy").style.display="block"
+    document.getElementById("boostBtn").style.display="block"
+  }
 
   startSliterz(n)
 }
 </script>
+
+<!-- ===== GAME LOGIC ===== -->
+<script type="module" src="game.js"></script>
 
 </body>
 </html>
