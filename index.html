@@ -3,259 +3,203 @@
 <head>
 <meta charset="UTF-8">
 <title>Sliterz</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
 <style>
 html,body{
-  margin:0; padding:0; overflow:hidden;
-  background:#08080f; font-family:Arial,sans-serif;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+  background:#0b0f1a;
+  font-family:Arial, Helvetica, sans-serif;
+  color:white;
 }
-canvas{display:block}
 
-button,input{outline:none}
+/* ===== FUNDO HEX ===== */
+#bg{
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at center, #10182a 0%, #06080f 70%),
+    repeating-linear-gradient(
+      60deg,
+      rgba(255,255,255,.03) 0,
+      rgba(255,255,255,.03) 1px,
+      transparent 1px,
+      transparent 40px
+    ),
+    repeating-linear-gradient(
+      -60deg,
+      rgba(255,255,255,.03) 0,
+      rgba(255,255,255,.03) 1px,
+      transparent 1px,
+      transparent 40px
+    );
+  z-index:-1;
+}
 
+/* ===== LOBBY ===== */
 #lobby{
-  position:fixed; inset:0;
-  background:linear-gradient(180deg,#0a0a15,#020205);
-  color:white; z-index:20;
-  display:flex; align-items:center; justify-content:center;
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-.panel{
-  width:720px; max-width:95%;
-  background:#141425;
-  border-radius:18px; padding:25px;
-}
-.tabs button{
-  margin:5px; padding:8px 14px;
-  background:#222; color:white; border:none;
-}
-.tab{display:none}
-.tab.active{display:block}
 
+#panel{
+  width:420px;
+  max-width:95%;
+  background:rgba(10,14,30,.85);
+  border-radius:18px;
+  padding:30px;
+  text-align:center;
+  box-shadow:0 0 40px rgba(0,0,0,.6);
+}
+
+#title{
+  font-size:64px;
+  font-weight:bold;
+  margin-bottom:20px;
+  background:linear-gradient(90deg,#5cff9d,#5ca9ff,#b56bff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+input{
+  width:80%;
+  padding:12px;
+  border-radius:25px;
+  border:none;
+  outline:none;
+  font-size:16px;
+  text-align:center;
+}
+
+button{
+  margin-top:15px;
+  padding:12px 30px;
+  border-radius:25px;
+  border:none;
+  background:linear-gradient(90deg,#4cff87,#4cb3ff);
+  color:#061014;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.menu-btn{
+  background:none;
+  color:#7fd3ff;
+  font-size:14px;
+  margin:8px;
+}
+
+/* ===== CANVAS ===== */
+#game{
+  display:none;
+}
+canvas{
+  display:block;
+}
+
+/* ===== HUD ===== */
 #hud{
-  position:fixed; top:10px; left:10px;
-  color:white; z-index:5;
-  transform-origin:top left;
+  position:fixed;
+  top:10px;
+  left:10px;
+  z-index:5;
+  display:none;
 }
 
+/* ===== MOBILE ===== */
 #boostBtn{
-  position:fixed; right:20px; bottom:80px;
-  width:70px; height:70px; border-radius:50%;
-  background:#ff595e; color:white;
-  border:none; font-weight:bold;
+  position:fixed;
+  right:25px;
+  bottom:80px;
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  background:#ff5b5b;
+  border:none;
+  color:white;
+  font-weight:bold;
+  display:none;
+}
+
+#joy{
+  position:fixed;
+  left:30px;
+  bottom:60px;
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  background:rgba(255,255,255,.1);
+  display:none;
+}
+#stick{
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  background:white;
+  position:absolute;
+  left:35px;
+  top:35px;
 }
 </style>
 </head>
 
 <body>
 
+<div id="bg"></div>
+
 <!-- ===== LOBBY ===== -->
 <div id="lobby">
-  <div class="panel">
-    <h1>🐍 SLITERZ</h1>
+  <div id="panel">
+    <div id="title">sliterz</div>
 
-    <div class="tabs">
-      <button onclick="openTab('play')">Jogar</button>
-      <button onclick="openTab('shop')">Loja</button>
-      <button onclick="openTab('rank')">Ranking</button>
-      <button onclick="openTab('settings')">Config</button>
-    </div>
+    <input id="nick" placeholder="Apelido"><br>
 
-    <div id="play" class="tab active">
-      <p>Nick:</p>
-      <input id="nick" placeholder="Player"><br><br>
-      <button onclick="start()">▶ Jogar</button>
-    </div>
+    <button onclick="startGame()">JOGAR</button>
 
-    <div id="shop" class="tab">
-      <h3>🛒 Loja</h3>
-      <button>+ Velocidade (100)</button><br><br>
-      <button>Boost melhor (150)</button><br><br>
-      <small>(funciona na próxima etapa)</small>
-    </div>
-
-    <div id="rank" class="tab">
-      <h3>🏆 Ranking Global</h3>
-      <ol id="rankList"></ol>
-    </div>
-
-    <div id="settings" class="tab">
-      <h3>⚙️ Configurações</h3>
-      <label>
-        <input type="checkbox" id="noBg">
-        Esconder fundo
-      </label><br><br>
-
-      <label>Zoom câmera</label><br>
-      <input type="range" min="1" max="2" step="0.1" value="1.3"
-        oninput="camZoom=this.value"><br><br>
-
-      <label>HUD escala</label><br>
-      <input type="range" min="0.5" max="2" step="0.1" value="1"
-        oninput="hudScale=this.value">
+    <div>
+      <button class="menu-btn">Change Skin</button>
+      <button class="menu-btn">Loja</button>
+      <button class="menu-btn">Config</button>
     </div>
   </div>
 </div>
 
-<div id="hud">Score: 0</div>
-<button id="boostBtn">BOOST</button>
-<canvas id="game"></canvas>
+<!-- ===== GAME ===== -->
+<div id="game">
+  <canvas id="c"></canvas>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getDatabase, ref, set, onValue, remove, onDisconnect, update
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  <div id="hud">
+    <div id="score">0</div>
+  </div>
 
-/* FIREBASE */
-const firebaseConfig = {
-  apiKey: "AIzaSyCfdgkO3WzaxXT-djAA6MsLC2m26c9optU",
-  authDomain: "slider-io.firebaseapp.com",
-  databaseURL: "https://slider-io-default-rtdb.firebaseio.com",
-  projectId: "slider-io",
-  storageBucket: "slider-io.firebasestorage.app",
-  messagingSenderId: "395647141464",
-  appId: "1:395647141464:web:251cc58a3e0e90ca262c2d"
-};
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+  <button id="boostBtn">BOOST</button>
 
-/* CANVAS */
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-resize(); addEventListener("resize",resize);
-function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+  <div id="joy">
+    <div id="stick"></div>
+  </div>
+</div>
 
-/* VARS */
-let id, me, players={}, foods={}
-let mouse={x:0,y:0}
-let boost=false
-window.camZoom=1.3
-window.hudScale=1
+<!-- ===== SCRIPTS ===== -->
+<script src="game.js"></script>
+<script src="ui.js"></script>
 
-/* INPUT */
-addEventListener("mousemove",e=>{
-  mouse.x=e.clientX-canvas.width/2
-  mouse.y=e.clientY-canvas.height/2
-})
-addEventListener("keydown",e=>{if(e.key==="c")boost=true})
-addEventListener("keyup",e=>{if(e.key==="c")boost=false})
-boostBtn.ontouchstart=()=>boost=true
-boostBtn.ontouchend=()=>boost=false
+<script>
+function startGame(){
+  const n = document.getElementById("nick").value.trim()
+  if(!n) return alert("Escolhe um nick")
 
-/* LOBBY */
-window.openTab=t=>{
-  document.querySelectorAll(".tab").forEach(e=>e.classList.remove("active"))
-  document.getElementById(t).classList.add("active")
-}
-
-/* START */
-window.start=()=>{
   document.getElementById("lobby").style.display="none"
-  id=Math.random().toString(36).slice(2)
-  me={
-    nick:nick.value||"Player",
-    snake:Array.from({length:12},(_,i)=>({x:-i*8,y:0})),
-    score:0
-  }
-  const myRef=ref(db,"players/"+id)
-  set(myRef,me)
-  onDisconnect(myRef).remove()
+  document.getElementById("game").style.display="block"
 
-  onValue(ref(db,"players"),s=>players=s.val()||{})
-  onValue(ref(db,"foods"),s=>foods=s.val()||{})
-
-  onValue(ref(db,"players"),snap=>{
-    const arr=Object.values(snap.val()||{})
-      .sort((a,b)=>b.score-a.score)
-      .slice(0,10)
-    rankList.innerHTML=arr.map(p=>`<li>${p.nick} - ${p.score}</li>`).join("")
-  })
-
-  loop()
-}
-
-/* FOOD SPAWN */
-setInterval(()=>{
-  if(Object.keys(foods).length<1000){
-    const fid=Math.random().toString(36).slice(2)
-    set(ref(db,"foods/"+fid),{
-      x:Math.random()*6000-3000,
-      y:Math.random()*6000-3000
-    })
-  }
-},300)
-
-/* UPDATE */
-function updateGame(){
-  if(!me)return
-  const head=me.snake[0]
-  const d=Math.hypot(mouse.x,mouse.y)||1
-  const sp=boost?5:2.8
-
-  me.snake.unshift({
-    x:head.x+mouse.x/d*sp,
-    y:head.y+mouse.y/d*sp
-  })
-
-  let ate=false
-  for(const f in foods){
-    const fd=foods[f]
-    if(Math.hypot(head.x-fd.x,head.y-fd.y)<7){
-      ate=true
-      me.score++
-      remove(ref(db,"foods/"+f))
-      break
-    }
-  }
-  if(!ate||boost)me.snake.pop()
-
-  hud.style.transform=`scale(${hudScale})`
-  hud.innerText="Score: "+me.score
-  update(ref(db,"players/"+id),me)
-}
-
-/* DRAW */
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height)
-  if(!me)return
-
-  if(!noBg.checked){
-    ctx.fillStyle="#0e0e18"
-    ctx.fillRect(0,0,canvas.width,canvas.height)
-  }
-
-  ctx.save()
-  ctx.translate(canvas.width/2,canvas.height/2)
-  ctx.scale(camZoom,camZoom)
-  ctx.translate(-me.snake[0].x,-me.snake[0].y)
-
-  ctx.fillStyle="#ffd166"
-  for(const f in foods){
-    const fd=foods[f]
-    ctx.beginPath();ctx.arc(fd.x,fd.y,3,0,Math.PI*2);ctx.fill()
-  }
-
-  for(const p in players){
-    const pl=players[p]
-    if(!pl?.snake)continue
-    ctx.fillStyle=p===id?"#6a4c93":"#1982c4"
-    pl.snake.forEach((s,i)=>{
-      ctx.beginPath()
-      ctx.arc(s.x,s.y,i?6:7,0,Math.PI*2)
-      ctx.fill()
-    })
-  }
-
-  ctx.restore()
-}
-
-/* LOOP */
-function loop(){
-  updateGame()
-  draw()
-  requestAnimationFrame(loop)
+  startSliterz(n)
 }
 </script>
+
 </body>
 </html>
