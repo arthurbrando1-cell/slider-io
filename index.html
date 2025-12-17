@@ -2,74 +2,21 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Slither Clone</title>
+<title>Sliterz</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-html,body{
-  margin:0;
-  padding:0;
-  overflow:hidden;
-  background:#0c0c14;
-  font-family:Arial,sans-serif;
-}
+html,body{margin:0;padding:0;overflow:hidden;background:#0b0b12;font-family:Arial}
 canvas{display:block}
-
-#menu,#shop{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.85);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:10;
+#menu{
+  position:fixed;inset:0;background:rgba(0,0,0,.85);
+  display:flex;align-items:center;justify-content:center;z-index:10;color:white
 }
-.box{
-  background:#151522;
-  padding:25px;
-  border-radius:12px;
-  color:white;
-  text-align:center;
-}
-
-#hud{
-  position:fixed;
-  top:10px;
-  left:10px;
-  color:white;
-  z-index:5;
-}
-
+#menu .box{background:#151522;padding:25px;border-radius:14px;text-align:center}
+#hud{position:fixed;top:10px;left:10px;color:white;z-index:5}
 #boostBtn{
-  position:fixed;
-  right:20px;
-  bottom:80px;
-  width:70px;
-  height:70px;
-  border-radius:50%;
-  background:#ff595e;
-  color:white;
-  font-weight:bold;
-  border:none;
-}
-
-#joystick{
-  position:fixed;
-  left:30px;
-  bottom:60px;
-  width:120px;
-  height:120px;
-  border-radius:50%;
-  background:rgba(255,255,255,.1);
-}
-#stick{
-  width:50px;
-  height:50px;
-  border-radius:50%;
-  background:white;
-  position:absolute;
-  top:35px;
-  left:35px;
+  position:fixed;right:20px;bottom:80px;
+  width:70px;height:70px;border-radius:50%;
+  background:#ff595e;color:white;border:none;font-weight:bold
 }
 </style>
 </head>
@@ -78,159 +25,145 @@ canvas{display:block}
 
 <div id="menu">
   <div class="box">
-    <h2>🐍 Slither.io</h2>
-    <button onclick="start()">Jogar</button>
-    <br><br>
-    <button onclick="openShop()">Loja</button>
-  </div>
-</div>
-
-<div id="shop" style="display:none">
-  <div class="box">
-    <h3>🛒 Loja</h3>
-    <p>Boost dura mais (fake)</p>
-    <p>Velocidade +1 (fake)</p>
-    <button onclick="closeShop()">Voltar</button>
+    <h1>🐍 SLITERZ</h1>
+    <input id="nick" placeholder="Seu nick"><br><br>
+    <button onclick="start()">JOGAR</button>
   </div>
 </div>
 
 <div id="hud">Score: 0</div>
 <button id="boostBtn">BOOST</button>
-
-<div id="joystick">
-  <div id="stick"></div>
-</div>
-
 <canvas id="game"></canvas>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getDatabase, ref, set, onValue, remove, onDisconnect, update
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+/* 🔥 FIREBASE */
+const firebaseConfig = {
+  apiKey: "AIzaSyCfdgkO3WzaxXT-djAA6MsLC2m26c9optU",
+  authDomain: "slider-io.firebaseapp.com",
+  databaseURL: "https://slider-io-default-rtdb.firebaseio.com",
+  projectId: "slider-io",
+  storageBucket: "slider-io.firebasestorage.app",
+  messagingSenderId: "395647141464",
+  appId: "1:395647141464:web:251cc58a3e0e90ca262c2d"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* CANVAS */
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
-resize();
-addEventListener("resize", resize);
-function resize(){
-  canvas.width=innerWidth;
-  canvas.height=innerHeight;
-}
+resize(); addEventListener("resize",resize);
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
 
-/* ===== GAME VARS ===== */
-let snake=[], foods=[];
-let playing=false;
-let mouse={x:0,y:0};
-let speed=2.5, boost=false;
-let camZoom=1.3;
+/* VARS */
+let id, me, players={}, foods={}
+let mouse={x:0,y:0}
+let boost=false
+
+addEventListener("mousemove",e=>{
+  mouse.x=e.clientX-canvas.width/2
+  mouse.y=e.clientY-canvas.height/2
+})
+addEventListener("keydown",e=>{if(e.key==="c")boost=true})
+addEventListener("keyup",e=>{if(e.key==="c")boost=false})
+boostBtn.ontouchstart=()=>boost=true
+boostBtn.ontouchend=()=>boost=false
 
 /* START */
-function start(){
-  document.getElementById("menu").style.display="none";
-  playing=true;
-  snake=[];
-  for(let i=0;i<15;i++)snake.push({x:-i*8,y:0});
-  foods=[];
-  for(let i=0;i<600;i++)spawnFood();
-  loop();
+window.start=()=>{
+  document.getElementById("menu").style.display="none"
+  id=Math.random().toString(36).slice(2)
+  me={
+    nick:nick.value||"Player",
+    snake:Array.from({length:12},(_,i)=>({x:-i*8,y:0})),
+    score:0
+  }
+  const myRef=ref(db,"players/"+id)
+  set(myRef,me)
+  onDisconnect(myRef).remove()
+
+  onValue(ref(db,"players"),s=>players=s.val()||{})
+  onValue(ref(db,"foods"),s=>foods=s.val()||{})
+  loop()
 }
 
-/* SHOP */
-function openShop(){document.getElementById("shop").style.display="flex";}
-function closeShop(){document.getElementById("shop").style.display="none";}
-
-/* FOOD */
-function spawnFood(){
-  foods.push({
-    x:Math.random()*5000-2500,
-    y:Math.random()*5000-2500
-  });
-}
-
-/* INPUT PC */
-addEventListener("mousemove",e=>{
-  mouse.x=e.clientX-canvas.width/2;
-  mouse.y=e.clientY-canvas.height/2;
-});
-addEventListener("keydown",e=>{ if(e.key==="c") boost=true; });
-addEventListener("keyup",e=>{ if(e.key==="c") boost=false; });
-
-/* MOBILE BOOST */
-document.getElementById("boostBtn").ontouchstart=()=>boost=true;
-document.getElementById("boostBtn").ontouchend=()=>boost=false;
-
-/* JOYSTICK */
-let joy=document.getElementById("joystick");
-let stick=document.getElementById("stick");
-joy.ontouchmove=e=>{
-  const r=joy.getBoundingClientRect();
-  const t=e.touches[0];
-  mouse.x=t.clientX-(r.left+r.width/2);
-  mouse.y=t.clientY-(r.top+r.height/2);
-  stick.style.left=(35+mouse.x/4)+"px";
-  stick.style.top=(35+mouse.y/4)+"px";
-};
-joy.ontouchend=()=>{
-  mouse={x:0,y:0};
-  stick.style.left="35px";
-  stick.style.top="35px";
-};
+/* FOOD SPAWN */
+setInterval(()=>{
+  if(Object.keys(foods).length<800){
+    const fid=Math.random().toString(36).slice(2)
+    set(ref(db,"foods/"+fid),{
+      x:Math.random()*6000-3000,
+      y:Math.random()*6000-3000
+    })
+  }
+},300)
 
 /* UPDATE */
-function update(){
-  if(!playing)return;
-  const head=snake[0];
-  const d=Math.hypot(mouse.x,mouse.y)||1;
-  const sp=boost?5:2.5;
+function updateGame(){
+  if(!me)return
+  const head=me.snake[0]
+  const d=Math.hypot(mouse.x,mouse.y)||1
+  const sp=boost?5:2.8
 
-  snake.unshift({
-    x:head.x+mouse.x/d*sp,
-    y:head.y+mouse.y/d*sp
-  });
+  const nx=head.x+mouse.x/d*sp
+  const ny=head.y+mouse.y/d*sp
+  me.snake.unshift({x:nx,y:ny})
 
-  let ate=false;
-  foods=foods.filter(f=>{
-    if(Math.hypot(head.x-f.x,head.y-f.y)<7){
-      ate=true;
-      return false;
+  let ate=false
+  for(const f in foods){
+    const fd=foods[f]
+    if(Math.hypot(nx-fd.x,ny-fd.y)<7){
+      ate=true
+      me.score++
+      remove(ref(db,"foods/"+f))
+      break
     }
-    return true;
-  });
+  }
+  if(!ate||boost)me.snake.pop()
 
-  if(!ate || boost) snake.pop();
-  if(foods.length<500)spawnFood();
-
-  document.getElementById("hud").innerText="Score: "+snake.length;
+  document.getElementById("hud").innerText="Score: "+me.score
+  update(ref(db,"players/"+id),me)
 }
 
 /* DRAW */
 function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.save();
-  ctx.translate(canvas.width/2,canvas.height/2);
-  ctx.scale(camZoom,camZoom);
-  ctx.translate(-snake[0].x,-snake[0].y);
+  ctx.clearRect(0,0,canvas.width,canvas.height)
+  if(!me)return
 
-  ctx.fillStyle="#ffd166";
-  foods.forEach(f=>{
-    ctx.beginPath();
-    ctx.arc(f.x,f.y,3,0,Math.PI*2);
-    ctx.fill();
-  });
+  ctx.save()
+  ctx.translate(canvas.width/2-me.snake[0].x,canvas.height/2-me.snake[0].y)
 
-  ctx.fillStyle="#6a4c93";
-  snake.forEach((s,i)=>{
-    ctx.beginPath();
-    ctx.arc(s.x,s.y,i?6:7,0,Math.PI*2);
-    ctx.fill();
-  });
+  ctx.fillStyle="#ffd166"
+  for(const f in foods){
+    const fd=foods[f]
+    ctx.beginPath();ctx.arc(fd.x,fd.y,3,0,Math.PI*2);ctx.fill()
+  }
 
-  ctx.restore();
+  for(const p in players){
+    const pl=players[p]
+    if(!pl||!pl.snake)continue
+    ctx.fillStyle=p===id?"#6a4c93":"#1982c4"
+    pl.snake.forEach((s,i)=>{
+      ctx.beginPath()
+      ctx.arc(s.x,s.y,i?6:7,0,Math.PI*2)
+      ctx.fill()
+    })
+  }
+
+  ctx.restore()
 }
 
 /* LOOP */
 function loop(){
-  update();
-  draw();
-  requestAnimationFrame(loop);
+  updateGame()
+  draw()
+  requestAnimationFrame(loop)
 }
 </script>
-
 </body>
 </html>
