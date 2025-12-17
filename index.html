@@ -11,11 +11,11 @@ html,body{
   padding:0;
   overflow:hidden;
   background:#0c0c14;
-  font-family:Arial, sans-serif;
+  font-family:Arial,sans-serif;
 }
 canvas{display:block}
 
-#menu{
+#menu,#shop{
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.85);
@@ -24,37 +24,52 @@ canvas{display:block}
   justify-content:center;
   z-index:10;
 }
-#menu .box{
+.box{
   background:#151522;
   padding:25px;
   border-radius:12px;
-  text-align:center;
   color:white;
+  text-align:center;
 }
-#menu input{
-  width:200px;
-  padding:8px;
-  margin:10px 0;
-}
-.skins{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-}
-.skin{
-  width:25px;
-  height:25px;
-  border-radius:50%;
-  cursor:pointer;
-  border:2px solid transparent;
-}
-.skin.selected{border-color:white}
 
-#score{
+#hud{
   position:fixed;
   top:10px;
   left:10px;
   color:white;
+  z-index:5;
+}
+
+#boostBtn{
+  position:fixed;
+  right:20px;
+  bottom:80px;
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  background:#ff595e;
+  color:white;
+  font-weight:bold;
+  border:none;
+}
+
+#joystick{
+  position:fixed;
+  left:30px;
+  bottom:60px;
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  background:rgba(255,255,255,.1);
+}
+#stick{
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  background:white;
+  position:absolute;
+  top:35px;
+  left:35px;
 }
 </style>
 </head>
@@ -64,13 +79,28 @@ canvas{display:block}
 <div id="menu">
   <div class="box">
     <h2>🐍 Slither.io</h2>
-    <input id="nick" placeholder="Seu nick"><br>
-    <div class="skins" id="skins"></div>
     <button onclick="start()">Jogar</button>
+    <br><br>
+    <button onclick="openShop()">Loja</button>
   </div>
 </div>
 
-<div id="score">Score: 0</div>
+<div id="shop" style="display:none">
+  <div class="box">
+    <h3>🛒 Loja</h3>
+    <p>Boost dura mais (fake)</p>
+    <p>Velocidade +1 (fake)</p>
+    <button onclick="closeShop()">Voltar</button>
+  </div>
+</div>
+
+<div id="hud">Score: 0</div>
+<button id="boostBtn">BOOST</button>
+
+<div id="joystick">
+  <div id="stick"></div>
+</div>
+
 <canvas id="game"></canvas>
 
 <script>
@@ -78,107 +108,105 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 resize();
 addEventListener("resize", resize);
-
 function resize(){
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
+  canvas.width=innerWidth;
+  canvas.height=innerHeight;
 }
 
-/* ===== MENU / SKINS ===== */
-const skinColors = ["#ff595e","#ffca3a","#8ac926","#1982c4","#6a4c93"];
-let selectedColor = skinColors[0];
-
-const skinsDiv = document.getElementById("skins");
-skinColors.forEach(c=>{
-  const d=document.createElement("div");
-  d.className="skin";
-  d.style.background=c;
-  if(c===selectedColor)d.classList.add("selected");
-  d.onclick=()=>{
-    document.querySelectorAll(".skin").forEach(s=>s.classList.remove("selected"));
-    d.classList.add("selected");
-    selectedColor=c;
-  }
-  skinsDiv.appendChild(d);
-});
-
 /* ===== GAME VARS ===== */
-let snake = [];
-let foods = [];
-let playing = false;
-let mouse = {x:innerWidth/2,y:innerHeight/2};
-let speed = 3;
-
-/* INPUT */
-addEventListener("mousemove",e=>{
-  mouse.x=e.clientX;
-  mouse.y=e.clientY;
-});
+let snake=[], foods=[];
+let playing=false;
+let mouse={x:0,y:0};
+let speed=2.5, boost=false;
+let camZoom=1.3;
 
 /* START */
 function start(){
   document.getElementById("menu").style.display="none";
   playing=true;
-
   snake=[];
-  for(let i=0;i<10;i++){
-    snake.push({x:0-i*8,y:0});
-  }
-
+  for(let i=0;i<15;i++)snake.push({x:-i*8,y:0});
   foods=[];
-  for(let i=0;i<200;i++)spawnFood();
-
+  for(let i=0;i<600;i++)spawnFood();
   loop();
 }
+
+/* SHOP */
+function openShop(){document.getElementById("shop").style.display="flex";}
+function closeShop(){document.getElementById("shop").style.display="none";}
 
 /* FOOD */
 function spawnFood(){
   foods.push({
-    x:Math.random()*4000-2000,
-    y:Math.random()*4000-2000
+    x:Math.random()*5000-2500,
+    y:Math.random()*5000-2500
   });
 }
+
+/* INPUT PC */
+addEventListener("mousemove",e=>{
+  mouse.x=e.clientX-canvas.width/2;
+  mouse.y=e.clientY-canvas.height/2;
+});
+addEventListener("keydown",e=>{ if(e.key==="c") boost=true; });
+addEventListener("keyup",e=>{ if(e.key==="c") boost=false; });
+
+/* MOBILE BOOST */
+document.getElementById("boostBtn").ontouchstart=()=>boost=true;
+document.getElementById("boostBtn").ontouchend=()=>boost=false;
+
+/* JOYSTICK */
+let joy=document.getElementById("joystick");
+let stick=document.getElementById("stick");
+joy.ontouchmove=e=>{
+  const r=joy.getBoundingClientRect();
+  const t=e.touches[0];
+  mouse.x=t.clientX-(r.left+r.width/2);
+  mouse.y=t.clientY-(r.top+r.height/2);
+  stick.style.left=(35+mouse.x/4)+"px";
+  stick.style.top=(35+mouse.y/4)+"px";
+};
+joy.ontouchend=()=>{
+  mouse={x:0,y:0};
+  stick.style.left="35px";
+  stick.style.top="35px";
+};
 
 /* UPDATE */
 function update(){
   if(!playing)return;
+  const head=snake[0];
+  const d=Math.hypot(mouse.x,mouse.y)||1;
+  const sp=boost?5:2.5;
 
-  const head = snake[0];
-  const dx = mouse.x - canvas.width/2;
-  const dy = mouse.y - canvas.height/2;
-  const d = Math.hypot(dx,dy)||1;
+  snake.unshift({
+    x:head.x+mouse.x/d*sp,
+    y:head.y+mouse.y/d*sp
+  });
 
-  const nx = head.x + dx/d*speed;
-  const ny = head.y + dy/d*speed;
-
-  snake.unshift({x:nx,y:ny});
-
-  /* EAT FOOD → VIRA CORPO */
   let ate=false;
-  foods = foods.filter(f=>{
-    if(Math.hypot(nx-f.x,ny-f.y)<8){
+  foods=foods.filter(f=>{
+    if(Math.hypot(head.x-f.x,head.y-f.y)<7){
       ate=true;
-      document.getElementById("score").innerText="Score: "+snake.length;
       return false;
     }
     return true;
   });
 
-  if(!ate) snake.pop();
-  if(foods.length<150)spawnFood();
+  if(!ate || boost) snake.pop();
+  if(foods.length<500)spawnFood();
+
+  document.getElementById("hud").innerText="Score: "+snake.length;
 }
 
 /* DRAW */
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  const camX = canvas.width/2 - snake[0].x;
-  const camY = canvas.height/2 - snake[0].y;
-
   ctx.save();
-  ctx.translate(camX,camY);
+  ctx.translate(canvas.width/2,canvas.height/2);
+  ctx.scale(camZoom,camZoom);
+  ctx.translate(-snake[0].x,-snake[0].y);
 
-  /* FOOD */
   ctx.fillStyle="#ffd166";
   foods.forEach(f=>{
     ctx.beginPath();
@@ -186,11 +214,10 @@ function draw(){
     ctx.fill();
   });
 
-  /* SNAKE */
-  ctx.fillStyle=selectedColor;
+  ctx.fillStyle="#6a4c93";
   snake.forEach((s,i)=>{
     ctx.beginPath();
-    ctx.arc(s.x,s.y,i===0?7:6,0,Math.PI*2);
+    ctx.arc(s.x,s.y,i?6:7,0,Math.PI*2);
     ctx.fill();
   });
 
