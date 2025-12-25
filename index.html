@@ -1,201 +1,902 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Sliterz</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Slither.io Clone</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #161c22;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+        canvas {
+            display: block;
+        }
+        .text-outline {
+            text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000, 1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+        }
+        #lobby, #skinShop {
+            background: radial-gradient(circle, rgba(20,30,40,0.95) 0%, rgba(10,15,20,1) 100%);
+        }
+        
+        /* Shop Card Styles */
+        .skin-card {
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .skin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .skin-card.selected {
+            border: 4px solid #4ade80; /* green-400 */
+            box-shadow: 0 0 15px #4ade80;
+        }
+        .skin-card.locked {
+            filter: grayscale(100%) opacity(0.5);
+            cursor: not-allowed;
+        }
+        .lock-overlay {
+            background: rgba(0,0,0,0.7);
+        }
+        
+        /* Custom Scrollbar for Shop */
+        .custom-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #1f2937; 
+            border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #4b5563; 
+            border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; 
+        }
 
-<style>
-html,body{
-  margin:0;
-  padding:0;
-  overflow:hidden;
-  background:#0b0f1a;
-  font-family:Arial, Helvetica, sans-serif;
-  color:white;
-}
-
-/* ===== FUNDO ===== */
-#bg{
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at center, #10182a 0%, #06080f 70%),
-    repeating-linear-gradient(60deg, rgba(255,255,255,.03) 0 1px, transparent 1px 40px),
-    repeating-linear-gradient(-60deg, rgba(255,255,255,.03) 0 1px, transparent 1px 40px);
-  z-index:-1;
-}
-
-/* ===== LOBBY ===== */
-#lobby{
-  position:fixed;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-#panel{
-  width:420px;
-  max-width:95%;
-  background:rgba(10,14,30,.85);
-  border-radius:18px;
-  padding:30px;
-  text-align:center;
-  box-shadow:0 0 40px rgba(0,0,0,.6);
-}
-
-#title{
-  font-size:64px;
-  font-weight:bold;
-  margin-bottom:20px;
-  background:linear-gradient(90deg,#5cff9d,#5ca9ff,#b56bff);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
-
-input{
-  width:80%;
-  padding:12px;
-  border-radius:25px;
-  border:none;
-  outline:none;
-  font-size:16px;
-  text-align:center;
-}
-
-button{
-  margin-top:15px;
-  padding:12px 30px;
-  border-radius:25px;
-  border:none;
-  background:linear-gradient(90deg,#4cff87,#4cb3ff);
-  color:#061014;
-  font-size:18px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.menu-btn{
-  background:none;
-  color:#7fd3ff;
-  font-size:14px;
-  margin:8px;
-}
-
-/* ===== GAME ===== */
-#game{
-  display:none;
-}
-canvas{
-  display:block;
-}
-
-/* ===== HUD ===== */
-#hud{
-  position:fixed;
-  top:10px;
-  left:10px;
-  z-index:5;
-  font-size:16px;
-  display:none;
-}
-
-/* ===== MOBILE ===== */
-#boostBtn{
-  position:fixed;
-  right:25px;
-  bottom:80px;
-  width:70px;
-  height:70px;
-  border-radius:50%;
-  background:#ff5b5b;
-  border:none;
-  color:white;
-  font-weight:bold;
-  display:none;
-}
-
-#joy{
-  position:fixed;
-  left:30px;
-  bottom:60px;
-  width:120px;
-  height:120px;
-  border-radius:50%;
-  background:rgba(255,255,255,.1);
-  display:none;
-}
-#stick{
-  width:50px;
-  height:50px;
-  border-radius:50%;
-  background:white;
-  position:absolute;
-  left:35px;
-  top:35px;
-}
-</style>
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+    </style>
 </head>
-
 <body>
 
-<div id="bg"></div>
+    <!-- GAME CANVAS -->
+    <canvas id="gameCanvas"></canvas>
 
-<!-- ===== LOBBY ===== -->
-<div id="lobby">
-  <div id="panel">
-    <div id="title">sliterz</div>
+    <!-- UI OVERLAYS -->
+    
+    <!-- LOBBY SCREEN -->
+    <div id="lobby" class="fixed inset-0 z-50 flex flex-col items-center justify-center text-white transition-opacity duration-300">
+        <div class="mb-8 text-center">
+            <h1 class="text-7xl font-bold text-green-400 text-outline tracking-wider mb-2">SLITHER.IO</h1>
+            <p class="text-gray-400 text-sm">Clone Completo v2.0</p>
+        </div>
 
-    <input id="nick" placeholder="Apelido"><br>
+        <div class="bg-gray-800/80 p-8 rounded-2xl shadow-2xl border border-gray-700 w-96 backdrop-blur-sm relative">
+            
+            <!-- High Score Badge -->
+            <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black font-bold px-4 py-1 rounded-full text-sm border-2 border-yellow-300 shadow-lg">
+                Recorde: <span id="lobbyHighScore">0</span>
+            </div>
 
-    <button onclick="startGame()">JOGAR</button>
+            <div class="mb-6 mt-2">
+                <label class="block text-gray-400 text-xs uppercase font-bold mb-2 ml-1">Seu Apelido</label>
+                <input type="text" id="nickname" placeholder="Nome da Cobra" maxlength="12" 
+                    class="w-full px-4 py-3 bg-gray-900 border-2 border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500 text-center text-xl font-bold transition-colors">
+            </div>
 
-    <div>
-      <button class="menu-btn">Change Skin</button>
-      <button class="menu-btn">Loja</button>
-      <button class="menu-btn">Config</button>
+            <div class="mb-6 flex gap-4">
+                <button id="openShopBtn" class="flex-1 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg shadow-lg transform transition hover:-translate-y-1 active:translate-y-0 border-b-4 border-purple-800 flex flex-col items-center justify-center">
+                    <span class="text-xs uppercase opacity-75">Skin Atual</span>
+                    <div class="flex items-center gap-2 mt-1">
+                        <div id="currentSkinPreview" class="w-6 h-6 rounded-full border-2 border-white"></div>
+                        <span>LOJA</span>
+                    </div>
+                </button>
+            </div>
+
+            <button id="playBtn" class="w-full py-4 bg-green-600 hover:bg-green-500 text-white font-bold text-2xl rounded-lg shadow-lg transform transition hover:-translate-y-1 active:translate-y-0 border-b-4 border-green-800">
+                JOGAR AGORA
+            </button>
+        </div>
+        
+        <div class="mt-8 text-gray-500 text-xs text-center leading-relaxed">
+            Mouse para mover • Clique/Espaço para correr (Gasta Massa)<br>
+            Corte outras cobras para matá-las!
+        </div>
     </div>
-  </div>
-</div>
 
-<!-- ===== GAME ===== -->
-<div id="game">
-  <canvas id="c"></canvas>
+    <!-- SKIN SHOP MODAL -->
+    <div id="skinShop" class="hidden fixed inset-0 z-[60] flex flex-col items-center justify-center text-white backdrop-blur-md">
+        <div class="bg-gray-900 p-6 rounded-xl shadow-2xl border border-gray-700 w-[800px] max-w-full h-[600px] flex flex-col">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-700">
+                <h2 class="text-3xl font-bold text-white"><span class="text-purple-400">LOJA</span> DE SKINS</h2>
+                <div class="text-right">
+                    <div class="text-xs text-gray-400 uppercase">Seu Recorde</div>
+                    <div class="text-2xl font-bold text-yellow-400" id="shopHighScore">0</div>
+                </div>
+            </div>
 
-  <div id="hud">
-    🐍 Score: <span id="score">0</span>
-  </div>
+            <div id="skinsGrid" class="flex-1 overflow-y-auto custom-scroll grid grid-cols-4 gap-4 p-2">
+                <!-- Skins generated by JS -->
+            </div>
 
-  <button id="boostBtn">BOOST</button>
+            <div class="mt-6 pt-4 border-t border-gray-700 flex justify-end">
+                <button id="closeShopBtn" class="px-8 py-2 bg-gray-600 hover:bg-gray-500 text-white font-bold rounded-lg transition">
+                    Voltar
+                </button>
+            </div>
+        </div>
+    </div>
 
-  <div id="joy">
-    <div id="stick"></div>
-  </div>
-</div>
+    <!-- HUD (In Game) -->
+    <div id="hud" class="hidden absolute inset-0 pointer-events-none">
+        <!-- Score -->
+        <div class="absolute bottom-4 left-4 text-white z-10">
+            <div class="text-gray-400 text-xs uppercase font-bold">Seu Tamanho</div>
+            <div id="scoreDisplay" class="text-2xl font-bold">10</div>
+        </div>
 
-<!-- ===== START ===== -->
-<script>
-function startGame(){
-  const n = document.getElementById("nick").value.trim()
-  if(!n) return alert("Escolhe um nick")
+        <!-- Leaderboard -->
+        <div class="absolute top-4 right-4 bg-black/40 p-4 rounded-lg w-48 text-white z-10 backdrop-blur-sm">
+            <h3 class="text-gray-300 text-xs uppercase font-bold mb-2 text-center border-b border-gray-600 pb-1">Leaderboard</h3>
+            <ul id="leaderboard" class="text-sm space-y-1 font-mono">
+                <!-- Filled by JS -->
+            </ul>
+        </div>
+        
+        <!-- Minimap Wrapper (Simplified representation) -->
+        <div class="absolute bottom-4 right-4 w-32 h-32 bg-gray-900/80 rounded-full border-2 border-gray-600 overflow-hidden opacity-80 z-10">
+             <canvas id="minimap" width="128" height="128" class="w-full h-full"></canvas>
+        </div>
+    </div>
 
-  document.getElementById("lobby").style.display="none"
-  document.getElementById("game").style.display="block"
-  document.getElementById("hud").style.display="block"
+    <!-- GAME OVER SCREEN -->
+    <div id="gameOver" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 text-white backdrop-blur-sm">
+        <h2 class="text-5xl font-bold text-red-500 text-outline mb-4">VOCÊ MORREU!</h2>
+        <div class="text-2xl mb-2">Tamanho Final: <span id="finalScore" class="font-bold text-green-400">0</span></div>
+        <div class="text-xl mb-8 text-gray-400">Morto por: <span id="killedBy" class="font-bold text-white">Ninguém</span></div>
+        <button id="restartBtn" class="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xl rounded-lg shadow-lg transition">
+            Jogar Novamente
+        </button>
+    </div>
 
-  // mobile detect
-  if(/Mobi|Android/i.test(navigator.userAgent)){
-    document.getElementById("joy").style.display="block"
-    document.getElementById("boostBtn").style.display="block"
-  }
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, onDisconnect, remove, update as fbUpdate } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-  startSliterz(n)
-}
-</script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfdgkO3WzaxXT-djAA6MsLC2m26c9optU",
+            authDomain: "slider-io.firebaseapp.com",
+            databaseURL: "https://slider-io-default-rtdb.firebaseio.com",
+            projectId: "slider-io",
+            storageBucket: "slider-io.firebasestorage.app",
+            messagingSenderId: "395647141464",
+            appId: "1:395647141464:web:251cc58a3e0e90ca262c2d"
+        };
 
-<!-- ===== GAME LOGIC ===== -->
-<script type="module" src="game.js"></script>
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
+        // --- CONFIGURATION ---
+        const CONFIG = {
+            worldSize: 3000,
+            initialMass: 20, 
+            baseSpeed: 5, 
+            boostSpeed: 10,
+            baseRotationSpeed: 0.12, 
+            foodCount: 1200, // Reduced for local performance
+            foodBaseVal: 0.3,
+            widthFactor: 0.4
+        };
+
+        const SKINS = [
+            { id: 1, name: "Vermelho", type: "color", value: "#FF3333", unlock: 0 },
+            { id: 2, name: "Verde", type: "color", value: "#00FF00", unlock: 0 },
+            { id: 3, name: "Azul", type: "color", value: "#0055FF", unlock: 0 },
+            { id: 4, name: "Amarelo", type: "color", value: "#FFFF00", unlock: 0 },
+            { id: 5, name: "Roxo", type: "color", value: "#8800FF", unlock: 0 },
+            { id: 6, name: "Ciano", type: "color", value: "#00FFFF", unlock: 100 },
+            { id: 7, name: "Rosa", type: "color", value: "#FF00FF", unlock: 200 },
+            { id: 8, name: "Laranja", type: "color", value: "#FF8800", unlock: 300 },
+            { id: 9, name: "Branco", type: "color", value: "#FFFFFF", unlock: 400 },
+            { id: 10, name: "Sombra", type: "color", value: "#333333", unlock: 500 },
+            { id: 11, name: "Abelha", type: "pattern", value: ["#FFFF00", "#222222"], unlock: 800 },
+            { id: 12, name: "EUA", type: "pattern", value: ["#FF0000", "#FFFFFF", "#0000FF"], unlock: 1000 },
+            { id: 13, name: "Alemanha", type: "pattern", value: ["#000000", "#FF0000", "#FFFF00"], unlock: 1200 },
+            { id: 14, name: "Brasil", type: "pattern", value: ["#00FF00", "#FFFF00", "#0055FF"], unlock: 1500 },
+            { id: 15, name: "Arco-íris", type: "pattern", value: ["#FF0000", "#FF7F00", "#FFFF00", "#00FF00", "#0000FF", "#4B0082", "#9400D3"], unlock: 2000 },
+            { id: 16, name: "Matrix", type: "pattern", value: ["#003300", "#00FF00"], unlock: 2500 },
+            { id: 17, name: "Lava", type: "pattern", value: ["#550000", "#FF0000", "#FF8800"], unlock: 3000 },
+            { id: 18, name: "Zebra", type: "pattern", value: ["#FFFFFF", "#000000"], unlock: 3500 },
+            { id: 19, name: "Dourado", type: "color", value: "#FFD700", unlock: 5000 },
+        ];
+
+        // --- GAME STATE ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const minimapCanvas = document.getElementById('minimap');
+        const minimapCtx = minimapCanvas.getContext('2d');
+        
+        let gameState = 'LOBBY'; 
+        let width, height;
+        let camera = { x: 0, y: 0, scale: 1 };
+        let mouse = { x: 0, y: 0, active: false };
+        let boostKey = false;
+        
+        // Persisted Data
+        let highScore = parseInt(localStorage.getItem('slither_highscore')) || 0;
+        let selectedSkinId = parseInt(localStorage.getItem('slither_skin')) || 1;
+
+        let player;
+        let snakes = {}; // Object for network players: { id: Snake }
+        let foods = [];
+        let particles = [];
+        
+        let frame = 0;
+        let playerId = null;
+        let playerRef = null;
+
+        // --- HELPERS ---
+        const rand = (min, max) => Math.random() * (max - min) + min;
+        const dist = (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1);
+        
+        // --- CLASSES ---
+
+        class Food {
+            constructor(x, y, mass = CONFIG.foodBaseVal, color = null) {
+                this.x = x || rand(-CONFIG.worldSize, CONFIG.worldSize);
+                this.y = y || rand(-CONFIG.worldSize, CONFIG.worldSize);
+                this.mass = mass;
+                this.radius = 3 + (mass * 3);
+                const colors = ['#FF3333', '#00FF00', '#0055FF', '#FFFF00', '#00FFFF', '#FF00FF'];
+                this.color = color || colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            draw(ctx) {
+                ctx.globalAlpha = 1;
+                ctx.fillStyle = this.color;
+                if (this.mass > 1) {
+                    ctx.shadowBlur = 5;
+                    ctx.shadowColor = this.color;
+                }
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.life = 1.0;
+                this.vx = rand(-3, 3);
+                this.vy = rand(-3, 3);
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= 0.02;
+            }
+
+            draw(ctx) {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        class Snake {
+            constructor(id, x, y, name = "Anon", skinId = 1, isMe = false) {
+                this.id = id;
+                this.x = x;
+                this.y = y;
+                this.angle = 0;
+                this.targetAngle = 0;
+                this.mass = CONFIG.initialMass;
+                this.name = name;
+                this.isMe = isMe;
+                this.skin = SKINS.find(s => s.id === skinId) || SKINS[0];
+                this.width = 20;
+                this.history = []; 
+                this.dead = false;
+                this.boosting = false;
+
+                // Network smoothing
+                this.lastUpdate = Date.now();
+                this.targetX = x;
+                this.targetY = y;
+                
+                for (let i = 0; i < this.mass * 5; i++) {
+                    this.history.push({x: this.x, y: this.y});
+                }
+            }
+
+            update() {
+                if (this.dead) return;
+
+                if (this.isMe) {
+                    this.playerLogic();
+                } else {
+                    this.networkLogic();
+                }
+
+                // Physics update for position (Local prediction or interpolation)
+                if (this.isMe) {
+                    const currentSpeed = this.boosting && this.mass > 10 ? CONFIG.boostSpeed : CONFIG.baseSpeed;
+                    const vx = Math.cos(this.angle) * currentSpeed;
+                    const vy = Math.sin(this.angle) * currentSpeed;
+
+                    this.x += vx;
+                    this.y += vy;
+
+                    // Bounds
+                    if (this.x < -CONFIG.worldSize) this.x = -CONFIG.worldSize;
+                    if (this.x > CONFIG.worldSize) this.x = CONFIG.worldSize;
+                    if (this.y < -CONFIG.worldSize) this.y = -CONFIG.worldSize;
+                    if (this.y > CONFIG.worldSize) this.y = CONFIG.worldSize;
+                    
+                    // Sync to Firebase periodically
+                    if (frame % 3 === 0) {
+                        this.sync();
+                    }
+                }
+
+                // History (Tail) Management
+                this.history.unshift({x: this.x, y: this.y});
+                
+                const targetLength = 20 + (this.mass * 2.5); 
+                while (this.history.length > targetLength * 4) { 
+                    this.history.pop();
+                }
+
+                // Boosting Cost (Local only)
+                if (this.isMe && this.boosting && this.mass > 10 && frame % 8 === 0) {
+                    this.mass -= 0.5;
+                    const dropX = this.history[this.history.length-1].x;
+                    const dropY = this.history[this.history.length-1].y;
+                    let dropColor = this.skin.type === 'color' ? this.skin.value : this.skin.value[0];
+                    foods.push(new Food(dropX + rand(-10,10), dropY + rand(-10,10), 0.3, dropColor));
+                }
+                
+                this.width = 20 + Math.sqrt(this.mass * CONFIG.widthFactor);
+            }
+
+            playerLogic() {
+                const dx = mouse.x - width / 2;
+                const dy = mouse.y - height / 2;
+                this.targetAngle = Math.atan2(dy, dx);
+                this.boosting = mouse.active || boostKey;
+
+                // Smooth turning
+                const turnSpeed = CONFIG.baseRotationSpeed * (25 / (25 + this.width));
+                let diff = this.targetAngle - this.angle;
+                while (diff < -Math.PI) diff += Math.PI * 2;
+                while (diff > Math.PI) diff -= Math.PI * 2;
+                if (Math.abs(diff) < turnSpeed) {
+                    this.angle = this.targetAngle;
+                } else {
+                    this.angle += Math.sign(diff) * turnSpeed;
+                }
+            }
+
+            networkLogic() {
+                // Simple interpolation towards target
+                const lerp = 0.3;
+                this.x += (this.targetX - this.x) * lerp;
+                this.y += (this.targetY - this.y) * lerp;
+                
+                // Re-calculate history points for smooth tail if distance jumped too much
+                // Or just let history unshift handle it naturally
+            }
+            
+            sync() {
+                if (!playerRef) return;
+                fbUpdate(playerRef, {
+                    x: Math.round(this.x),
+                    y: Math.round(this.y),
+                    angle: this.angle,
+                    mass: Math.round(this.mass),
+                    boosting: this.boosting,
+                    skinId: this.skin.id,
+                    name: this.name,
+                    timestamp: Date.now()
+                });
+            }
+
+            draw(ctx) {
+                const segmentSpacing = 5; 
+                let colors = this.skin.type === 'color' ? [this.skin.value] : this.skin.value;
+
+                // Body
+                for (let i = 0; i < this.history.length; i+=segmentSpacing) {
+                    const point = this.history[i];
+                    const size = this.width - (i / this.history.length) * 10;
+                    if (size < 0) continue;
+
+                    const colorIndex = Math.floor(i / (segmentSpacing * 3)) % colors.length;
+                    ctx.fillStyle = colors[colorIndex];
+                    
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, size / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Head
+                ctx.fillStyle = colors[0];
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Eyes
+                const eyeOffset = this.width / 3;
+                const eyeSize = this.width / 4;
+                const eyeX1 = this.x + Math.cos(this.angle - 0.5) * eyeOffset;
+                const eyeY1 = this.y + Math.sin(this.angle - 0.5) * eyeOffset;
+                const eyeX2 = this.x + Math.cos(this.angle + 0.5) * eyeOffset;
+                const eyeY2 = this.y + Math.sin(this.angle + 0.5) * eyeOffset;
+
+                ctx.fillStyle = "white";
+                ctx.beginPath();
+                ctx.arc(eyeX1, eyeY1, eyeSize, 0, Math.PI * 2);
+                ctx.arc(eyeX2, eyeY2, eyeSize, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = "black";
+                ctx.beginPath();
+                ctx.arc(eyeX1 + Math.cos(this.angle)*2, eyeY1 + Math.sin(this.angle)*2, eyeSize/2, 0, Math.PI * 2);
+                ctx.arc(eyeX2 + Math.cos(this.angle)*2, eyeY2 + Math.sin(this.angle)*2, eyeSize/2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Name
+                ctx.fillStyle = "white";
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 2;
+                ctx.font = "bold 12px Arial";
+                ctx.textAlign = "center";
+                ctx.strokeText(this.name, this.x, this.y - this.width);
+                ctx.fillText(this.name, this.x, this.y - this.width);
+            }
+        }
+
+        // --- MAIN FUNCTIONS ---
+
+        function init() {
+            resize();
+            window.addEventListener('resize', resize);
+            updateLobbyUI();
+            
+            // Listen to all players constantly (for menu bg activity or ready state)
+            const playersRef = ref(db, 'players');
+            onValue(playersRef, (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    // Remove all non-local snakes
+                    Object.keys(snakes).forEach(id => {
+                        if (snakes[id] !== player) delete snakes[id];
+                    });
+                    return;
+                }
+
+                // Update or create snakes
+                Object.keys(data).forEach(key => {
+                    if (playerId && key === playerId) return; // Skip self in this loop
+                    
+                    const pData = data[key];
+                    if (pData.dead) {
+                        if (snakes[key]) {
+                            // Convert to food if just died
+                            killSnake(snakes[key], "Someone", false); 
+                            delete snakes[key];
+                        }
+                        return;
+                    }
+
+                    if (!snakes[key]) {
+                        snakes[key] = new Snake(key, pData.x, pData.y, pData.name, pData.skinId, false);
+                    }
+                    
+                    // Update target data for interpolation
+                    const s = snakes[key];
+                    s.targetX = pData.x;
+                    s.targetY = pData.y;
+                    s.angle = pData.angle;
+                    s.mass = pData.mass;
+                    s.boosting = pData.boosting;
+                    s.lastUpdate = Date.now();
+                });
+
+                // Remove disconnected snakes
+                Object.keys(snakes).forEach(key => {
+                    if (key !== playerId && !data[key]) {
+                         delete snakes[key];
+                    }
+                });
+            });
+
+            loop();
+        }
+
+        function updateLobbyUI() {
+            document.getElementById('lobbyHighScore').innerText = Math.floor(highScore);
+            document.getElementById('shopHighScore').innerText = Math.floor(highScore);
+            
+            const currentSkin = SKINS.find(s => s.id === selectedSkinId) || SKINS[0];
+            const preview = document.getElementById('currentSkinPreview');
+            
+            if (currentSkin.type === 'color') {
+                preview.style.background = currentSkin.value;
+            } else {
+                preview.style.background = `linear-gradient(45deg, ${currentSkin.value.join(', ')})`;
+            }
+        }
+
+        function renderShop() {
+            const grid = document.getElementById('skinsGrid');
+            grid.innerHTML = '';
+            
+            SKINS.forEach(skin => {
+                const locked = highScore < skin.unlock;
+                const selected = selectedSkinId === skin.id;
+                
+                const card = document.createElement('div');
+                card.className = `skin-card bg-gray-800 rounded-lg p-3 flex flex-col items-center cursor-pointer border border-gray-700 ${selected ? 'selected' : ''} ${locked ? 'locked' : ''}`;
+                
+                // Visual Preview
+                let bgStyle = '';
+                if (skin.type === 'color') bgStyle = skin.value;
+                else bgStyle = `linear-gradient(45deg, ${skin.value.join(', ')})`;
+                
+                let content = `
+                    <div class="w-16 h-16 rounded-full mb-2 shadow-inner" style="background: ${bgStyle}"></div>
+                    <div class="font-bold text-sm">${skin.name}</div>
+                `;
+
+                if (locked) {
+                    content += `<div class="text-xs text-red-400 mt-1">Recorde: ${skin.unlock}</div>`;
+                    content += `<div class="absolute inset-0 flex items-center justify-center lock-overlay"><span class="text-3xl">🔒</span></div>`;
+                } else if (selected) {
+                    content += `<div class="text-xs text-green-400 mt-1">Selecionado</div>`;
+                } else {
+                     content += `<div class="text-xs text-gray-500 mt-1">Clique para usar</div>`;
+                }
+
+                card.innerHTML = content;
+                
+                if (!locked) {
+                    card.onclick = () => selectSkin(skin.id);
+                }
+                
+                grid.appendChild(card);
+            });
+        }
+
+        function selectSkin(id) {
+            selectedSkinId = id;
+            localStorage.setItem('slither_skin', id);
+            renderShop();
+            updateLobbyUI();
+        }
+
+        async function startGame() {
+            const nick = document.getElementById('nickname').value || "Cobrinha";
+            
+            // Generate ID
+            playerId = 'player_' + Math.random().toString(36).substr(2, 9);
+            playerRef = ref(db, 'players/' + playerId);
+            
+            // Initialize Player
+            player = new Snake(playerId, rand(-1000, 1000), rand(-1000, 1000), nick, selectedSkinId, true);
+            snakes[playerId] = player;
+            
+            // Set initial state in Firebase
+            await set(playerRef, {
+                x: Math.round(player.x),
+                y: Math.round(player.y),
+                angle: player.angle,
+                mass: player.mass,
+                boosting: false,
+                skinId: selectedSkinId,
+                name: nick,
+                dead: false,
+                timestamp: Date.now()
+            });
+
+            // Handle Disconnect (Remove player on tab close)
+            onDisconnect(playerRef).remove();
+
+            // Local Food Gen
+            foods = [];
+            particles = [];
+            for (let i = 0; i < CONFIG.foodCount; i++) {
+                foods.push(new Food());
+            }
+
+            gameState = 'PLAYING';
+            document.getElementById('lobby').classList.add('hidden');
+            document.getElementById('gameOver').classList.add('hidden');
+            document.getElementById('hud').classList.remove('hidden');
+        }
+
+        function createExplosion(x, y, color, mass) {
+            const foodAmount = Math.min(100, Math.max(10, mass / 2)); 
+            const scatter = Math.min(150, mass); 
+            
+            for(let i=0; i<foodAmount; i++) {
+                const fMass = rand(0.5, 2);
+                foods.push(new Food(x + rand(-scatter, scatter), y + rand(-scatter, scatter), fMass, typeof color === 'string' ? color : color[0]));
+            }
+            for(let i=0; i<20; i++) {
+                particles.push(new Particle(x, y, typeof color === 'string' ? color : color[0]));
+            }
+        }
+
+        function update() {
+            frame++;
+
+            if (gameState === 'PLAYING') {
+                // Ensure local food count
+                while (foods.length < CONFIG.foodCount) foods.push(new Food());
+
+                // Update all snakes
+                Object.values(snakes).forEach(snake => snake.update());
+
+                // Camera follows player
+                if (player) {
+                    let targetScale = Math.max(0.1, 0.9 - (player.width - 20) * 0.003); 
+                    camera.scale += (targetScale - camera.scale) * 0.05;
+                    camera.x = width / 2 - player.x * camera.scale;
+                    camera.y = height / 2 - player.y * camera.scale;
+                    
+                    document.getElementById('scoreDisplay').innerText = Math.floor(player.mass);
+                }
+
+                checkCollisions();
+                
+                // Cleanup
+                particles.forEach(p => p.update());
+                particles = particles.filter(p => p.life > 0);
+
+                updateLeaderboard();
+                drawMinimap();
+            }
+        }
+
+        function checkCollisions() {
+            if (!player || player.dead) return;
+
+            // Food Eating (Local only)
+            for (let i = foods.length - 1; i >= 0; i--) {
+                const f = foods[i];
+                if (Math.abs(player.x - f.x) > player.width + f.radius) continue;
+                if (Math.abs(player.y - f.y) > player.width + f.radius) continue;
+
+                if (dist(player.x, player.y, f.x, f.y) < player.width / 2 + f.radius) {
+                    player.mass += f.mass;
+                    foods.splice(i, 1);
+                }
+            }
+
+            // Snake vs Snake (I check if I hit anyone)
+            const allSnakes = Object.values(snakes);
+            for (let other of allSnakes) {
+                if (other === player) continue;
+                if (Math.abs(player.x - other.x) > 1000) continue; 
+
+                // Check collision with other's body
+                // We assume 'other' is valid networked snake
+                for (let k = 0; k < other.history.length; k+=2) {
+                    const pt = other.history[k];
+                    // Simple distance check
+                    if (dist(player.x, player.y, pt.x, pt.y) < player.width/2 + other.width/2 - 4) {
+                        killSnake(player, other.name, true);
+                        break;
+                    }
+                }
+            }
+        }
+
+        function killSnake(snake, killerName, isLocalDeath) {
+            snake.dead = true;
+            let explosionColor = snake.skin.type === 'color' ? snake.skin.value : snake.skin.value[0];
+            createExplosion(snake.x, snake.y, explosionColor, snake.mass);
+            
+            if (isLocalDeath && snake === player) {
+                // Update Firebase to let others know
+                fbUpdate(playerRef, { dead: true });
+                
+                if (snake.mass > highScore) {
+                    highScore = snake.mass;
+                    localStorage.setItem('slither_highscore', highScore);
+                    updateLobbyUI();
+                }
+                
+                setTimeout(() => {
+                    // Clean up after delay
+                    remove(playerRef);
+                    showGameOver(killerName);
+                }, 1000);
+            }
+        }
+
+        function showGameOver(killer) {
+            gameState = 'GAMEOVER';
+            document.getElementById('hud').classList.add('hidden');
+            document.getElementById('gameOver').classList.remove('hidden');
+            document.getElementById('finalScore').innerText = Math.floor(player.mass);
+            document.getElementById('killedBy').innerText = killer;
+        }
+
+        function draw() {
+            ctx.fillStyle = '#161c22';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.save();
+            
+            if (gameState === 'PLAYING' || gameState === 'GAMEOVER') {
+                ctx.translate(camera.x, camera.y);
+                ctx.scale(camera.scale, camera.scale);
+
+                // Grid
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+                ctx.lineWidth = 2;
+                const gridSize = 80;
+                
+                const left = -camera.x / camera.scale;
+                const top = -camera.y / camera.scale;
+                const right = (width - camera.x) / camera.scale;
+                const bottom = (height - camera.y) / camera.scale;
+
+                ctx.beginPath();
+                const startX = Math.floor(left / gridSize) * gridSize;
+                const startY = Math.floor(top / gridSize) * gridSize;
+                
+                for (let x = startX; x <= right; x += gridSize) {
+                    ctx.moveTo(x, top);
+                    ctx.lineTo(x, bottom);
+                }
+                for (let y = startY; y <= bottom; y += gridSize) {
+                    ctx.moveTo(left, y);
+                    ctx.lineTo(right, y);
+                }
+                ctx.stroke();
+
+                // World Borders
+                ctx.strokeStyle = '#440000';
+                ctx.lineWidth = 20;
+                ctx.strokeRect(-CONFIG.worldSize, -CONFIG.worldSize, CONFIG.worldSize*2, CONFIG.worldSize*2);
+
+                // Draw Food
+                foods.forEach(f => {
+                    // Viewport culling
+                    if (f.x > left - 100 && f.x < right + 100 && f.y > top - 100 && f.y < bottom + 100) {
+                        f.draw(ctx);
+                    }
+                });
+
+                particles.forEach(p => p.draw(ctx));
+
+                // Draw Snakes (Me last so I'm on top)
+                const snakeList = Object.values(snakes).sort((a, b) => (a === player ? 1 : -1));
+                snakeList.forEach(s => s.draw(ctx));
+            }
+
+            ctx.restore();
+        }
+
+        function drawMinimap() {
+            minimapCtx.clearRect(0, 0, 128, 128);
+            minimapCtx.fillStyle = 'rgba(0,0,0,0.5)';
+            minimapCtx.fillRect(0,0,128,128);
+            
+            const scale = 128 / (CONFIG.worldSize * 2);
+            
+            Object.values(snakes).forEach(s => {
+                const mx = (s.x + CONFIG.worldSize) * scale;
+                const my = (s.y + CONFIG.worldSize) * scale;
+                
+                let mColor = '#FFF';
+                if (s !== player) {
+                    mColor = s.skin.type === 'color' ? s.skin.value : s.skin.value[0];
+                }
+
+                minimapCtx.fillStyle = s === player ? '#FFF' : mColor;
+                minimapCtx.beginPath();
+                minimapCtx.arc(mx, my, s === player ? 3 : 2, 0, Math.PI * 2);
+                minimapCtx.fill();
+            });
+        }
+
+        function updateLeaderboard() {
+            if (frame % 30 !== 0) return;
+            const list = document.getElementById('leaderboard');
+            list.innerHTML = '';
+            
+            const sorted = Object.values(snakes).sort((a, b) => b.mass - a.mass).slice(0, 10);
+            
+            sorted.forEach((s, i) => {
+                const li = document.createElement('li');
+                li.className = 'flex justify-between';
+                if (s === player) li.className += ' text-green-400 font-bold';
+                li.innerHTML = `<span>${i+1}. ${s.name.substring(0,10)}</span> <span>${Math.floor(s.mass)}</span>`;
+                list.appendChild(li);
+            });
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+        // Shop Events
+        document.getElementById('openShopBtn').addEventListener('click', () => {
+            document.getElementById('lobby').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('lobby').classList.add('hidden');
+                document.getElementById('skinShop').classList.remove('hidden');
+                document.getElementById('lobby').classList.remove('opacity-0');
+                renderShop();
+            }, 300);
+        });
+
+        document.getElementById('closeShopBtn').addEventListener('click', () => {
+            document.getElementById('skinShop').classList.add('hidden');
+            document.getElementById('lobby').classList.remove('hidden');
+        });
+
+        // Input Handling
+        window.addEventListener('mousemove', e => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        window.addEventListener('mousedown', () => mouse.active = true);
+        window.addEventListener('mouseup', () => mouse.active = false);
+
+        window.addEventListener('keydown', e => {
+            if (e.code === 'Space') boostKey = true;
+        });
+        window.addEventListener('keyup', e => {
+            if (e.code === 'Space') boostKey = false;
+        });
+
+        document.getElementById('playBtn').addEventListener('click', startGame);
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            document.getElementById('gameOver').classList.add('hidden');
+            document.getElementById('lobby').classList.remove('hidden');
+            gameState = 'LOBBY';
+            updateLobbyUI();
+        });
+
+        // Initialize
+        init();
+
+    </script>
 </body>
 </html>
