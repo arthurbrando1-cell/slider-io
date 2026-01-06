@@ -2,901 +2,1779 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Slither.io Clone</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #161c22;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-        }
-        canvas {
-            display: block;
-        }
-        .text-outline {
-            text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000, 1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
-        }
-        #lobby, #skinShop {
-            background: radial-gradient(circle, rgba(20,30,40,0.95) 0%, rgba(10,15,20,1) 100%);
-        }
-        
-        /* Shop Card Styles */
-        .skin-card {
-            transition: all 0.2s;
-            position: relative;
-            overflow: hidden;
-        }
-        .skin-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
-        .skin-card.selected {
-            border: 4px solid #4ade80; /* green-400 */
-            box-shadow: 0 0 15px #4ade80;
-        }
-        .skin-card.locked {
-            filter: grayscale(100%) opacity(0.5);
-            cursor: not-allowed;
-        }
-        .lock-overlay {
-            background: rgba(0,0,0,0.7);
-        }
-        
-        /* Custom Scrollbar for Shop */
-        .custom-scroll::-webkit-scrollbar {
-            width: 8px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #1f2937; 
-            border-radius: 4px;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #4b5563; 
-            border-radius: 4px;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb:hover {
-            background: #6b7280; 
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
-        }
-    </style>
-</head>
-<body>
-
-    <!-- GAME CANVAS -->
-    <canvas id="gameCanvas"></canvas>
-
-    <!-- UI OVERLAYS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameDev Space - Ultimate Hub</title>
     
-    <!-- LOBBY SCREEN -->
-    <div id="lobby" class="fixed inset-0 z-50 flex flex-col items-center justify-center text-white transition-opacity duration-300">
-        <div class="mb-8 text-center">
-            <h1 class="text-7xl font-bold text-green-400 text-outline tracking-wider mb-2">SLITHER.IO</h1>
-            <p class="text-gray-400 text-sm">Clone Completo v2.0</p>
-        </div>
-
-        <div class="bg-gray-800/80 p-8 rounded-2xl shadow-2xl border border-gray-700 w-96 backdrop-blur-sm relative">
-            
-            <!-- High Score Badge -->
-            <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black font-bold px-4 py-1 rounded-full text-sm border-2 border-yellow-300 shadow-lg">
-                Recorde: <span id="lobbyHighScore">0</span>
-            </div>
-
-            <div class="mb-6 mt-2">
-                <label class="block text-gray-400 text-xs uppercase font-bold mb-2 ml-1">Seu Apelido</label>
-                <input type="text" id="nickname" placeholder="Nome da Cobra" maxlength="12" 
-                    class="w-full px-4 py-3 bg-gray-900 border-2 border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500 text-center text-xl font-bold transition-colors">
-            </div>
-
-            <div class="mb-6 flex gap-4">
-                <button id="openShopBtn" class="flex-1 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg shadow-lg transform transition hover:-translate-y-1 active:translate-y-0 border-b-4 border-purple-800 flex flex-col items-center justify-center">
-                    <span class="text-xs uppercase opacity-75">Skin Atual</span>
-                    <div class="flex items-center gap-2 mt-1">
-                        <div id="currentSkinPreview" class="w-6 h-6 rounded-full border-2 border-white"></div>
-                        <span>LOJA</span>
-                    </div>
-                </button>
-            </div>
-
-            <button id="playBtn" class="w-full py-4 bg-green-600 hover:bg-green-500 text-white font-bold text-2xl rounded-lg shadow-lg transform transition hover:-translate-y-1 active:translate-y-0 border-b-4 border-green-800">
-                JOGAR AGORA
-            </button>
-        </div>
-        
-        <div class="mt-8 text-gray-500 text-xs text-center leading-relaxed">
-            Mouse para mover • Clique/Espaço para correr (Gasta Massa)<br>
-            Corte outras cobras para matá-las!
-        </div>
-    </div>
-
-    <!-- SKIN SHOP MODAL -->
-    <div id="skinShop" class="hidden fixed inset-0 z-[60] flex flex-col items-center justify-center text-white backdrop-blur-md">
-        <div class="bg-gray-900 p-6 rounded-xl shadow-2xl border border-gray-700 w-[800px] max-w-full h-[600px] flex flex-col">
-            <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-700">
-                <h2 class="text-3xl font-bold text-white"><span class="text-purple-400">LOJA</span> DE SKINS</h2>
-                <div class="text-right">
-                    <div class="text-xs text-gray-400 uppercase">Seu Recorde</div>
-                    <div class="text-2xl font-bold text-yellow-400" id="shopHighScore">0</div>
-                </div>
-            </div>
-
-            <div id="skinsGrid" class="flex-1 overflow-y-auto custom-scroll grid grid-cols-4 gap-4 p-2">
-                <!-- Skins generated by JS -->
-            </div>
-
-            <div class="mt-6 pt-4 border-t border-gray-700 flex justify-end">
-                <button id="closeShopBtn" class="px-8 py-2 bg-gray-600 hover:bg-gray-500 text-white font-bold rounded-lg transition">
-                    Voltar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- HUD (In Game) -->
-    <div id="hud" class="hidden absolute inset-0 pointer-events-none">
-        <!-- Score -->
-        <div class="absolute bottom-4 left-4 text-white z-10">
-            <div class="text-gray-400 text-xs uppercase font-bold">Seu Tamanho</div>
-            <div id="scoreDisplay" class="text-2xl font-bold">10</div>
-        </div>
-
-        <!-- Leaderboard -->
-        <div class="absolute top-4 right-4 bg-black/40 p-4 rounded-lg w-48 text-white z-10 backdrop-blur-sm">
-            <h3 class="text-gray-300 text-xs uppercase font-bold mb-2 text-center border-b border-gray-600 pb-1">Leaderboard</h3>
-            <ul id="leaderboard" class="text-sm space-y-1 font-mono">
-                <!-- Filled by JS -->
-            </ul>
-        </div>
-        
-        <!-- Minimap Wrapper (Simplified representation) -->
-        <div class="absolute bottom-4 right-4 w-32 h-32 bg-gray-900/80 rounded-full border-2 border-gray-600 overflow-hidden opacity-80 z-10">
-             <canvas id="minimap" width="128" height="128" class="w-full h-full"></canvas>
-        </div>
-    </div>
-
-    <!-- GAME OVER SCREEN -->
-    <div id="gameOver" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 text-white backdrop-blur-sm">
-        <h2 class="text-5xl font-bold text-red-500 text-outline mb-4">VOCÊ MORREU!</h2>
-        <div class="text-2xl mb-2">Tamanho Final: <span id="finalScore" class="font-bold text-green-400">0</span></div>
-        <div class="text-xl mb-8 text-gray-400">Morto por: <span id="killedBy" class="font-bold text-white">Ninguém</span></div>
-        <button id="restartBtn" class="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xl rounded-lg shadow-lg transition">
-            Jogar Novamente
-        </button>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;700;900&family=Press+Start+2P&family=Audiowide&family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@400;500;600;700;800&family=Russo+One&family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, onDisconnect, remove, update as fbUpdate } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, update, increment, remove, off, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyCfdgkO3WzaxXT-djAA6MsLC2m26c9optU",
-            authDomain: "slider-io.firebaseapp.com",
-            databaseURL: "https://slider-io-default-rtdb.firebaseio.com",
-            projectId: "slider-io",
-            storageBucket: "slider-io.firebasestorage.app",
-            messagingSenderId: "395647141464",
-            appId: "1:395647141464:web:251cc58a3e0e90ca262c2d"
+            apiKey: "AIzaSyAMHAKVot044psR421B_t-Ht5EmsueVS8A",
+            authDomain: "game-dev-space.firebaseapp.com",
+            databaseURL: "https://game-dev-space-default-rtdb.firebaseio.com",
+            projectId: "game-dev-space",
+            storageBucket: "game-dev-space.firebasestorage.app",
+            messagingSenderId: "1073185335190",
+            appId: "1:1073185335190:web:ae9ffd88cdf89f53cbdfb7"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        
+        window.fbDB = db;
+        window.fbLib = { ref, set, push, onValue, update, increment, remove, off, get };
+    </script>
 
-        // --- CONFIGURATION ---
-        const CONFIG = {
-            worldSize: 3000,
-            initialMass: 20, 
-            baseSpeed: 5, 
-            boostSpeed: 10,
-            baseRotationSpeed: 0.12, 
-            foodCount: 1200, // Reduced for local performance
-            foodBaseVal: 0.3,
-            widthFactor: 0.4
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.5);
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: #09090b;
+            --bg-card: #18181b;
+            --bg-elevated: #27272a;
+            --border: #3f3f46;
+            --text-color: #fafafa;
+            --font-main: 'Outfit', sans-serif;
+            --font-title: 'Orbitron', sans-serif;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            font-family: var(--font-main); 
+            background: var(--bg-dark); 
+            color: var(--text-color); 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .hidden { display: none !important; }
+        
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 10px; border: 2px solid var(--bg-dark); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border); }
+        
+        .bg-animated {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .bg-gradient {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.15), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(139, 92, 246, 0.1), transparent),
+                radial-gradient(ellipse 50% 30% at 0% 100%, rgba(6, 182, 212, 0.1), transparent);
+        }
+        
+        .grid-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+        }
+        
+        .floating-shapes { position: absolute; inset: 0; }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.5;
+            animation: shapeFloat 20s ease-in-out infinite;
+        }
+        
+        .shape-1 { width: 500px; height: 500px; background: var(--primary); top: -10%; left: -10%; }
+        .shape-2 { width: 400px; height: 400px; background: var(--secondary); bottom: -10%; right: -10%; animation-delay: -5s; }
+        .shape-3 { width: 300px; height: 300px; background: var(--accent); top: 50%; left: 50%; animation-delay: -10s; }
+        
+        @keyframes shapeFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        
+        #intro {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .intro-bg {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 50% 80%, rgba(6, 182, 212, 0.2) 0%, transparent 50%);
+        }
+        
+        .intro-particles { position: absolute; inset: 0; overflow: hidden; }
+        
+        .intro-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: particleFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes particleFloat {
+            0%, 100% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) scale(1); opacity: 0; }
+        }
+        
+        .intro-content { position: relative; z-index: 10; text-align: center; }
+        
+        .intro-logo-container { position: relative; margin-bottom: 40px; }
+        
+        .intro-hexagon {
+            width: 180px;
+            height: 200px;
+            position: relative;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .intro-hex-border {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            animation: hexRotate 4s linear infinite, hexPulse 2s ease-in-out infinite;
+        }
+        
+        .intro-hex-inner {
+            position: absolute;
+            width: 92%;
+            height: 92%;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background: #000;
+        }
+        
+        @keyframes hexRotate { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+        @keyframes hexPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        
+        .intro-icon {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 70px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            z-index: 10;
+            animation: iconGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes iconGlow {
+            0%, 100% { filter: drop-shadow(0 0 20px var(--primary-glow)); }
+            50% { filter: drop-shadow(0 0 40px var(--primary-glow)); }
+        }
+        
+        .intro-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: titleSlide 1s ease 0.5s forwards;
+        }
+        
+        .intro-title span {
+            background: linear-gradient(135deg, #fff, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        @keyframes titleSlide { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .intro-subtitle {
+            font-size: 14px;
+            letter-spacing: 12px;
+            color: var(--accent);
+            text-transform: uppercase;
+            opacity: 0;
+            animation: titleSlide 1s ease 0.8s forwards;
+        }
+        
+        .intro-credits { margin-top: 60px; text-align: center; opacity: 0; animation: fadeIn 1s ease 1.5s forwards; }
+        .intro-credit-label { font-size: 10px; font-weight: 700; letter-spacing: 4px; color: #71717a; margin-bottom: 8px; }
+        .intro-credit-name { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 20px; background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        @keyframes fadeIn { to { opacity: 1; } }
+        
+        .intro-loading { margin-top: 50px; opacity: 0; animation: fadeIn 1s ease 2.5s forwards; }
+        .intro-loader { width: 300px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; position: relative; }
+        .intro-loader-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent)); animation: loading 2s ease 3s forwards; width: 0%; border-radius: 10px; box-shadow: 0 0 20px var(--primary-glow); }
+        .intro-loader-text { margin-top: 16px; font-size: 12px; letter-spacing: 4px; color: #71717a; text-transform: uppercase; }
+        
+        .intro-start { margin-top: 40px; opacity: 0; visibility: hidden; transition: all 0.5s ease; }
+        .intro-start.visible { opacity: 1; visibility: visible; }
+        
+        .intro-start-btn {
+            padding: 18px 60px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .intro-start-btn::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            border-radius: 50px;
+            z-index: -1;
+            animation: borderGlow 2s linear infinite;
+        }
+        
+        .intro-start-btn:hover { transform: scale(1.05); box-shadow: 0 10px 40px var(--primary-glow); }
+        
+        @keyframes borderGlow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+        @keyframes loading { to { width: 100%; } }
+        
+        .main-container { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+        
+        @media (max-width: 1024px) {
+            .main-container { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+        }
+        
+        .sidebar {
+            background: rgba(24, 24, 27, 0.6);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .logo { display: flex; align-items: center; gap: 12px; padding-bottom: 24px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+        .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-weight: 900; font-size: 24px; }
+        .logo-text { font-family: var(--font-title); font-weight: 900; font-size: 18px; color: var(--text-color); }
+        
+        .nav-section { margin-bottom: 24px; }
+        .nav-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #71717a; margin-bottom: 12px; padding-left: 12px; }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #a1a1aa;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .nav-item:hover { background: var(--bg-elevated); color: var(--text-color); }
+        .nav-item.active { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; box-shadow: 0 4px 20px var(--primary-glow); }
+        .nav-item i { font-size: 18px; width: 24px; text-align: center; }
+        .nav-badge { margin-left: auto; background: var(--danger); color: white; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+        
+        .sidebar-profile { margin-top: auto; padding-top: 24px; border-top: 1px solid var(--border); }
+        .profile-card { display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--bg-elevated); border-radius: 16px; cursor: pointer; transition: all 0.2s ease; }
+        .profile-card:hover { background: var(--border); }
+        .profile-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--bg-card); background-size: cover; background-position: center; border: 3px solid var(--primary); flex-shrink: 0; position: relative; }
+        .online-indicator { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--success); border-radius: 50%; border: 2px solid var(--bg-card); }
+        .profile-info h4 { font-weight: 700; font-size: 15px; margin-bottom: 2px; color: var(--text-color); }
+        .profile-info p { font-size: 12px; color: #71717a; }
+        
+        .content { padding: 32px; overflow-y: auto; }
+        
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 20px; }
+        .search-box { display: flex; align-items: center; gap: 12px; background: var(--bg-card); border: 2px solid var(--border); border-radius: 16px; padding: 14px 20px; width: 100%; max-width: 400px; transition: all 0.2s ease; }
+        .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-glow); }
+        .search-box i { color: #71717a; }
+        .search-box input { background: none; border: none; outline: none; color: var(--text-color); font-size: 15px; width: 100%; }
+        .search-box input::placeholder { color: #52525b; }
+        
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        
+        .btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 24px; border-radius: 14px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s ease; border: none; white-space: nowrap; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--primary-glow); }
+        .btn-secondary { background: var(--bg-elevated); color: var(--text-color); border: 2px solid var(--border); }
+        .btn-secondary:hover { border-color: var(--primary); background: var(--bg-card); }
+        .btn-icon { width: 50px; height: 50px; padding: 0; border-radius: 14px; background: var(--bg-card); border: 2px solid var(--border); color: #a1a1aa; position: relative; }
+        .btn-icon:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-icon .notification-dot { position: absolute; top: -4px; right: -4px; width: 18px; height: 18px; background: var(--danger); border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        
+        .profile-hero { background: var(--bg-card); border-radius: 24px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 32px; }
+        .profile-banner { height: 200px; background: linear-gradient(135deg, var(--primary), var(--secondary)); background-size: cover; background-position: center; position: relative; }
+        .profile-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-card), transparent); }
+        .profile-main { padding: 0 32px 32px; display: flex; align-items: flex-end; gap: 24px; margin-top: -60px; position: relative; z-index: 10; flex-wrap: wrap; }
+        .profile-avatar-large { width: 140px; height: 140px; border-radius: 28px; background: var(--bg-elevated); background-size: cover; background-position: center; border: 5px solid var(--bg-card); box-shadow: 0 10px 40px rgba(0,0,0,0.4); flex-shrink: 0; cursor: pointer; }
+        .profile-details { flex: 1; min-width: 200px; padding-bottom: 10px; }
+        .profile-name { font-family: var(--font-title); font-size: 28px; font-weight: 900; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; color: var(--text-color); }
+        .verified-badge { background: var(--accent); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .profile-bio { color: #a1a1aa; font-size: 15px; margin-bottom: 16px; }
+        .profile-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+        .stat-item { text-align: center; cursor: pointer; }
+        .stat-value { font-size: 24px; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 12px; color: #71717a; text-transform: uppercase; }
+        .profile-actions { display: flex; gap: 12px; padding-bottom: 10px; }
+        
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .section-title { font-family: var(--font-title); font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 12px; color: var(--text-color); }
+        .section-title i { color: var(--primary); }
+        
+        .filter-tabs { display: flex; gap: 8px; background: var(--bg-card); padding: 6px; border-radius: 14px; border: 1px solid var(--border); }
+        .filter-tab { padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s ease; color: #71717a; border: none; background: transparent; }
+        .filter-tab:hover { color: var(--text-color); }
+        .filter-tab.active { background: var(--primary); color: white; }
+        
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+        
+        .game-card { background: var(--bg-card); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: all 0.3s ease; position: relative; }
+        .game-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px var(--primary); }
+        .game-thumbnail { height: 180px; background: var(--bg-elevated); background-size: cover; background-position: center; position: relative; overflow: hidden; }
+        .game-thumbnail::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-card) 0%, transparent 50%); }
+        .game-play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); width: 70px; height: 70px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: all 0.3s ease; z-index: 10; box-shadow: 0 10px 40px var(--primary-glow); }
+        .game-card:hover .game-play-btn { transform: translate(-50%, -50%) scale(1); }
+        .game-badges { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 10; }
+        .badge { background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+        .badge-hot { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+        .badge-multiplayer { background: linear-gradient(135deg, #10b981, #06b6d4); }
+        .game-info { padding: 20px; }
+        .game-title { font-weight: 800; font-size: 18px; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; color: var(--text-color); }
+        .game-author { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; cursor: pointer; }
+        .game-author:hover .game-author-name { color: var(--primary); }
+        .game-author-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--bg-elevated); background-size: cover; background-position: center; }
+        .game-author-name { font-size: 13px; color: #71717a; transition: color 0.2s; }
+        .game-stats { display: flex; gap: 20px; }
+        .game-stat { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #71717a; }
+        .game-stat i { color: var(--primary); }
+        
+        .game-owner-actions { position: absolute; bottom: 12px; left: 12px; display: flex; gap: 6px; z-index: 15; }
+        .game-owner-btn { width: 30px; height: 30px; border-radius: 8px; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 11px; }
+        .game-owner-btn:hover { background: var(--primary); transform: scale(1.1); }
+        .game-owner-btn.delete:hover { background: var(--danger); }
+        
+        .image-upload-box { display: flex; flex-direction: column; gap: 12px; }
+        .image-upload-row { display: flex; gap: 12px; align-items: center; }
+        .image-upload-preview { width: 60px; height: 60px; border-radius: 12px; background: var(--bg-elevated); background-size: cover; background-position: center; flex-shrink: 0; border: 2px solid var(--border); }
+        .image-upload-preview.banner { width: 120px; height: 60px; border-radius: 8px; }
+        .image-upload-btn { padding: 10px 16px; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: 10px; color: var(--text-color); font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+        .image-upload-btn:hover { border-color: var(--primary); }
+        .image-upload-btn input { display: none; }
+        
+        .empty-state { text-align: center; padding: 80px 20px; }
+        .empty-icon { width: 100px; height: 100px; background: var(--bg-card); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 40px; color: #52525b; }
+        .empty-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; color: var(--text-color); }
+        .empty-text { color: #71717a; margin-bottom: 24px; }
+        
+        #viewer { display: none; position: fixed; inset: 0; background: var(--bg-dark); z-index: 1000; }
+        .viewer-layout { display: grid; grid-template-columns: 1fr 420px; height: 100vh; }
+        @media (max-width: 1024px) { .viewer-layout { grid-template-columns: 1fr; } .viewer-sidebar { display: none; } }
+        .viewer-main { display: flex; flex-direction: column; background: #000; }
+        .viewer-header { padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; background: var(--bg-card); border-bottom: 1px solid var(--border); }
+        .viewer-frame { flex: 1; border: none; background: white; }
+        .viewer-sidebar { background: var(--bg-card); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+        .viewer-game-info { padding: 24px; border-bottom: 1px solid var(--border); }
+        .viewer-title { font-family: var(--font-title); font-size: 20px; font-weight: 800; margin-bottom: 8px; color: var(--text-color); }
+        .viewer-author { color: #71717a; font-size: 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .viewer-author:hover { color: var(--primary); }
+        .viewer-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 24px; border-bottom: 1px solid var(--border); }
+        .viewer-stat { text-align: center; padding: 16px 8px; background: var(--bg-elevated); border-radius: 16px; }
+        .viewer-stat-value { font-size: 20px; font-weight: 800; color: var(--primary); }
+        .viewer-stat-label { font-size: 10px; color: #71717a; text-transform: uppercase; margin-top: 4px; }
+        .viewer-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 24px; border-bottom: 1px solid var(--border); }
+        .action-btn { padding: 16px; border-radius: 14px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s ease; border: 2px solid var(--border); background: var(--bg-elevated); color: var(--text-color); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .action-btn:hover { border-color: var(--primary); }
+        .action-btn.liked { background: rgba(239, 68, 68, 0.2); border-color: var(--danger); color: var(--danger); }
+        .action-btn.favorited { background: rgba(245, 158, 11, 0.2); border-color: var(--warning); color: var(--warning); }
+        .comments-section { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 24px; }
+        .comments-title { font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; color: var(--text-color); }
+        .comments-list { flex: 1; overflow-y: auto; margin-bottom: 16px; }
+        .comment { background: var(--bg-elevated); padding: 16px; border-radius: 14px; margin-bottom: 12px; }
+        .comment-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .comment-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; cursor: pointer; }
+        .comment-user { font-weight: 700; font-size: 14px; cursor: pointer; color: var(--text-color); }
+        .comment-user:hover { color: var(--primary); }
+        .comment-time { font-size: 11px; color: #71717a; margin-left: auto; }
+        .comment-text { font-size: 14px; color: #d4d4d8; line-height: 1.5; }
+        .comment-input-box { display: flex; gap: 12px; }
+        .comment-input { flex: 1; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: 14px; padding: 14px 18px; color: var(--text-color); font-size: 14px; outline: none; transition: all 0.2s ease; }
+        .comment-input:focus { border-color: var(--primary); }
+        .comment-send { width: 52px; height: 52px; background: var(--primary); border: none; border-radius: 14px; color: white; font-size: 18px; cursor: pointer; transition: all 0.2s ease; }
+        .comment-send:hover { transform: scale(1.05); }
+        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 28px; padding: 32px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; transform: translateY(30px) scale(0.95); transition: all 0.3s ease; }
+        .modal-overlay.active .modal { transform: translateY(0) scale(1); }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .modal-title { font-family: var(--font-title); font-size: 22px; font-weight: 800; color: var(--text-color); }
+        .modal-close { width: 40px; height: 40px; border-radius: 12px; background: var(--bg-elevated); border: none; color: #71717a; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: var(--danger); color: white; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 10px; color: #a1a1aa; }
+        .form-input { width: 100%; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: 14px; padding: 16px 20px; color: var(--text-color); font-size: 15px; outline: none; transition: all 0.2s ease; }
+        .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-glow); }
+        .form-select { width: 100%; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: 14px; padding: 16px 20px; color: var(--text-color); font-size: 15px; outline: none; cursor: pointer; }
+        .form-textarea { width: 100%; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: 14px; padding: 16px 20px; color: var(--text-color); font-size: 15px; outline: none; resize: none; height: 120px; transition: all 0.2s ease; }
+        .form-textarea:focus { border-color: var(--primary); }
+        .form-checkbox { display: flex; align-items: center; gap: 12px; cursor: pointer; color: var(--text-color); }
+        .form-checkbox input { width: 20px; height: 20px; accent-color: var(--primary); }
+        
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 12px; }
+        .toast { background: var(--bg-card); border: 1px solid var(--border); padding: 16px 24px; border-radius: 14px; display: flex; align-items: center; gap: 14px; animation: toastIn 0.3s ease; box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+        @keyframes toastIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .toast-success .toast-icon { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .toast-error .toast-icon { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .toast-info .toast-icon { background: rgba(99, 102, 241, 0.2); color: var(--primary); }
+        .toast-content h4 { font-weight: 700; font-size: 15px; margin-bottom: 2px; color: var(--text-color); }
+        .toast-content p { font-size: 13px; color: #71717a; }
+        
+        .mobile-header { display: none; padding: 16px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border); align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        @media (max-width: 1024px) { .mobile-header { display: flex; } .content { padding: 20px; } .profile-main { padding: 0 20px 20px; } }
+        
+        .color-picker-container { display: flex; flex-direction: column; gap: 16px; }
+        .color-picker-row { display: flex; align-items: center; gap: 16px; }
+        .color-picker { width: 60px; height: 60px; border: none; border-radius: 14px; cursor: pointer; background: none; }
+        .color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-picker::-webkit-color-swatch { border: 3px solid white; border-radius: 12px; }
+        .rainbow-btn { padding: 12px 24px; background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981, #06b6d4, #6366f1, #8b5cf6, #ec4899); border: none; border-radius: 12px; color: white; font-weight: 700; cursor: pointer; transition: all 0.2s; animation: rainbowShift 3s linear infinite; background-size: 200% 100%; }
+        .rainbow-btn:hover { transform: scale(1.05); }
+        @keyframes rainbowShift { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+        
+        .rainbow-mode { animation: rainbowColor 5s linear infinite; }
+        @keyframes rainbowColor {
+            0% { --primary: #ef4444; }
+            16% { --primary: #f59e0b; }
+            33% { --primary: #10b981; }
+            50% { --primary: #06b6d4; }
+            66% { --primary: #6366f1; }
+            83% { --primary: #8b5cf6; }
+            100% { --primary: #ef4444; }
+        }
+        
+        /* Full Page User Profile */
+        #user-profile-page { display: none; position: fixed; inset: 0; background: var(--bg-dark); z-index: 900; overflow-y: auto; }
+        .user-profile-full { max-width: 1200px; margin: 0 auto; padding: 32px; }
+        .user-profile-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+        .user-profile-banner { height: 300px; background: linear-gradient(135deg, var(--primary), var(--secondary)); background-size: cover; background-position: center; border-radius: 24px; position: relative; margin-bottom: -80px; }
+        .user-profile-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-dark), transparent 50%); border-radius: 24px; }
+        .user-profile-main { position: relative; z-index: 10; display: flex; gap: 32px; padding: 0 32px; flex-wrap: wrap; }
+        .user-profile-avatar-lg { width: 180px; height: 180px; border-radius: 50%; background: var(--bg-card); background-size: cover; background-position: center; border: 6px solid var(--bg-dark); flex-shrink: 0; }
+        .user-profile-info { flex: 1; min-width: 250px; padding-top: 100px; }
+        .user-profile-name-lg { font-family: var(--font-title); font-size: 36px; font-weight: 900; margin-bottom: 8px; color: var(--text-color); display: flex; align-items: center; gap: 16px; }
+        .user-profile-bio-lg { color: #a1a1aa; font-size: 16px; margin-bottom: 24px; max-width: 600px; }
+        .user-profile-stats-lg { display: flex; gap: 40px; margin-bottom: 24px; }
+        .user-profile-actions-lg { display: flex; gap: 16px; flex-wrap: wrap; }
+        .user-games-full { margin-top: 48px; }
+        .user-games-full h2 { font-family: var(--font-title); font-size: 28px; margin-bottom: 24px; color: var(--text-color); }
+        .user-games-grid-full { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+
+        .inbox-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .inbox-tab { flex: 1; padding: 12px; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s; color: #a1a1aa; }
+        .inbox-tab.active { background: var(--primary); border-color: var(--primary); color: white; }
+        .inbox-item { background: var(--bg-elevated); border-radius: 14px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 14px; }
+        .inbox-item-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--bg-card); background-size: cover; background-position: center; flex-shrink: 0; }
+        .inbox-item-content { flex: 1; min-width: 0; }
+        .inbox-item-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .inbox-item-name { font-weight: 700; color: var(--text-color); }
+        .inbox-item-time { font-size: 12px; color: #71717a; }
+        .inbox-item-text { font-size: 14px; color: #a1a1aa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .inbox-item-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .inbox-item-actions button { padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer; border: none; transition: all 0.2s; }
+        .inbox-accept { background: var(--success); color: white; }
+        .inbox-decline { background: var(--danger); color: white; }
+        
+        .friends-list { max-height: 400px; overflow-y: auto; }
+        .friend-item { display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--bg-elevated); border-radius: 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+        .friend-item:hover { background: var(--border); }
+        .friend-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--bg-card); background-size: cover; background-position: center; position: relative; flex-shrink: 0; }
+        .friend-online { position: absolute; bottom: 2px; right: 2px; width: 14px; height: 14px; background: var(--success); border-radius: 50%; border: 3px solid var(--bg-elevated); }
+        .friend-info { flex: 1; }
+        .friend-name { font-weight: 700; margin-bottom: 2px; color: var(--text-color); }
+        .friend-status { font-size: 12px; color: #71717a; }
+        .friend-actions button { padding: 10px 16px; border-radius: 10px; background: var(--primary); color: white; border: none; font-weight: 600; cursor: pointer; }
+        
+        .online-users { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .online-user { width: 44px; height: 44px; border-radius: 50%; background: var(--bg-elevated); background-size: cover; background-position: center; border: 3px solid var(--success); cursor: pointer; transition: all 0.2s; }
+        .online-user:hover { transform: scale(1.1); }
+        
+        .chat-container { display: flex; flex-direction: column; height: 400px; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 10px 0; }
+        .chat-message { margin-bottom: 12px; padding: 12px; background: var(--bg-elevated); border-radius: 12px; max-width: 85%; }
+        .chat-message.sent { background: var(--primary); margin-left: auto; }
+        .chat-message.received { margin-right: auto; }
+        .chat-message-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .chat-message-user { font-weight: 700; font-size: 13px; color: var(--text-color); }
+        .chat-message-time { font-size: 11px; color: #71717a; }
+        .chat-message-text { font-size: 14px; color: #d4d4d8; word-wrap: break-word; }
+        .chat-message.sent .chat-message-text { color: white; }
+        .chat-message.sent .chat-message-user { color: rgba(255,255,255,0.8); }
+        .chat-message.sent .chat-message-time { color: rgba(255,255,255,0.6); }
+        .chat-input-area { display: flex; gap: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+    <div class="bg-animated">
+        <div class="bg-gradient"></div>
+        <div class="grid-pattern"></div>
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+    </div>
+
+    <div id="intro">
+        <div class="intro-bg"></div>
+        <div class="intro-particles" id="intro-particles"></div>
+        <div class="intro-content">
+            <div class="intro-logo-container">
+                <div class="intro-hexagon">
+                    <div class="intro-hex-border"></div>
+                    <div class="intro-hex-inner"></div>
+                    <div class="intro-icon">G</div>
+                </div>
+            </div>
+            <h1 class="intro-title"><span>GAMEDEV</span></h1>
+            <p class="intro-subtitle">Space</p>
+            <div class="intro-credits">
+                <p class="intro-credit-label">DESENVOLVIDO POR</p>
+                <p class="intro-credit-name">BYTEZT & JHOSSMINE2</p>
+                <p class="intro-credit-label">PRODUZIDO POR</p>
+                <p class="intro-credit-name">EXILED OWNER & CHAD</p>
+            </div>
+            <div class="intro-loading">
+                <div class="intro-loader"><div class="intro-loader-bar" id="intro-loader-bar"></div></div>
+                <p class="intro-loader-text" id="loading-text">Carregando recursos...</p>
+            </div>
+            <div class="intro-start" id="intro-start">
+                <button class="intro-start-btn" onclick="startApp()"><i class="fas fa-play" style="margin-right: 12px;"></i>Iniciar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Page User Profile -->
+    <div id="user-profile-page">
+        <div class="user-profile-full">
+            <div class="user-profile-header">
+                <button class="btn btn-secondary" onclick="closeUserProfilePage()"><i class="fas fa-arrow-left"></i> Voltar</button>
+            </div>
+            <div id="user-profile-banner" class="user-profile-banner"></div>
+            <div class="user-profile-main">
+                <div id="user-profile-avatar" class="user-profile-avatar-lg"></div>
+                <div class="user-profile-info">
+                    <h1 id="user-profile-name" class="user-profile-name-lg">---</h1>
+                    <p id="user-profile-bio" class="user-profile-bio-lg">---</p>
+                    <div class="user-profile-stats-lg">
+                        <div class="stat-item"><div id="user-profile-games-count" class="stat-value">0</div><div class="stat-label">Jogos</div></div>
+                        <div class="stat-item"><div id="user-profile-likes-count" class="stat-value">0</div><div class="stat-label">Likes</div></div>
+                        <div class="stat-item"><div id="user-profile-views-count" class="stat-value">0</div><div class="stat-label">Views</div></div>
+                    </div>
+                    <div class="user-profile-actions-lg">
+                        <button id="profile-add-friend-btn" class="btn btn-primary" onclick="sendFriendRequestFromPage()"><i class="fas fa-user-plus"></i> Adicionar Amigo</button>
+                        <button class="btn btn-secondary" onclick="openMessageModalFromPage()"><i class="fas fa-envelope"></i> Enviar Mensagem</button>
+                    </div>
+                </div>
+            </div>
+            <div class="user-games-full">
+                <h2><i class="fas fa-gamepad" style="color: var(--primary); margin-right: 12px;"></i>Jogos Publicados</h2>
+                <div id="user-profile-games" class="user-games-grid-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app" class="hidden">
+        <div class="mobile-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="logo-icon" style="width: 40px; height: 40px; font-size: 18px;">G</div>
+                <span style="font-family: Orbitron; font-weight: 900;">GAMEDEV</span>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button onclick="openModal('inbox')" class="btn-icon" style="width: 44px; height: 44px;"><i class="fas fa-envelope"></i><span class="notification-dot" id="mobile-inbox-badge" style="display: none;">0</span></button>
+                <button onclick="openModal('upload')" class="btn-icon" style="width: 44px; height: 44px;"><i class="fas fa-plus"></i></button>
+                <div id="mobile-avatar" onclick="openModal('profile')" style="width: 44px; height: 44px; border-radius: 12px; background: var(--bg-elevated); background-size: cover; background-position: center; cursor: pointer;"></div>
+            </div>
+        </div>
+        
+        <div class="main-container">
+            <aside class="sidebar">
+                <div class="logo">
+                    <div class="logo-icon">G</div>
+                    <div>
+                        <div class="logo-text">GAMEDEV</div>
+                        <div style="font-size: 11px; color: #71717a; letter-spacing: 2px;">SPACE</div>
+                    </div>
+                </div>
+                
+                <nav class="nav-section">
+                    <div class="nav-title">Menu</div>
+                    <div class="nav-item active" onclick="showSection('feed')"><i class="fas fa-home"></i><span>Feed</span></div>
+                    <div class="nav-item" onclick="showSection('trending')"><i class="fas fa-fire"></i><span>Em Alta</span></div>
+                    <div class="nav-item" onclick="showSection('new')"><i class="fas fa-bolt"></i><span>Novos</span></div>
+                    <div class="nav-item" onclick="showSection('favorites')"><i class="fas fa-heart"></i><span>Favoritos</span></div>
+                    <div class="nav-item" onclick="showSection('multiplayer')"><i class="fas fa-users"></i><span>Multiplayer</span></div>
+                    <div class="nav-item" onclick="showSection('mygames')"><i class="fas fa-folder"></i><span>Meus Jogos</span></div>
+                </nav>
+                
+                <nav class="nav-section">
+                    <div class="nav-title">Social</div>
+                    <div class="nav-item" onclick="openModal('friends')"><i class="fas fa-user-friends"></i><span>Amigos</span><span class="nav-badge" id="friends-count">0</span></div>
+                    <div class="nav-item" onclick="openModal('inbox')"><i class="fas fa-envelope"></i><span>Caixa de Entrada</span><span class="nav-badge" id="inbox-badge" style="display: none;">0</span></div>
+                </nav>
+                
+                <nav class="nav-section">
+                    <div class="nav-title">Categorias</div>
+                    <div class="nav-item" onclick="filterCategory('action')"><i class="fas fa-crosshairs"></i><span>Ação</span></div>
+                    <div class="nav-item" onclick="filterCategory('puzzle')"><i class="fas fa-puzzle-piece"></i><span>Puzzle</span></div>
+                    <div class="nav-item" onclick="filterCategory('adventure')"><i class="fas fa-map"></i><span>Aventura</span></div>
+                    <div class="nav-item" onclick="filterCategory('racing')"><i class="fas fa-car"></i><span>Corrida</span></div>
+                    <div class="nav-item" onclick="filterCategory('sports')"><i class="fas fa-futbol"></i><span>Esportes</span></div>
+                    <div class="nav-item" onclick="filterCategory('strategy')"><i class="fas fa-chess"></i><span>Estratégia</span></div>
+                    <div class="nav-item" onclick="filterCategory('horror')"><i class="fas fa-ghost"></i><span>Terror</span></div>
+                    <div class="nav-item" onclick="filterCategory('rpg')"><i class="fas fa-hat-wizard"></i><span>RPG</span></div>
+                    <div class="nav-item" onclick="filterCategory('simulation')"><i class="fas fa-city"></i><span>Simulação</span></div>
+                    <div class="nav-item" onclick="filterCategory('platformer')"><i class="fas fa-running"></i><span>Plataforma</span></div>
+                    <div class="nav-item" onclick="filterCategory('shooter')"><i class="fas fa-bullseye"></i><span>Tiro</span></div>
+                    <div class="nav-item" onclick="filterCategory('other')"><i class="fas fa-gamepad"></i><span>Outros</span></div>
+                </nav>
+                
+                <nav class="nav-section">
+                    <div class="nav-title">Configurações</div>
+                    <div class="nav-item" onclick="openModal('settings')"><i class="fas fa-cog"></i><span>Preferências</span></div>
+                    <div class="nav-item" onclick="openModal('upload')"><i class="fas fa-cloud-upload-alt"></i><span>Publicar Jogo</span></div>
+                </nav>
+                
+                <div class="sidebar-profile">
+                    <div class="profile-card" onclick="openModal('profile')">
+                        <div id="sidebar-avatar" class="profile-avatar"><div class="online-indicator"></div></div>
+                        <div class="profile-info">
+                            <h4 id="sidebar-name">Player</h4>
+                            <p><i class="fas fa-circle" style="color: var(--success); font-size: 8px; margin-right: 6px;"></i>Online</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            
+            <div class="content">
+                <div class="header">
+                    <div class="search-box"><i class="fas fa-search"></i><input type="text" id="search-input" placeholder="Buscar jogos, desenvolvedores..." onkeyup="searchGames(this.value)"></div>
+                    <div class="header-actions">
+                        <button class="btn-icon" onclick="openModal('inbox')"><i class="fas fa-envelope"></i><span class="notification-dot" id="header-inbox-badge" style="display: none;">0</span></button>
+                        <button class="btn-icon" onclick="openModal('friends')"><i class="fas fa-user-friends"></i></button>
+                        <button class="btn-icon" onclick="openModal('settings')"><i class="fas fa-cog"></i></button>
+                        <button class="btn btn-primary" onclick="openModal('upload')"><i class="fas fa-rocket"></i>Publicar Jogo</button>
+                    </div>
+                </div>
+                
+                <div class="profile-hero">
+                    <div id="hero-banner" class="profile-banner"></div>
+                    <div class="profile-main">
+                        <div id="hero-avatar" class="profile-avatar-large"></div>
+                        <div class="profile-details">
+                            <h1 id="hero-name" class="profile-name">Player<span class="verified-badge"><i class="fas fa-check"></i></span></h1>
+                            <p id="hero-bio" class="profile-bio">Desenvolvedor de jogos apaixonado</p>
+                            <div class="profile-stats">
+                                <div class="stat-item"><div id="stat-games" class="stat-value">0</div><div class="stat-label">Jogos</div></div>
+                                <div class="stat-item"><div id="stat-likes" class="stat-value">0</div><div class="stat-label">Likes</div></div>
+                                <div class="stat-item"><div id="stat-views" class="stat-value">0</div><div class="stat-label">Views</div></div>
+                                <div class="stat-item" onclick="openModal('friends')"><div id="stat-friends" class="stat-value">0</div><div class="stat-label">Amigos</div></div>
+                            </div>
+                        </div>
+                        <div class="profile-actions"><button class="btn btn-secondary" onclick="openModal('profile')"><i class="fas fa-edit"></i>Editar Perfil</button></div>
+                    </div>
+                </div>
+                
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-gamepad"></i>Jogos Publicados</h2>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" onclick="setFilter('all', this)">Todos</button>
+                        <button class="filter-tab" onclick="setFilter('popular', this)">Populares</button>
+                        <button class="filter-tab" onclick="setFilter('recent', this)">Recentes</button>
+                    </div>
+                </div>
+                
+                <div id="games-grid" class="games-grid"></div>
+                
+                <div id="empty-state" class="empty-state hidden">
+                    <div class="empty-icon"><i class="fas fa-ghost"></i></div>
+                    <h3 class="empty-title">Nenhum jogo encontrado</h3>
+                    <p class="empty-text">Seja o primeiro a publicar um jogo incrível!</p>
+                    <button class="btn btn-primary" onclick="openModal('upload')"><i class="fas fa-plus"></i>Publicar Agora</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="viewer">
+        <div class="viewer-layout">
+            <div class="viewer-main">
+                <div class="viewer-header">
+                    <button class="btn btn-secondary" onclick="closeViewer()"><i class="fas fa-arrow-left"></i>Voltar</button>
+                    <div style="display: flex; gap: 12px;">
+                        <button id="invite-btn" class="btn btn-secondary hidden" onclick="openModal('invite')"><i class="fas fa-user-plus"></i>Convidar</button>
+                        <button class="btn btn-secondary" onclick="shareGame()"><i class="fas fa-share"></i>Compartilhar</button>
+                        <button class="btn btn-primary" onclick="document.getElementById('game-frame').requestFullscreen()"><i class="fas fa-expand"></i>Tela Cheia</button>
+                    </div>
+                </div>
+                <iframe id="game-frame" class="viewer-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock" allowfullscreen></iframe>
+            </div>
+            
+            <div class="viewer-sidebar">
+                <div class="viewer-game-info">
+                    <h2 id="viewer-title" class="viewer-title">---</h2>
+                    <p id="viewer-author" class="viewer-author" onclick="viewUserProfile(activeGameData?.authorId)"><i class="fas fa-user"></i><span>---</span></p>
+                    <div id="viewer-tags" style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;"></div>
+                </div>
+                
+                <div class="viewer-stats">
+                    <div class="viewer-stat"><div id="viewer-views" class="viewer-stat-value">0</div><div class="viewer-stat-label">Views</div></div>
+                    <div class="viewer-stat"><div id="viewer-likes" class="viewer-stat-value">0</div><div class="viewer-stat-label">Likes</div></div>
+                    <div class="viewer-stat"><div id="viewer-comments" class="viewer-stat-value">0</div><div class="viewer-stat-label">Comments</div></div>
+                </div>
+                
+                <div class="viewer-actions">
+                    <button id="like-btn" class="action-btn" onclick="toggleLike()"><i class="fas fa-heart"></i>Curtir</button>
+                    <button id="fav-btn" class="action-btn" onclick="toggleFavorite()"><i class="fas fa-star"></i>Favoritar</button>
+                </div>
+                <div class="viewer-actions" style="padding-top: 0;">
+                    <button class="action-btn" onclick="openModal('report')" style="grid-column: span 2;"><i class="fas fa-flag"></i>Reportar Jogo</button>
+                </div>
+                
+                <div class="comments-section">
+                    <h3 class="comments-title"><i class="fas fa-comments" style="color: var(--primary);"></i>Comentários</h3>
+                    <div id="comments-list" class="comments-list"></div>
+                    <div class="comment-input-box">
+                        <input type="text" id="comment-input" class="comment-input" placeholder="Escreva um comentário...">
+                        <button class="comment-send" onclick="postComment()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Modals -->
+    <div id="modal-upload" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header"><h3 class="modal-title">Publicar Jogo</h3><button class="modal-close" onclick="closeModal('upload')"><i class="fas fa-times"></i></button></div>
+            <div class="form-group"><label class="form-label">Título do Jogo</label><input type="text" id="up-name" class="form-input" placeholder="Nome incrível do seu jogo"></div>
+            <div class="form-group"><label class="form-label">URL da Capa</label><input type="text" id="up-cover" class="form-input" placeholder="https://exemplo.com/imagem.jpg"></div>
+            <div class="form-group"><label class="form-label">Categoria</label>
+                <select id="up-category" class="form-select">
+                    <option value="action">🎯 Ação</option>
+                    <option value="puzzle">🧩 Puzzle</option>
+                    <option value="adventure">🗺️ Aventura</option>
+                    <option value="racing">🏎️ Corrida</option>
+                    <option value="sports">⚽ Esportes</option>
+                    <option value="strategy">♟️ Estratégia</option>
+                    <option value="horror">👻 Terror</option>
+                    <option value="rpg">🧙 RPG</option>
+                    <option value="simulation">🏙️ Simulação</option>
+                    <option value="platformer">🏃 Plataforma</option>
+                    <option value="shooter">🔫 Tiro</option>
+                    <option value="other">🎮 Outros</option>
+                </select>
+            </div>
+            <div class="form-group"><label class="form-checkbox"><input type="checkbox" id="up-multiplayer"><span>🎮 Jogo Multiplayer</span></label></div>
+            <div class="form-group"><label class="form-label">Tipo de Conteúdo</label>
+                <select id="up-type" class="form-select" onchange="toggleUploadType()">
+                    <option value="url">🔗 Link (URL)</option>
+                    <option value="code">💻 Código HTML</option>
+                    <option value="file">📁 Arquivo .html</option>
+                </select>
+            </div>
+            <div class="form-group" id="upload-content-area"><label class="form-label">Link ou Código</label><textarea id="up-content" class="form-textarea" placeholder="Cole o link ou código aqui..."></textarea></div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-secondary" style="flex: 1; padding: 18px;" onclick="testGame()"><i class="fas fa-play"></i>Testar</button>
+                <button class="btn btn-primary" style="flex: 1; padding: 18px;" onclick="publishGame()"><i class="fas fa-rocket"></i>Publicar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-editgame" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header"><h3 class="modal-title">Editar Jogo</h3><button class="modal-close" onclick="closeModal('editgame')"><i class="fas fa-times"></i></button></div>
+            <div class="form-group"><label class="form-label">Título do Jogo</label><input type="text" id="edit-name" class="form-input"></div>
+            <div class="form-group"><label class="form-label">URL da Capa</label><input type="text" id="edit-cover" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Categoria</label>
+                <select id="edit-category" class="form-select">
+                    <option value="action">🎯 Ação</option>
+                    <option value="puzzle">🧩 Puzzle</option>
+                    <option value="adventure">🗺️ Aventura</option>
+                    <option value="racing">🏎️ Corrida</option>
+                    <option value="sports">⚽ Esportes</option>
+                    <option value="strategy">♟️ Estratégia</option>
+                    <option value="horror">👻 Terror</option>
+                    <option value="rpg">🧙 RPG</option>
+                    <option value="simulation">🏙️ Simulação</option>
+                    <option value="platformer">🏃 Plataforma</option>
+                    <option value="shooter">🔫 Tiro</option>
+                    <option value="other">🎮 Outros</option>
+                </select>
+            </div>
+            <div class="form-group"><label class="form-checkbox"><input type="checkbox" id="edit-multiplayer"><span>🎮 Jogo Multiplayer</span></label></div>
+            <button class="btn btn-primary" style="width: 100%; padding: 18px;" onclick="saveGameEdit()"><i class="fas fa-save"></i>Salvar Alterações</button>
+        </div>
+    </div>
+
+    <div id="modal-profile" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header"><h3 class="modal-title">Meu Perfil</h3><button class="modal-close" onclick="closeModal('profile')"><i class="fas fa-times"></i></button></div>
+            
+            <!-- Preview Area -->
+            <div style="margin-bottom: 24px;">
+                <div id="modal-banner-preview" style="height: 80px; background: linear-gradient(135deg, var(--primary), var(--secondary)); background-size: cover; background-position: center; border-radius: 16px 16px 0 0; position: relative;">
+                    <div id="modal-avatar-preview" style="width: 80px; height: 80px; border-radius: 20px; background: var(--bg-elevated); background-size: cover; background-position: center; border: 4px solid var(--bg-card); position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%);"></div>
+                </div>
+                <div style="height: 50px; background: var(--bg-elevated); border-radius: 0 0 16px 16px;"></div>
+            </div>
+            
+            <div class="form-group"><label class="form-label">Nome</label><input type="text" id="p-name" class="form-input" placeholder="Seu nome"></div>
+            <div class="form-group"><label class="form-label">Bio</label><input type="text" id="p-bio" class="form-input" placeholder="Fale um pouco sobre você"></div>
+            
+            <!-- Avatar Upload -->
+            <div class="form-group">
+                <label class="form-label">Avatar</label>
+                <div class="image-upload-box">
+                    <div class="image-upload-row">
+                        <div id="avatar-preview-small" class="image-upload-preview"></div>
+                        <label class="image-upload-btn"><i class="fas fa-upload"></i> Upload<input type="file" id="avatar-file" accept="image/*" onchange="handleImageUpload('avatar', this)"></label>
+                        <span style="color: #71717a;">ou</span>
+                    </div>
+                    <input type="text" id="p-avatar" class="form-input" placeholder="Cole URL da imagem..." oninput="previewAvatarFromUrl(this.value)">
+                </div>
+            </div>
+            
+            <!-- Banner Upload -->
+            <div class="form-group">
+                <label class="form-label">Banner</label>
+                <div class="image-upload-box">
+                    <div class="image-upload-row">
+                        <div id="banner-preview-small" class="image-upload-preview banner"></div>
+                        <label class="image-upload-btn"><i class="fas fa-upload"></i> Upload<input type="file" id="banner-file" accept="image/*" onchange="handleImageUpload('banner', this)"></label>
+                        <span style="color: #71717a;">ou</span>
+                    </div>
+                    <input type="text" id="p-banner" class="form-input" placeholder="Cole URL da imagem..." oninput="previewBannerFromUrl(this.value)">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" style="width: 100%; padding: 18px;" onclick="saveProfile()"><i class="fas fa-save"></i>Salvar Alterações</button>
+        </div>
+    </div>
+
+    <div id="modal-friends" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header"><h3 class="modal-title">Amigos</h3><button class="modal-close" onclick="closeModal('friends')"><i class="fas fa-times"></i></button></div>
+            <div class="form-group"><label class="form-label">Usuários Online</label><div id="online-users-list" class="online-users"></div></div>
+            <div class="form-group"><label class="form-label">Seus Amigos</label><div id="friends-list" class="friends-list"></div></div>
+        </div>
+    </div>
+
+    <div id="modal-inbox" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header"><h3 class="modal-title">Caixa de Entrada</h3><button class="modal-close" onclick="closeModal('inbox')"><i class="fas fa-times"></i></button></div>
+            <div class="inbox-tabs">
+                <div class="inbox-tab active" onclick="switchInboxTab('requests', this)"><i class="fas fa-user-plus"></i> Pedidos</div>
+                <div class="inbox-tab" onclick="switchInboxTab('messages', this)"><i class="fas fa-envelope"></i> Msgs</div>
+                <div class="inbox-tab" onclick="switchInboxTab('invites', this)"><i class="fas fa-gamepad"></i> Convites</div>
+            </div>
+            <div id="inbox-content"></div>
+        </div>
+    </div>
+
+    <div id="modal-chat" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header"><h3 class="modal-title">Chat com <span id="chat-recipient-name"></span></h3><button class="modal-close" onclick="closeModal('chat')"><i class="fas fa-times"></i></button></div>
+            <div class="chat-container">
+                <div id="chat-messages" class="chat-messages"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" class="comment-input" placeholder="Digite uma mensagem..." onkeypress="if(event.key==='Enter')sendChatMessage()">
+                    <button class="comment-send" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-message" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header"><h3 class="modal-title">Enviar Mensagem</h3><button class="modal-close" onclick="closeModal('message')"><i class="fas fa-times"></i></button></div>
+            <div class="form-group"><label class="form-label">Para: <span id="msg-recipient-name"></span></label></div>
+            <div class="form-group"><label class="form-label">Mensagem</label><textarea id="msg-content" class="form-textarea" style="height: 150px;" placeholder="Escreva sua mensagem..."></textarea></div>
+            <button class="btn btn-primary" style="width: 100%; padding: 18px;" onclick="sendMessage()"><i class="fas fa-paper-plane"></i>Enviar Mensagem</button>
+        </div>
+    </div>
+
+    <div id="modal-invite" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header"><h3 class="modal-title">Convidar para Jogar</h3><button class="modal-close" onclick="closeModal('invite')"><i class="fas fa-times"></i></button></div>
+            <p style="color: #a1a1aa; margin-bottom: 20px;">Selecione um amigo online:</p>
+            <div id="invite-friends-list" class="friends-list"></div>
+        </div>
+    </div>
+
+    <div id="modal-report" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header"><h3 class="modal-title">Reportar Jogo</h3><button class="modal-close" onclick="closeModal('report')"><i class="fas fa-times"></i></button></div>
+            <div class="form-group"><label class="form-label">Nome do Jogo</label><input type="text" id="report-game-name" class="form-input" readonly></div>
+            <div class="form-group"><label class="form-label">Motivo</label>
+                <select id="report-reason" class="form-select">
+                    <option value="inappropriate">Conteúdo Inapropriado</option>
+                    <option value="spam">Spam / Propaganda</option>
+                    <option value="copyright">Violação de Direitos Autorais</option>
+                    <option value="malware">Malware / Vírus</option>
+                    <option value="broken">Jogo Quebrado</option>
+                    <option value="other">Outro</option>
+                </select>
+            </div>
+            <div class="form-group"><label class="form-label">Descrição</label><textarea id="report-message" class="form-textarea" style="height: 150px;" placeholder="Descreva o problema..."></textarea></div>
+            <div class="form-group"><label class="form-label">Seu Contato (Opcional)</label><input type="text" id="report-contact" class="form-input" placeholder="Discord, Email..."></div>
+            <button class="btn btn-primary" style="width: 100%; padding: 18px; background: linear-gradient(135deg, var(--danger), #dc2626);" onclick="sendReport()"><i class="fas fa-paper-plane"></i>Enviar Report</button>
+        </div>
+    </div>
+
+    <div id="modal-testgame" class="modal-overlay">
+        <div class="modal" style="max-width: 90vw; max-height: 90vh; width: 900px; height: 700px; padding: 0; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: var(--bg-card); border-bottom: 1px solid var(--border);">
+                <h3 class="modal-title">Modo de Teste</h3>
+                <button class="modal-close" onclick="closeModal('testgame')"><i class="fas fa-times"></i></button>
+            </div>
+            <iframe id="test-frame" style="width: 100%; height: calc(100% - 60px); border: none; background: white;"></iframe>
+        </div>
+    </div>
+
+    <div id="modal-settings" class="modal-overlay">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header"><h3 class="modal-title">Preferências</h3><button class="modal-close" onclick="closeModal('settings')"><i class="fas fa-times"></i></button></div>
+            
+            <div class="form-group">
+                <label class="form-label">Cor Principal</label>
+                <div class="color-picker-container">
+                    <div class="color-picker-row">
+                        <input type="color" id="primary-color-picker" class="color-picker" value="#6366f1" onchange="setThemeFromPicker(this.value)">
+                        <span style="color: #a1a1aa;">Escolha qualquer cor</span>
+                    </div>
+                    <button class="rainbow-btn" onclick="toggleRainbowMode()"><i class="fas fa-rainbow"></i> Modo Rainbow</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Cor do Texto</label>
+                <div class="color-picker-row">
+                    <input type="color" id="text-color-picker" class="color-picker" value="#fafafa" onchange="setTextColorFromPicker(this.value)">
+                    <span style="color: #a1a1aa;">Escolha a cor do texto</span>
+                </div>
+            </div>
+            
+            <div class="form-group"><label class="form-label">Fundo do Hub (URL)</label><input type="text" id="hub-bg" class="form-input" placeholder="https://exemplo.com/fundo.jpg" onchange="setHubBackground(this.value)"></div>
+            <div class="form-group"><label class="form-label">Fonte do Título</label>
+                <select id="font-title" class="form-select" onchange="setTitleFont(this.value)">
+                    <option value="'Orbitron', sans-serif">Orbitron (Padrão)</option>
+                    <option value="'Press Start 2P', cursive">Press Start 2P</option>
+                    <option value="'Audiowide', cursive">Audiowide</option>
+                    <option value="'Russo One', sans-serif">Russo One</option>
+                    <option value="'Exo 2', sans-serif">Exo 2</option>
+                    <option value="'Rajdhani', sans-serif">Rajdhani</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        let user = JSON.parse(localStorage.getItem('gds_user')) || { id: 'u' + Date.now(), name: 'Player', bio: 'Desenvolvedor de jogos apaixonado', avatar: '', banner: '' };
+        let interactions = JSON.parse(localStorage.getItem('gds_interactions')) || { liked: [], viewed: [], favorites: [] };
+        if (!interactions.favorites) interactions.favorites = [];
+        
+        let activeGameId = null, activeGameData = null, viewingUserId = null, editingGameId = null;
+        let allGames = {}, allUsers = {}, currentFilter = 'all', currentCategory = null, currentInboxTab = 'requests', chatWithUser = null;
+        let rainbowMode = false, rainbowInterval = null;
+        
+        const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1457436500173258880/aWzfq7RVqOt2D4K_pMpGHvWSE3V-X8hPB4yPLoURirZASQqCU3PWJIIm8AIfxrBxojtT';
+        
+        function createIntroParticles() {
+            const container = document.getElementById('intro-particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'intro-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 3 + 's';
+                particle.style.animationDuration = (2 + Math.random() * 2) + 's';
+                particle.style.background = ['var(--primary)', 'var(--secondary)', 'var(--accent)'][Math.floor(Math.random() * 3)];
+                container.appendChild(particle);
+            }
+        }
+        
+        window.onload = () => {
+            createIntroParticles();
+            loadSettings();
+            const texts = ['Carregando recursos...', 'Iniciando sistemas...', 'Preparando jogos...', 'Conectando...', 'Quase lá...'];
+            let i = 0;
+            const interval = setInterval(() => { i = (i + 1) % texts.length; document.getElementById('loading-text').textContent = texts[i]; }, 600);
+            setTimeout(() => { clearInterval(interval); document.getElementById('loading-text').textContent = 'Pronto!'; document.getElementById('intro-start').classList.add('visible'); }, 5000);
         };
-
-        const SKINS = [
-            { id: 1, name: "Vermelho", type: "color", value: "#FF3333", unlock: 0 },
-            { id: 2, name: "Verde", type: "color", value: "#00FF00", unlock: 0 },
-            { id: 3, name: "Azul", type: "color", value: "#0055FF", unlock: 0 },
-            { id: 4, name: "Amarelo", type: "color", value: "#FFFF00", unlock: 0 },
-            { id: 5, name: "Roxo", type: "color", value: "#8800FF", unlock: 0 },
-            { id: 6, name: "Ciano", type: "color", value: "#00FFFF", unlock: 100 },
-            { id: 7, name: "Rosa", type: "color", value: "#FF00FF", unlock: 200 },
-            { id: 8, name: "Laranja", type: "color", value: "#FF8800", unlock: 300 },
-            { id: 9, name: "Branco", type: "color", value: "#FFFFFF", unlock: 400 },
-            { id: 10, name: "Sombra", type: "color", value: "#333333", unlock: 500 },
-            { id: 11, name: "Abelha", type: "pattern", value: ["#FFFF00", "#222222"], unlock: 800 },
-            { id: 12, name: "EUA", type: "pattern", value: ["#FF0000", "#FFFFFF", "#0000FF"], unlock: 1000 },
-            { id: 13, name: "Alemanha", type: "pattern", value: ["#000000", "#FF0000", "#FFFF00"], unlock: 1200 },
-            { id: 14, name: "Brasil", type: "pattern", value: ["#00FF00", "#FFFF00", "#0055FF"], unlock: 1500 },
-            { id: 15, name: "Arco-íris", type: "pattern", value: ["#FF0000", "#FF7F00", "#FFFF00", "#00FF00", "#0000FF", "#4B0082", "#9400D3"], unlock: 2000 },
-            { id: 16, name: "Matrix", type: "pattern", value: ["#003300", "#00FF00"], unlock: 2500 },
-            { id: 17, name: "Lava", type: "pattern", value: ["#550000", "#FF0000", "#FF8800"], unlock: 3000 },
-            { id: 18, name: "Zebra", type: "pattern", value: ["#FFFFFF", "#000000"], unlock: 3500 },
-            { id: 19, name: "Dourado", type: "color", value: "#FFD700", unlock: 5000 },
-        ];
-
-        // --- GAME STATE ---
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const minimapCanvas = document.getElementById('minimap');
-        const minimapCtx = minimapCanvas.getContext('2d');
         
-        let gameState = 'LOBBY'; 
-        let width, height;
-        let camera = { x: 0, y: 0, scale: 1 };
-        let mouse = { x: 0, y: 0, active: false };
-        let boostKey = false;
-        
-        // Persisted Data
-        let highScore = parseInt(localStorage.getItem('slither_highscore')) || 0;
-        let selectedSkinId = parseInt(localStorage.getItem('slither_skin')) || 1;
-
-        let player;
-        let snakes = {}; // Object for network players: { id: Snake }
-        let foods = [];
-        let particles = [];
-        
-        let frame = 0;
-        let playerId = null;
-        let playerRef = null;
-
-        // --- HELPERS ---
-        const rand = (min, max) => Math.random() * (max - min) + min;
-        const dist = (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1);
-        
-        // --- CLASSES ---
-
-        class Food {
-            constructor(x, y, mass = CONFIG.foodBaseVal, color = null) {
-                this.x = x || rand(-CONFIG.worldSize, CONFIG.worldSize);
-                this.y = y || rand(-CONFIG.worldSize, CONFIG.worldSize);
-                this.mass = mass;
-                this.radius = 3 + (mass * 3);
-                const colors = ['#FF3333', '#00FF00', '#0055FF', '#FFFF00', '#00FFFF', '#FF00FF'];
-                this.color = color || colors[Math.floor(Math.random() * colors.length)];
-            }
-
-            draw(ctx) {
-                ctx.globalAlpha = 1;
-                ctx.fillStyle = this.color;
-                if (this.mass > 1) {
-                    ctx.shadowBlur = 5;
-                    ctx.shadowColor = this.color;
-                }
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
+        function startApp() {
+            document.getElementById('intro').style.opacity = '0';
+            document.getElementById('intro').style.transition = 'opacity 0.5s ease';
+            setTimeout(() => { document.getElementById('intro').style.display = 'none'; document.getElementById('app').classList.remove('hidden'); initApp(); }, 500);
         }
-
-        class Particle {
-            constructor(x, y, color) {
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.life = 1.0;
-                this.vx = rand(-3, 3);
-                this.vy = rand(-3, 3);
-            }
-
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.life -= 0.02;
-            }
-
-            draw(ctx) {
-                ctx.globalAlpha = this.life;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.globalAlpha = 1;
-            }
+        
+        function initApp() { updateUI(); loadGames(); registerOnline(); loadUsers(); loadFriends(); loadInbox(); }
+        
+        function updateUI() {
+            const avatar = user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.id}`;
+            const banner = user.banner || 'https://images.unsplash.com/photo-1614294148960-9aa740632a87?w=1200&h=400&fit=crop';
+            document.getElementById('sidebar-avatar').style.backgroundImage = `url('${avatar}')`;
+            document.getElementById('sidebar-name').textContent = user.name;
+            document.getElementById('hero-avatar').style.backgroundImage = `url('${avatar}')`;
+            document.getElementById('hero-banner').style.backgroundImage = `url('${banner}')`;
+            document.getElementById('hero-name').innerHTML = `${user.name} <span class="verified-badge"><i class="fas fa-check"></i></span>`;
+            document.getElementById('hero-bio').textContent = user.bio;
+            document.getElementById('mobile-avatar').style.backgroundImage = `url('${avatar}')`;
+            document.getElementById('modal-avatar-preview').style.backgroundImage = `url('${avatar}')`;
+            localStorage.setItem('gds_user', JSON.stringify(user));
         }
-
-        class Snake {
-            constructor(id, x, y, name = "Anon", skinId = 1, isMe = false) {
-                this.id = id;
-                this.x = x;
-                this.y = y;
-                this.angle = 0;
-                this.targetAngle = 0;
-                this.mass = CONFIG.initialMass;
-                this.name = name;
-                this.isMe = isMe;
-                this.skin = SKINS.find(s => s.id === skinId) || SKINS[0];
-                this.width = 20;
-                this.history = []; 
-                this.dead = false;
-                this.boosting = false;
-
-                // Network smoothing
-                this.lastUpdate = Date.now();
-                this.targetX = x;
-                this.targetY = y;
-                
-                for (let i = 0; i < this.mass * 5; i++) {
-                    this.history.push({x: this.x, y: this.y});
+        
+        function openModal(type) {
+            document.getElementById(`modal-${type}`).classList.add('active');
+            if (type === 'profile') { 
+                document.getElementById('p-name').value = user.name; 
+                document.getElementById('p-bio').value = user.bio; 
+                document.getElementById('p-avatar').value = user.avatar; 
+                document.getElementById('p-banner').value = user.banner;
+                // Update previews
+                const avatar = user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.id}`;
+                const banner = user.banner || '';
+                document.getElementById('modal-avatar-preview').style.backgroundImage = `url('${avatar}')`;
+                document.getElementById('avatar-preview-small').style.backgroundImage = `url('${avatar}')`;
+                if (banner) {
+                    document.getElementById('modal-banner-preview').style.backgroundImage = `url('${banner}')`;
+                    document.getElementById('banner-preview-small').style.backgroundImage = `url('${banner}')`;
                 }
             }
-
-            update() {
-                if (this.dead) return;
-
-                if (this.isMe) {
-                    this.playerLogic();
+            if (type === 'report' && activeGameData) document.getElementById('report-game-name').value = activeGameData.name || '';
+            if (type === 'inbox') renderInbox();
+            if (type === 'friends') renderFriends();
+            if (type === 'invite') renderInviteFriends();
+        }
+        
+        function handleImageUpload(type, input) {
+            const file = input.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('error', 'Arquivo muito grande', 'Máximo 2MB permitido');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = e => {
+                const base64 = e.target.result;
+                if (type === 'avatar') {
+                    document.getElementById('p-avatar').value = base64;
+                    document.getElementById('modal-avatar-preview').style.backgroundImage = `url('${base64}')`;
+                    document.getElementById('avatar-preview-small').style.backgroundImage = `url('${base64}')`;
                 } else {
-                    this.networkLogic();
+                    document.getElementById('p-banner').value = base64;
+                    document.getElementById('modal-banner-preview').style.backgroundImage = `url('${base64}')`;
+                    document.getElementById('banner-preview-small').style.backgroundImage = `url('${base64}')`;
                 }
-
-                // Physics update for position (Local prediction or interpolation)
-                if (this.isMe) {
-                    const currentSpeed = this.boosting && this.mass > 10 ? CONFIG.boostSpeed : CONFIG.baseSpeed;
-                    const vx = Math.cos(this.angle) * currentSpeed;
-                    const vy = Math.sin(this.angle) * currentSpeed;
-
-                    this.x += vx;
-                    this.y += vy;
-
-                    // Bounds
-                    if (this.x < -CONFIG.worldSize) this.x = -CONFIG.worldSize;
-                    if (this.x > CONFIG.worldSize) this.x = CONFIG.worldSize;
-                    if (this.y < -CONFIG.worldSize) this.y = -CONFIG.worldSize;
-                    if (this.y > CONFIG.worldSize) this.y = CONFIG.worldSize;
-                    
-                    // Sync to Firebase periodically
-                    if (frame % 3 === 0) {
-                        this.sync();
-                    }
-                }
-
-                // History (Tail) Management
-                this.history.unshift({x: this.x, y: this.y});
-                
-                const targetLength = 20 + (this.mass * 2.5); 
-                while (this.history.length > targetLength * 4) { 
-                    this.history.pop();
-                }
-
-                // Boosting Cost (Local only)
-                if (this.isMe && this.boosting && this.mass > 10 && frame % 8 === 0) {
-                    this.mass -= 0.5;
-                    const dropX = this.history[this.history.length-1].x;
-                    const dropY = this.history[this.history.length-1].y;
-                    let dropColor = this.skin.type === 'color' ? this.skin.value : this.skin.value[0];
-                    foods.push(new Food(dropX + rand(-10,10), dropY + rand(-10,10), 0.3, dropColor));
-                }
-                
-                this.width = 20 + Math.sqrt(this.mass * CONFIG.widthFactor);
-            }
-
-            playerLogic() {
-                const dx = mouse.x - width / 2;
-                const dy = mouse.y - height / 2;
-                this.targetAngle = Math.atan2(dy, dx);
-                this.boosting = mouse.active || boostKey;
-
-                // Smooth turning
-                const turnSpeed = CONFIG.baseRotationSpeed * (25 / (25 + this.width));
-                let diff = this.targetAngle - this.angle;
-                while (diff < -Math.PI) diff += Math.PI * 2;
-                while (diff > Math.PI) diff -= Math.PI * 2;
-                if (Math.abs(diff) < turnSpeed) {
-                    this.angle = this.targetAngle;
-                } else {
-                    this.angle += Math.sign(diff) * turnSpeed;
-                }
-            }
-
-            networkLogic() {
-                // Simple interpolation towards target
-                const lerp = 0.3;
-                this.x += (this.targetX - this.x) * lerp;
-                this.y += (this.targetY - this.y) * lerp;
-                
-                // Re-calculate history points for smooth tail if distance jumped too much
-                // Or just let history unshift handle it naturally
-            }
-            
-            sync() {
-                if (!playerRef) return;
-                fbUpdate(playerRef, {
-                    x: Math.round(this.x),
-                    y: Math.round(this.y),
-                    angle: this.angle,
-                    mass: Math.round(this.mass),
-                    boosting: this.boosting,
-                    skinId: this.skin.id,
-                    name: this.name,
-                    timestamp: Date.now()
-                });
-            }
-
-            draw(ctx) {
-                const segmentSpacing = 5; 
-                let colors = this.skin.type === 'color' ? [this.skin.value] : this.skin.value;
-
-                // Body
-                for (let i = 0; i < this.history.length; i+=segmentSpacing) {
-                    const point = this.history[i];
-                    const size = this.width - (i / this.history.length) * 10;
-                    if (size < 0) continue;
-
-                    const colorIndex = Math.floor(i / (segmentSpacing * 3)) % colors.length;
-                    ctx.fillStyle = colors[colorIndex];
-                    
-                    ctx.beginPath();
-                    ctx.arc(point.x, point.y, size / 2, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                // Head
-                ctx.fillStyle = colors[0];
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Eyes
-                const eyeOffset = this.width / 3;
-                const eyeSize = this.width / 4;
-                const eyeX1 = this.x + Math.cos(this.angle - 0.5) * eyeOffset;
-                const eyeY1 = this.y + Math.sin(this.angle - 0.5) * eyeOffset;
-                const eyeX2 = this.x + Math.cos(this.angle + 0.5) * eyeOffset;
-                const eyeY2 = this.y + Math.sin(this.angle + 0.5) * eyeOffset;
-
-                ctx.fillStyle = "white";
-                ctx.beginPath();
-                ctx.arc(eyeX1, eyeY1, eyeSize, 0, Math.PI * 2);
-                ctx.arc(eyeX2, eyeY2, eyeSize, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = "black";
-                ctx.beginPath();
-                ctx.arc(eyeX1 + Math.cos(this.angle)*2, eyeY1 + Math.sin(this.angle)*2, eyeSize/2, 0, Math.PI * 2);
-                ctx.arc(eyeX2 + Math.cos(this.angle)*2, eyeY2 + Math.sin(this.angle)*2, eyeSize/2, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Name
-                ctx.fillStyle = "white";
-                ctx.strokeStyle = "black";
-                ctx.lineWidth = 2;
-                ctx.font = "bold 12px Arial";
-                ctx.textAlign = "center";
-                ctx.strokeText(this.name, this.x, this.y - this.width);
-                ctx.fillText(this.name, this.x, this.y - this.width);
+                showToast('success', 'Imagem Carregada', 'Preview atualizado!');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function previewAvatarFromUrl(url) {
+            if (url) {
+                document.getElementById('modal-avatar-preview').style.backgroundImage = `url('${url}')`;
+                document.getElementById('avatar-preview-small').style.backgroundImage = `url('${url}')`;
             }
         }
-
-        // --- MAIN FUNCTIONS ---
-
-        function init() {
-            resize();
-            window.addEventListener('resize', resize);
-            updateLobbyUI();
-            
-            // Listen to all players constantly (for menu bg activity or ready state)
-            const playersRef = ref(db, 'players');
-            onValue(playersRef, (snapshot) => {
-                const data = snapshot.val();
-                if (!data) {
-                    // Remove all non-local snakes
-                    Object.keys(snakes).forEach(id => {
-                        if (snakes[id] !== player) delete snakes[id];
-                    });
-                    return;
-                }
-
-                // Update or create snakes
-                Object.keys(data).forEach(key => {
-                    if (playerId && key === playerId) return; // Skip self in this loop
-                    
-                    const pData = data[key];
-                    if (pData.dead) {
-                        if (snakes[key]) {
-                            // Convert to food if just died
-                            killSnake(snakes[key], "Someone", false); 
-                            delete snakes[key];
-                        }
-                        return;
-                    }
-
-                    if (!snakes[key]) {
-                        snakes[key] = new Snake(key, pData.x, pData.y, pData.name, pData.skinId, false);
-                    }
-                    
-                    // Update target data for interpolation
-                    const s = snakes[key];
-                    s.targetX = pData.x;
-                    s.targetY = pData.y;
-                    s.angle = pData.angle;
-                    s.mass = pData.mass;
-                    s.boosting = pData.boosting;
-                    s.lastUpdate = Date.now();
-                });
-
-                // Remove disconnected snakes
-                Object.keys(snakes).forEach(key => {
-                    if (key !== playerId && !data[key]) {
-                         delete snakes[key];
-                    }
-                });
-            });
-
-            loop();
-        }
-
-        function updateLobbyUI() {
-            document.getElementById('lobbyHighScore').innerText = Math.floor(highScore);
-            document.getElementById('shopHighScore').innerText = Math.floor(highScore);
-            
-            const currentSkin = SKINS.find(s => s.id === selectedSkinId) || SKINS[0];
-            const preview = document.getElementById('currentSkinPreview');
-            
-            if (currentSkin.type === 'color') {
-                preview.style.background = currentSkin.value;
-            } else {
-                preview.style.background = `linear-gradient(45deg, ${currentSkin.value.join(', ')})`;
+        
+        function previewBannerFromUrl(url) {
+            if (url) {
+                document.getElementById('modal-banner-preview').style.backgroundImage = `url('${url}')`;
+                document.getElementById('banner-preview-small').style.backgroundImage = `url('${url}')`;
             }
         }
-
-        function renderShop() {
-            const grid = document.getElementById('skinsGrid');
-            grid.innerHTML = '';
-            
-            SKINS.forEach(skin => {
-                const locked = highScore < skin.unlock;
-                const selected = selectedSkinId === skin.id;
-                
-                const card = document.createElement('div');
-                card.className = `skin-card bg-gray-800 rounded-lg p-3 flex flex-col items-center cursor-pointer border border-gray-700 ${selected ? 'selected' : ''} ${locked ? 'locked' : ''}`;
-                
-                // Visual Preview
-                let bgStyle = '';
-                if (skin.type === 'color') bgStyle = skin.value;
-                else bgStyle = `linear-gradient(45deg, ${skin.value.join(', ')})`;
-                
-                let content = `
-                    <div class="w-16 h-16 rounded-full mb-2 shadow-inner" style="background: ${bgStyle}"></div>
-                    <div class="font-bold text-sm">${skin.name}</div>
-                `;
-
-                if (locked) {
-                    content += `<div class="text-xs text-red-400 mt-1">Recorde: ${skin.unlock}</div>`;
-                    content += `<div class="absolute inset-0 flex items-center justify-center lock-overlay"><span class="text-3xl">🔒</span></div>`;
-                } else if (selected) {
-                    content += `<div class="text-xs text-green-400 mt-1">Selecionado</div>`;
-                } else {
-                     content += `<div class="text-xs text-gray-500 mt-1">Clique para usar</div>`;
-                }
-
-                card.innerHTML = content;
-                
-                if (!locked) {
-                    card.onclick = () => selectSkin(skin.id);
-                }
-                
-                grid.appendChild(card);
+        
+        function closeModal(type) { document.getElementById(`modal-${type}`).classList.remove('active'); }
+        
+        function showToast(type, title, message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `<div class="toast-icon"><i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'}"></i></div><div class="toast-content"><h4>${title}</h4><p>${message}</p></div>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+        
+        function saveProfile() {
+            user.name = document.getElementById('p-name').value || user.name;
+            user.bio = document.getElementById('p-bio').value || user.bio;
+            user.avatar = document.getElementById('p-avatar').value;
+            user.banner = document.getElementById('p-banner').value;
+            window.fbLib.update(window.fbLib.ref(window.fbDB, `users/${user.id}`), { name: user.name, bio: user.bio, avatar: user.avatar, banner: user.banner, online: true, lastSeen: Date.now() });
+            updateUI(); closeModal('profile'); showToast('success', 'Perfil Salvo', 'Suas alterações foram aplicadas');
+        }
+        
+        function registerOnline() {
+            window.fbLib.set(window.fbLib.ref(window.fbDB, `users/${user.id}`), { id: user.id, name: user.name, bio: user.bio, avatar: user.avatar, banner: user.banner, online: true, lastSeen: Date.now() });
+            window.addEventListener('beforeunload', () => { window.fbLib.update(window.fbLib.ref(window.fbDB, `users/${user.id}`), { online: false, lastSeen: Date.now() }); });
+        }
+        
+        function loadUsers() { window.fbLib.onValue(window.fbLib.ref(window.fbDB, 'users'), snap => { allUsers = snap.val() || {}; }); }
+        
+        function loadFriends() {
+            window.fbLib.onValue(window.fbLib.ref(window.fbDB, `friends/${user.id}`), snap => {
+                const friends = snap.val() || {};
+                const count = Object.keys(friends).length;
+                document.getElementById('friends-count').textContent = count;
+                document.getElementById('stat-friends').textContent = count;
             });
         }
-
-        function selectSkin(id) {
-            selectedSkinId = id;
-            localStorage.setItem('slither_skin', id);
-            renderShop();
-            updateLobbyUI();
-        }
-
-        async function startGame() {
-            const nick = document.getElementById('nickname').value || "Cobrinha";
-            
-            // Generate ID
-            playerId = 'player_' + Math.random().toString(36).substr(2, 9);
-            playerRef = ref(db, 'players/' + playerId);
-            
-            // Initialize Player
-            player = new Snake(playerId, rand(-1000, 1000), rand(-1000, 1000), nick, selectedSkinId, true);
-            snakes[playerId] = player;
-            
-            // Set initial state in Firebase
-            await set(playerRef, {
-                x: Math.round(player.x),
-                y: Math.round(player.y),
-                angle: player.angle,
-                mass: player.mass,
-                boosting: false,
-                skinId: selectedSkinId,
-                name: nick,
-                dead: false,
-                timestamp: Date.now()
+        
+        function renderFriends() {
+            const onlineList = document.getElementById('online-users-list');
+            onlineList.innerHTML = '';
+            Object.values(allUsers).forEach(u => {
+                if (u.id !== user.id && u.online) {
+                    const avatar = u.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.id}`;
+                    const div = document.createElement('div');
+                    div.className = 'online-user';
+                    div.style.backgroundImage = `url('${avatar}')`;
+                    div.onclick = () => { closeModal('friends'); viewUserProfile(u.id); };
+                    div.title = u.name;
+                    onlineList.appendChild(div);
+                }
             });
-
-            // Handle Disconnect (Remove player on tab close)
-            onDisconnect(playerRef).remove();
-
-            // Local Food Gen
-            foods = [];
-            particles = [];
-            for (let i = 0; i < CONFIG.foodCount; i++) {
-                foods.push(new Food());
-            }
-
-            gameState = 'PLAYING';
-            document.getElementById('lobby').classList.add('hidden');
-            document.getElementById('gameOver').classList.add('hidden');
-            document.getElementById('hud').classList.remove('hidden');
-        }
-
-        function createExplosion(x, y, color, mass) {
-            const foodAmount = Math.min(100, Math.max(10, mass / 2)); 
-            const scatter = Math.min(150, mass); 
+            if (onlineList.children.length === 0) onlineList.innerHTML = '<p style="color: #71717a;">Nenhum usuário online</p>';
             
-            for(let i=0; i<foodAmount; i++) {
-                const fMass = rand(0.5, 2);
-                foods.push(new Food(x + rand(-scatter, scatter), y + rand(-scatter, scatter), fMass, typeof color === 'string' ? color : color[0]));
-            }
-            for(let i=0; i<20; i++) {
-                particles.push(new Particle(x, y, typeof color === 'string' ? color : color[0]));
-            }
-        }
-
-        function update() {
-            frame++;
-
-            if (gameState === 'PLAYING') {
-                // Ensure local food count
-                while (foods.length < CONFIG.foodCount) foods.push(new Food());
-
-                // Update all snakes
-                Object.values(snakes).forEach(snake => snake.update());
-
-                // Camera follows player
-                if (player) {
-                    let targetScale = Math.max(0.1, 0.9 - (player.width - 20) * 0.003); 
-                    camera.scale += (targetScale - camera.scale) * 0.05;
-                    camera.x = width / 2 - player.x * camera.scale;
-                    camera.y = height / 2 - player.y * camera.scale;
-                    
-                    document.getElementById('scoreDisplay').innerText = Math.floor(player.mass);
-                }
-
-                checkCollisions();
-                
-                // Cleanup
-                particles.forEach(p => p.update());
-                particles = particles.filter(p => p.life > 0);
-
-                updateLeaderboard();
-                drawMinimap();
-            }
-        }
-
-        function checkCollisions() {
-            if (!player || player.dead) return;
-
-            // Food Eating (Local only)
-            for (let i = foods.length - 1; i >= 0; i--) {
-                const f = foods[i];
-                if (Math.abs(player.x - f.x) > player.width + f.radius) continue;
-                if (Math.abs(player.y - f.y) > player.width + f.radius) continue;
-
-                if (dist(player.x, player.y, f.x, f.y) < player.width / 2 + f.radius) {
-                    player.mass += f.mass;
-                    foods.splice(i, 1);
-                }
-            }
-
-            // Snake vs Snake (I check if I hit anyone)
-            const allSnakes = Object.values(snakes);
-            for (let other of allSnakes) {
-                if (other === player) continue;
-                if (Math.abs(player.x - other.x) > 1000) continue; 
-
-                // Check collision with other's body
-                // We assume 'other' is valid networked snake
-                for (let k = 0; k < other.history.length; k+=2) {
-                    const pt = other.history[k];
-                    // Simple distance check
-                    if (dist(player.x, player.y, pt.x, pt.y) < player.width/2 + other.width/2 - 4) {
-                        killSnake(player, other.name, true);
-                        break;
-                    }
-                }
-            }
-        }
-
-        function killSnake(snake, killerName, isLocalDeath) {
-            snake.dead = true;
-            let explosionColor = snake.skin.type === 'color' ? snake.skin.value : snake.skin.value[0];
-            createExplosion(snake.x, snake.y, explosionColor, snake.mass);
-            
-            if (isLocalDeath && snake === player) {
-                // Update Firebase to let others know
-                fbUpdate(playerRef, { dead: true });
-                
-                if (snake.mass > highScore) {
-                    highScore = snake.mass;
-                    localStorage.setItem('slither_highscore', highScore);
-                    updateLobbyUI();
-                }
-                
-                setTimeout(() => {
-                    // Clean up after delay
-                    remove(playerRef);
-                    showGameOver(killerName);
-                }, 1000);
-            }
-        }
-
-        function showGameOver(killer) {
-            gameState = 'GAMEOVER';
-            document.getElementById('hud').classList.add('hidden');
-            document.getElementById('gameOver').classList.remove('hidden');
-            document.getElementById('finalScore').innerText = Math.floor(player.mass);
-            document.getElementById('killedBy').innerText = killer;
-        }
-
-        function draw() {
-            ctx.fillStyle = '#161c22';
-            ctx.fillRect(0, 0, width, height);
-
-            ctx.save();
-            
-            if (gameState === 'PLAYING' || gameState === 'GAMEOVER') {
-                ctx.translate(camera.x, camera.y);
-                ctx.scale(camera.scale, camera.scale);
-
-                // Grid
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
-                ctx.lineWidth = 2;
-                const gridSize = 80;
-                
-                const left = -camera.x / camera.scale;
-                const top = -camera.y / camera.scale;
-                const right = (width - camera.x) / camera.scale;
-                const bottom = (height - camera.y) / camera.scale;
-
-                ctx.beginPath();
-                const startX = Math.floor(left / gridSize) * gridSize;
-                const startY = Math.floor(top / gridSize) * gridSize;
-                
-                for (let x = startX; x <= right; x += gridSize) {
-                    ctx.moveTo(x, top);
-                    ctx.lineTo(x, bottom);
-                }
-                for (let y = startY; y <= bottom; y += gridSize) {
-                    ctx.moveTo(left, y);
-                    ctx.lineTo(right, y);
-                }
-                ctx.stroke();
-
-                // World Borders
-                ctx.strokeStyle = '#440000';
-                ctx.lineWidth = 20;
-                ctx.strokeRect(-CONFIG.worldSize, -CONFIG.worldSize, CONFIG.worldSize*2, CONFIG.worldSize*2);
-
-                // Draw Food
-                foods.forEach(f => {
-                    // Viewport culling
-                    if (f.x > left - 100 && f.x < right + 100 && f.y > top - 100 && f.y < bottom + 100) {
-                        f.draw(ctx);
+            window.fbLib.get(window.fbLib.ref(window.fbDB, `friends/${user.id}`)).then(snap => {
+                const friends = snap.val() || {};
+                const friendsList = document.getElementById('friends-list');
+                friendsList.innerHTML = '';
+                Object.keys(friends).forEach(friendId => {
+                    const friend = allUsers[friendId];
+                    if (friend) {
+                        const avatar = friend.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${friendId}`;
+                        const div = document.createElement('div');
+                        div.className = 'friend-item';
+                        div.innerHTML = `<div class="friend-avatar" style="background-image: url('${avatar}')">${friend.online ? '<div class="friend-online"></div>' : ''}</div><div class="friend-info"><div class="friend-name">${friend.name}</div><div class="friend-status">${friend.online ? 'Online' : 'Offline'}</div></div><div class="friend-actions"><button onclick="event.stopPropagation(); openChat('${friendId}', '${friend.name}')"><i class="fas fa-comment"></i></button></div>`;
+                        div.onclick = () => { closeModal('friends'); viewUserProfile(friendId); };
+                        friendsList.appendChild(div);
                     }
                 });
-
-                particles.forEach(p => p.draw(ctx));
-
-                // Draw Snakes (Me last so I'm on top)
-                const snakeList = Object.values(snakes).sort((a, b) => (a === player ? 1 : -1));
-                snakeList.forEach(s => s.draw(ctx));
-            }
-
-            ctx.restore();
-        }
-
-        function drawMinimap() {
-            minimapCtx.clearRect(0, 0, 128, 128);
-            minimapCtx.fillStyle = 'rgba(0,0,0,0.5)';
-            minimapCtx.fillRect(0,0,128,128);
-            
-            const scale = 128 / (CONFIG.worldSize * 2);
-            
-            Object.values(snakes).forEach(s => {
-                const mx = (s.x + CONFIG.worldSize) * scale;
-                const my = (s.y + CONFIG.worldSize) * scale;
-                
-                let mColor = '#FFF';
-                if (s !== player) {
-                    mColor = s.skin.type === 'color' ? s.skin.value : s.skin.value[0];
-                }
-
-                minimapCtx.fillStyle = s === player ? '#FFF' : mColor;
-                minimapCtx.beginPath();
-                minimapCtx.arc(mx, my, s === player ? 3 : 2, 0, Math.PI * 2);
-                minimapCtx.fill();
+                if (friendsList.children.length === 0) friendsList.innerHTML = '<p style="color: #71717a; text-align: center; padding: 20px;">Você ainda não tem amigos.</p>';
             });
         }
-
-        function updateLeaderboard() {
-            if (frame % 30 !== 0) return;
-            const list = document.getElementById('leaderboard');
+        
+        function viewUserProfile(userId) {
+            if (!userId || userId === user.id) return;
+            viewingUserId = userId;
+            const u = allUsers[userId];
+            if (!u) return;
+            
+            const avatar = u.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${userId}`;
+            const banner = u.banner || 'https://images.unsplash.com/photo-1614294148960-9aa740632a87?w=1200&h=400&fit=crop';
+            
+            document.getElementById('user-profile-avatar').style.backgroundImage = `url('${avatar}')`;
+            document.getElementById('user-profile-banner').style.backgroundImage = `url('${banner}')`;
+            document.getElementById('user-profile-name').innerHTML = `${u.name} <span class="verified-badge"><i class="fas fa-check"></i></span>`;
+            document.getElementById('user-profile-bio').textContent = u.bio || 'Sem bio';
+            
+            let games = 0, likes = 0, views = 0;
+            const userGamesGrid = document.getElementById('user-profile-games');
+            userGamesGrid.innerHTML = '';
+            Object.entries(allGames).forEach(([id, g]) => {
+                if (g.authorId === userId) {
+                    games++; likes += g.likes || 0; views += g.views || 0;
+                    const card = document.createElement('div');
+                    card.className = 'game-card';
+                    card.onclick = () => { closeUserProfilePage(); openViewer(id); };
+                    const authorAvatar = g.authorAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${g.authorId}`;
+                    card.innerHTML = `<div class="game-thumbnail" style="background-image: url('${g.cover || 'https://images.unsplash.com/photo-1614294148960-9aa740632a87?w=400'}')"><div class="game-badges"><div style="display: flex; gap: 8px;">${g.multiplayer ? '<div class="badge badge-multiplayer"><i class="fas fa-users"></i> MP</div>' : ''}</div><div class="badge"><i class="fas fa-eye"></i> ${g.views || 0}</div></div><div class="game-play-btn"><i class="fas fa-play"></i></div></div><div class="game-info"><h3 class="game-title">${g.name}</h3><div class="game-stats"><div class="game-stat"><i class="fas fa-heart"></i> ${g.likes || 0}</div><div class="game-stat"><i class="fas fa-clock"></i> ${timeAgo(g.ts)}</div></div></div>`;
+                    userGamesGrid.appendChild(card);
+                }
+            });
+            if (userGamesGrid.children.length === 0) userGamesGrid.innerHTML = '<p style="color: #71717a; text-align: center; padding: 40px;">Nenhum jogo publicado</p>';
+            
+            document.getElementById('user-profile-games-count').textContent = games;
+            document.getElementById('user-profile-likes-count').textContent = likes;
+            document.getElementById('user-profile-views-count').textContent = views;
+            
+            window.fbLib.get(window.fbLib.ref(window.fbDB, `friends/${user.id}/${userId}`)).then(snap => {
+                const btn = document.getElementById('profile-add-friend-btn');
+                if (snap.exists()) { btn.innerHTML = '<i class="fas fa-check"></i> Amigos'; btn.disabled = true; btn.style.opacity = '0.5'; }
+                else { btn.innerHTML = '<i class="fas fa-user-plus"></i> Adicionar Amigo'; btn.disabled = false; btn.style.opacity = '1'; }
+            });
+            
+            document.getElementById('user-profile-page').style.display = 'block';
+            document.getElementById('app').style.display = 'none';
+        }
+        
+        function closeUserProfilePage() {
+            document.getElementById('user-profile-page').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+        }
+        
+        function sendFriendRequestFromPage() {
+            if (!viewingUserId) return;
+            window.fbLib.set(window.fbLib.push(window.fbLib.ref(window.fbDB, `inbox/${viewingUserId}/requests`)), { type: 'friend_request', fromId: user.id, fromName: user.name, fromAvatar: user.avatar, ts: Date.now() });
+            showToast('success', 'Pedido Enviado', 'Seu pedido de amizade foi enviado!');
+            document.getElementById('profile-add-friend-btn').innerHTML = '<i class="fas fa-clock"></i> Pendente';
+            document.getElementById('profile-add-friend-btn').disabled = true;
+        }
+        
+        function openMessageModalFromPage() {
+            if (!viewingUserId) return;
+            const u = allUsers[viewingUserId];
+            document.getElementById('msg-recipient-name').textContent = u?.name || 'Usuário';
+            openModal('message');
+        }
+        
+        function sendFriendRequest() {
+            if (!viewingUserId) return;
+            window.fbLib.set(window.fbLib.push(window.fbLib.ref(window.fbDB, `inbox/${viewingUserId}/requests`)), { type: 'friend_request', fromId: user.id, fromName: user.name, fromAvatar: user.avatar, ts: Date.now() });
+            showToast('success', 'Pedido Enviado', 'Seu pedido de amizade foi enviado!');
+        }
+        
+        function acceptFriendRequest(requestId, fromId) {
+            window.fbLib.set(window.fbLib.ref(window.fbDB, `friends/${user.id}/${fromId}`), true);
+            window.fbLib.set(window.fbLib.ref(window.fbDB, `friends/${fromId}/${user.id}`), true);
+            window.fbLib.remove(window.fbLib.ref(window.fbDB, `inbox/${user.id}/requests/${requestId}`));
+            showToast('success', 'Amigo Adicionado', 'Vocês agora são amigos!');
+            renderInbox();
+        }
+        
+        function declineFriendRequest(requestId) {
+            window.fbLib.remove(window.fbLib.ref(window.fbDB, `inbox/${user.id}/requests/${requestId}`));
+            showToast('info', 'Pedido Recusado', 'O pedido foi recusado');
+            renderInbox();
+        }
+        
+        function loadInbox() {
+            window.fbLib.onValue(window.fbLib.ref(window.fbDB, `inbox/${user.id}`), snap => {
+                const inbox = snap.val() || {};
+                let total = 0;
+                if (inbox.requests) total += Object.keys(inbox.requests).length;
+                if (inbox.messages) total += Object.keys(inbox.messages).length;
+                if (inbox.invites) total += Object.keys(inbox.invites).length;
+                ['inbox-badge', 'header-inbox-badge', 'mobile-inbox-badge'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { if (total > 0) { el.style.display = 'flex'; el.textContent = total; } else { el.style.display = 'none'; } }
+                });
+            });
+        }
+        
+        function switchInboxTab(tab, el) { currentInboxTab = tab; document.querySelectorAll('.inbox-tab').forEach(t => t.classList.remove('active')); el.classList.add('active'); renderInbox(); }
+        
+        function renderInbox() {
+            const content = document.getElementById('inbox-content');
+            content.innerHTML = '<p style="color: #71717a; text-align: center;">Carregando...</p>';
+            const path = currentInboxTab === 'requests' ? 'requests' : currentInboxTab === 'messages' ? 'messages' : 'invites';
+            window.fbLib.get(window.fbLib.ref(window.fbDB, `inbox/${user.id}/${path}`)).then(snap => {
+                const items = snap.val() || {};
+                content.innerHTML = '';
+                if (Object.keys(items).length === 0) { content.innerHTML = '<p style="color: #71717a; text-align: center; padding: 40px;">Nenhum item</p>'; return; }
+                Object.entries(items).forEach(([id, item]) => {
+                    const avatar = item.fromAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${item.fromId}`;
+                    const div = document.createElement('div');
+                    div.className = 'inbox-item';
+                    if (currentInboxTab === 'requests') {
+                        div.innerHTML = `<div class="inbox-item-avatar" style="background-image: url('${avatar}')"></div><div class="inbox-item-content"><div class="inbox-item-header"><span class="inbox-item-name">${item.fromName}</span><span class="inbox-item-time">${timeAgo(item.ts)}</span></div><div class="inbox-item-text">Quer ser seu amigo</div></div><div class="inbox-item-actions"><button class="inbox-accept" onclick="acceptFriendRequest('${id}', '${item.fromId}')">Aceitar</button><button class="inbox-decline" onclick="declineFriendRequest('${id}')">Recusar</button></div>`;
+                    } else if (currentInboxTab === 'messages') {
+                        div.innerHTML = `<div class="inbox-item-avatar" style="background-image: url('${avatar}')"></div><div class="inbox-item-content"><div class="inbox-item-header"><span class="inbox-item-name">${item.fromName}</span><span class="inbox-item-time">${timeAgo(item.ts)}</span></div><div class="inbox-item-text">${item.text}</div></div><div class="inbox-item-actions"><button class="inbox-accept" onclick="openChatFromInbox('${item.fromId}', '${item.fromName}', '${id}')">Chat</button><button class="inbox-decline" onclick="deleteMessage('${id}')"><i class="fas fa-trash"></i></button></div>`;
+                    } else {
+                        div.innerHTML = `<div class="inbox-item-avatar" style="background-image: url('${avatar}')"></div><div class="inbox-item-content"><div class="inbox-item-header"><span class="inbox-item-name">${item.fromName}</span><span class="inbox-item-time">${timeAgo(item.ts)}</span></div><div class="inbox-item-text">Convite: ${item.gameName}</div></div><div class="inbox-item-actions"><button class="inbox-accept" onclick="acceptGameInvite('${item.gameId}', '${id}')">Jogar</button><button class="inbox-decline" onclick="declineGameInvite('${id}')">Recusar</button></div>`;
+                    }
+                    content.appendChild(div);
+                });
+            });
+        }
+        
+        function openChatFromInbox(userId, userName, msgId) {
+            window.fbLib.remove(window.fbLib.ref(window.fbDB, `inbox/${user.id}/messages/${msgId}`));
+            openChat(userId, userName);
+        }
+        
+        function deleteMessage(msgId) { 
+            window.fbLib.remove(window.fbLib.ref(window.fbDB, `inbox/${user.id}/messages/${msgId}`)); 
+            renderInbox(); 
+            showToast('info', 'Deletado', 'Mensagem removida'); 
+        }
+        
+        function openChat(userId, userName) {
+            chatWithUser = userId;
+            document.getElementById('chat-recipient-name').textContent = userName;
+            closeModal('inbox'); closeModal('friends');
+            loadChatMessages(userId);
+            openModal('chat');
+        }
+        
+        function loadChatMessages(userId) {
+            const chatId = [user.id, userId].sort().join('_');
+            window.fbLib.onValue(window.fbLib.ref(window.fbDB, `chats/${chatId}`), snap => {
+                const messages = snap.val() || {};
+                const container = document.getElementById('chat-messages');
+                container.innerHTML = '';
+                Object.values(messages).sort((a, b) => a.ts - b.ts).forEach(msg => {
+                    const isSent = msg.fromId === user.id;
+                    container.innerHTML += `<div class="chat-message ${isSent ? 'sent' : 'received'}"><div class="chat-message-header"><span class="chat-message-user">${msg.fromName}</span><span class="chat-message-time">${timeAgo(msg.ts)}</span></div><div class="chat-message-text">${msg.text}</div></div>`;
+                });
+                container.scrollTop = container.scrollHeight;
+            });
+        }
+        
+        function sendChatMessage() {
+            if (!chatWithUser) return;
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+            const chatId = [user.id, chatWithUser].sort().join('_');
+            window.fbLib.push(window.fbLib.ref(window.fbDB, `chats/${chatId}`), { fromId: user.id, fromName: user.name, text, ts: Date.now() });
+            // Also send notification to recipient
+            window.fbLib.push(window.fbLib.ref(window.fbDB, `inbox/${chatWithUser}/messages`), { type: 'message', fromId: user.id, fromName: user.name, fromAvatar: user.avatar, text: text.substring(0, 50) + (text.length > 50 ? '...' : ''), ts: Date.now() });
+            input.value = '';
+        }
+        
+        function sendMessage() {
+            if (!viewingUserId) return;
+            const text = document.getElementById('msg-content').value.trim();
+            if (!text) return showToast('error', 'Erro', 'Digite uma mensagem');
+            window.fbLib.push(window.fbLib.ref(window.fbDB, `inbox/${viewingUserId}/messages`), { type: 'message', fromId: user.id, fromName: user.name, fromAvatar: user.avatar, text, ts: Date.now() });
+            document.getElementById('msg-content').value = '';
+            closeModal('message');
+            showToast('success', 'Mensagem Enviada', 'Sua mensagem foi enviada!');
+        }
+        
+        function renderInviteFriends() {
+            const list = document.getElementById('invite-friends-list');
             list.innerHTML = '';
-            
-            const sorted = Object.values(snakes).sort((a, b) => b.mass - a.mass).slice(0, 10);
-            
-            sorted.forEach((s, i) => {
-                const li = document.createElement('li');
-                li.className = 'flex justify-between';
-                if (s === player) li.className += ' text-green-400 font-bold';
-                li.innerHTML = `<span>${i+1}. ${s.name.substring(0,10)}</span> <span>${Math.floor(s.mass)}</span>`;
-                list.appendChild(li);
+            window.fbLib.get(window.fbLib.ref(window.fbDB, `friends/${user.id}`)).then(snap => {
+                const friends = snap.val() || {};
+                Object.keys(friends).forEach(friendId => {
+                    const friend = allUsers[friendId];
+                    if (friend && friend.online) {
+                        const avatar = friend.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${friendId}`;
+                        const div = document.createElement('div');
+                        div.className = 'friend-item';
+                        div.innerHTML = `<div class="friend-avatar" style="background-image: url('${avatar}')"><div class="friend-online"></div></div><div class="friend-info"><div class="friend-name">${friend.name}</div><div class="friend-status">Online</div></div><div class="friend-actions"><button onclick="sendGameInvite('${friendId}')">Convidar</button></div>`;
+                        list.appendChild(div);
+                    }
+                });
+                if (list.children.length === 0) list.innerHTML = '<p style="color: #71717a; text-align: center; padding: 20px;">Nenhum amigo online</p>';
             });
         }
-
-        function loop() {
-            update();
-            draw();
-            requestAnimationFrame(loop);
+        
+        function sendGameInvite(friendId) {
+            if (!activeGameId || !activeGameData) return;
+            window.fbLib.push(window.fbLib.ref(window.fbDB, `inbox/${friendId}/invites`), { type: 'game_invite', fromId: user.id, fromName: user.name, fromAvatar: user.avatar, gameId: activeGameId, gameName: activeGameData.name, ts: Date.now() });
+            closeModal('invite');
+            showToast('success', 'Convite Enviado', `Convite enviado!`);
         }
-
-        function resize() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
+        
+        function acceptGameInvite(gameId, inviteId) { window.fbLib.remove(window.fbLib.ref(window.fbDB, `inbox/${user.id}/invites/${inviteId}`)); closeModal('inbox'); openViewer(gameId); }
+        function declineGameInvite(inviteId) { window.fbLib.remove(window.fbLib.ref(window.fbDB, `inbox/${user.id}/invites/${inviteId}`)); renderInbox(); }
+        
+        function loadGames() { window.fbLib.onValue(window.fbLib.ref(window.fbDB, 'games'), snap => { allGames = snap.val() || {}; renderGames(); updateStats(); }); }
+        
+        function renderGames(filter = currentFilter, search = '') {
+            const grid = document.getElementById('games-grid');
+            const empty = document.getElementById('empty-state');
+            grid.innerHTML = '';
+            let games = Object.entries(allGames);
+            if (currentCategory) games = games.filter(([id, g]) => g.category === currentCategory);
+            if (filter === 'popular') games = games.sort((a, b) => (b[1].likes || 0) - (a[1].likes || 0));
+            else if (filter === 'recent') games = games.sort((a, b) => b[1].ts - a[1].ts);
+            else games = games.reverse();
+            if (search) games = games.filter(([id, g]) => g.name.toLowerCase().includes(search.toLowerCase()) || g.author.toLowerCase().includes(search.toLowerCase()));
+            if (games.length === 0) { empty.classList.remove('hidden'); return; }
+            empty.classList.add('hidden');
+            games.forEach(([id, g]) => renderGameCard(grid, id, g));
         }
-
-        // Shop Events
-        document.getElementById('openShopBtn').addEventListener('click', () => {
-            document.getElementById('lobby').classList.add('opacity-0');
-            setTimeout(() => {
-                document.getElementById('lobby').classList.add('hidden');
-                document.getElementById('skinShop').classList.remove('hidden');
-                document.getElementById('lobby').classList.remove('opacity-0');
-                renderShop();
-            }, 300);
+        
+        function renderGameCard(grid, id, g) {
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            const isHot = (g.likes || 0) >= 5;
+            const isFavorite = interactions.favorites.includes(id);
+            const isMultiplayer = g.multiplayer;
+            const isOwner = g.authorId === user.id;
+            const authorAvatar = g.authorAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${g.authorId}`;
+            
+            card.innerHTML = `
+                <div class="game-thumbnail" style="background-image: url('${g.cover || 'https://images.unsplash.com/photo-1614294148960-9aa740632a87?w=400&h=200&fit=crop'}')">
+                    <div class="game-badges">
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">${isHot ? '<div class="badge badge-hot"><i class="fas fa-fire"></i> HOT</div>' : ''}${isMultiplayer ? '<div class="badge badge-multiplayer"><i class="fas fa-users"></i> MP</div>' : ''}${isFavorite ? '<div class="badge" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);"><i class="fas fa-star"></i></div>' : ''}</div>
+                        <div class="badge"><i class="fas fa-eye"></i> ${g.views || 0}</div>
+                    </div>
+                    ${isOwner ? `<div class="game-owner-actions"><button class="game-owner-btn" onclick="event.stopPropagation(); editGame('${id}')" title="Editar"><i class="fas fa-edit"></i></button><button class="game-owner-btn delete" onclick="event.stopPropagation(); deleteGame('${id}')" title="Apagar"><i class="fas fa-trash"></i></button></div>` : ''}
+                    <div class="game-play-btn"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="game-info">
+                    <h3 class="game-title">${g.name}</h3>
+                    <div class="game-author" onclick="event.stopPropagation(); viewUserProfile('${g.authorId}')"><div class="game-author-avatar" style="background-image: url('${authorAvatar}')"></div><span class="game-author-name">${g.author}</span></div>
+                    <div class="game-stats"><div class="game-stat"><i class="fas fa-heart"></i> ${g.likes || 0}</div><div class="game-stat"><i class="fas fa-clock"></i> ${timeAgo(g.ts)}</div></div>
+                </div>`;
+            card.onclick = () => openViewer(id);
+            grid.appendChild(card);
+        }
+        
+        function editGame(id) {
+            editingGameId = id;
+            const g = allGames[id];
+            if (!g || g.authorId !== user.id) return;
+            document.getElementById('edit-name').value = g.name;
+            document.getElementById('edit-cover').value = g.cover || '';
+            document.getElementById('edit-category').value = g.category;
+            document.getElementById('edit-multiplayer').checked = g.multiplayer || false;
+            openModal('editgame');
+        }
+        
+        function saveGameEdit() {
+            if (!editingGameId) return;
+            const g = allGames[editingGameId];
+            if (!g || g.authorId !== user.id) return;
+            window.fbLib.update(window.fbLib.ref(window.fbDB, `games/${editingGameId}`), {
+                name: document.getElementById('edit-name').value,
+                cover: document.getElementById('edit-cover').value,
+                category: document.getElementById('edit-category').value,
+                multiplayer: document.getElementById('edit-multiplayer').checked
+            });
+            closeModal('editgame');
+            editingGameId = null;
+            showToast('success', 'Jogo Atualizado', 'Suas alterações foram salvas!');
+        }
+        
+        function deleteGame(id) {
+            const g = allGames[id];
+            if (!g || g.authorId !== user.id) return showToast('error', 'Erro', 'Você só pode apagar seus jogos');
+            if (!confirm('Tem certeza que deseja apagar este jogo? Esta ação não pode ser desfeita.')) return;
+            window.fbLib.remove(window.fbLib.ref(window.fbDB, `games/${id}`)).then(() => {
+                window.fbLib.remove(window.fbLib.ref(window.fbDB, `comments/${id}`));
+                showToast('success', 'Jogo Apagado', 'O jogo foi removido com sucesso');
+            }).catch(() => {
+                showToast('error', 'Erro', 'Falha ao apagar o jogo');
+            });
+        }
+        
+        function updateStats() {
+            let totalLikes = 0, totalViews = 0, userGames = 0;
+            Object.values(allGames).forEach(g => { if (g.authorId === user.id) { totalLikes += g.likes || 0; totalViews += g.views || 0; userGames++; } });
+            document.getElementById('stat-games').textContent = userGames;
+            document.getElementById('stat-likes').textContent = totalLikes;
+            document.getElementById('stat-views').textContent = totalViews;
+        }
+        
+        function toggleUploadType() {
+            const type = document.getElementById('up-type').value;
+            const area = document.getElementById('upload-content-area');
+            if (type === 'file') area.innerHTML = `<label class="form-label">Arquivo HTML</label><div class="form-input" style="display: flex; align-items: center; justify-content: center; height: 120px; cursor: pointer; border-style: dashed;" onclick="document.getElementById('up-file').click()"><input type="file" id="up-file" accept=".html" hidden><div style="text-align: center;"><i class="fas fa-cloud-upload-alt" style="font-size: 32px; color: var(--primary); margin-bottom: 12px;"></i><p style="color: #71717a;">Clique para selecionar</p></div></div>`;
+            else area.innerHTML = `<label class="form-label">Link ou Código</label><textarea id="up-content" class="form-textarea" placeholder="Cole o link ou código aqui..."></textarea>`;
+        }
+        
+        function testGame() {
+            const type = document.getElementById('up-type').value;
+            let content = '';
+            if (type === 'file') {
+                const file = document.getElementById('up-file')?.files[0];
+                if (!file) return showToast('error', 'Erro', 'Selecione um arquivo');
+                const reader = new FileReader();
+                reader.onload = e => { document.getElementById('test-frame').srcdoc = e.target.result; openModal('testgame'); };
+                reader.readAsText(file);
+                return;
+            }
+            content = document.getElementById('up-content').value;
+            if (!content) return showToast('error', 'Erro', 'Insira o conteúdo');
+            const frame = document.getElementById('test-frame');
+            if (type === 'url') frame.src = content;
+            else frame.srcdoc = content;
+            openModal('testgame');
+        }
+        
+        async function publishGame() {
+            const name = document.getElementById('up-name').value;
+            const cover = document.getElementById('up-cover').value;
+            const category = document.getElementById('up-category').value;
+            const multiplayer = document.getElementById('up-multiplayer').checked;
+            const type = document.getElementById('up-type').value;
+            let content = '';
+            if (type === 'file') {
+                const file = document.getElementById('up-file')?.files[0];
+                if (!file) return showToast('error', 'Erro', 'Selecione um arquivo');
+                content = await new Promise(r => { const reader = new FileReader(); reader.onload = e => r(e.target.result); reader.readAsDataURL(file); });
+            } else content = document.getElementById('up-content').value;
+            if (!name || !content) return showToast('error', 'Erro', 'Preencha todos os campos');
+            await window.fbLib.set(window.fbLib.push(window.fbLib.ref(window.fbDB, 'games')), { name, cover, category, multiplayer, type, content, author: user.name, authorId: user.id, authorAvatar: user.avatar, likes: 0, views: 0, ts: Date.now() });
+            closeModal('upload');
+            showToast('success', 'Jogo Publicado!', 'Seu jogo está disponível!');
+            document.getElementById('up-name').value = '';
+            document.getElementById('up-cover').value = '';
+            if (document.getElementById('up-content')) document.getElementById('up-content').value = '';
+        }
+        
+        function openViewer(id) {
+            activeGameId = id;
+            if (!interactions.viewed.includes(id)) { window.fbLib.update(window.fbLib.ref(window.fbDB, `games/${id}`), { views: window.fbLib.increment(1) }); interactions.viewed.push(id); localStorage.setItem('gds_interactions', JSON.stringify(interactions)); }
+            window.fbLib.onValue(window.fbLib.ref(window.fbDB, `games/${id}`), snap => {
+                const g = snap.val();
+                if (!g) return;
+                activeGameData = g;
+                document.getElementById('viewer-title').textContent = g.name;
+                document.getElementById('viewer-author').querySelector('span').textContent = g.author;
+                document.getElementById('viewer-views').textContent = g.views || 0;
+                document.getElementById('viewer-likes').textContent = g.likes || 0;
+                const tagsContainer = document.getElementById('viewer-tags');
+                tagsContainer.innerHTML = '';
+                if (g.multiplayer) { tagsContainer.innerHTML += '<span class="badge badge-multiplayer"><i class="fas fa-users"></i> Multiplayer</span>'; document.getElementById('invite-btn').classList.remove('hidden'); }
+                else document.getElementById('invite-btn').classList.add('hidden');
+                const likeBtn = document.getElementById('like-btn');
+                if (interactions.liked.includes(id)) { likeBtn.classList.add('liked'); likeBtn.innerHTML = '<i class="fas fa-heart"></i> Curtido'; }
+                else { likeBtn.classList.remove('liked'); likeBtn.innerHTML = '<i class="fas fa-heart"></i> Curtir'; }
+                const favBtn = document.getElementById('fav-btn');
+                if (interactions.favorites.includes(id)) { favBtn.classList.add('favorited'); favBtn.innerHTML = '<i class="fas fa-star"></i> Favoritado'; }
+                else { favBtn.classList.remove('favorited'); favBtn.innerHTML = '<i class="fas fa-star"></i> Favoritar'; }
+                const frame = document.getElementById('game-frame');
+                if (!frame.src && !frame.srcdoc) { if (g.type === 'url' || g.type === 'file') frame.src = g.content; else frame.srcdoc = g.content; }
+            });
+            loadComments(id);
+            document.getElementById('viewer').style.display = 'block';
+        }
+        
+        function closeViewer() { const frame = document.getElementById('game-frame'); frame.src = ''; frame.srcdoc = ''; document.getElementById('viewer').style.display = 'none'; activeGameId = null; activeGameData = null; }
+        
+        function toggleLike() {
+            if (!activeGameId) return;
+            if (interactions.liked.includes(activeGameId)) return showToast('info', 'Já Curtiu', 'Você já curtiu este jogo');
+            window.fbLib.update(window.fbLib.ref(window.fbDB, `games/${activeGameId}`), { likes: window.fbLib.increment(1) });
+            interactions.liked.push(activeGameId);
+            localStorage.setItem('gds_interactions', JSON.stringify(interactions));
+            document.getElementById('like-btn').classList.add('liked');
+            document.getElementById('like-btn').innerHTML = '<i class="fas fa-heart"></i> Curtido';
+            showToast('success', 'Curtido!', 'Você curtiu este jogo');
+        }
+        
+        function toggleFavorite() {
+            if (!activeGameId) return;
+            const favBtn = document.getElementById('fav-btn');
+            if (interactions.favorites.includes(activeGameId)) { interactions.favorites = interactions.favorites.filter(id => id !== activeGameId); favBtn.classList.remove('favorited'); favBtn.innerHTML = '<i class="fas fa-star"></i> Favoritar'; showToast('info', 'Removido', 'Removido dos favoritos'); }
+            else { interactions.favorites.push(activeGameId); favBtn.classList.add('favorited'); favBtn.innerHTML = '<i class="fas fa-star"></i> Favoritado'; showToast('success', 'Favoritado!', 'Adicionado aos favoritos'); }
+            localStorage.setItem('gds_interactions', JSON.stringify(interactions));
+        }
+        
+        function shareGame() { navigator.clipboard.writeText(window.location.href); showToast('success', 'Link Copiado', 'Compartilhe com seus amigos'); }
+        
+        function loadComments(id) {
+            window.fbLib.onValue(window.fbLib.ref(window.fbDB, `comments/${id}`), snap => {
+                const list = document.getElementById('comments-list');
+                list.innerHTML = '';
+                const data = snap.val();
+                document.getElementById('viewer-comments').textContent = data ? Object.keys(data).length : 0;
+                if (data) {
+                    Object.values(data).forEach(c => {
+                        const avatar = c.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${c.userId || c.user}`;
+                        list.innerHTML += `<div class="comment"><div class="comment-header"><div class="comment-avatar" style="background-image: url('${avatar}')" onclick="viewUserProfile('${c.userId}')"></div><span class="comment-user" onclick="viewUserProfile('${c.userId}')">${c.user}</span><span class="comment-time">${timeAgo(c.ts || Date.now())}</span></div><p class="comment-text">${c.text}</p></div>`;
+                    });
+                    list.scrollTop = list.scrollHeight;
+                }
+            });
+        }
+        
+        function postComment() {
+            const input = document.getElementById('comment-input');
+            const text = input.value.trim();
+            if (!text || !activeGameId) return;
+            window.fbLib.set(window.fbLib.push(window.fbLib.ref(window.fbDB, `comments/${activeGameId}`)), { user: user.name, userId: user.id, avatar: user.avatar, text, ts: Date.now() });
+            input.value = '';
+        }
+        
+        async function sendReport() {
+            const gameName = document.getElementById('report-game-name').value;
+            const reason = document.getElementById('report-reason').value;
+            const message = document.getElementById('report-message').value;
+            const contact = document.getElementById('report-contact').value;
+            if (!message.trim()) return showToast('error', 'Erro', 'Descreva o problema');
+            const reasonLabels = { inappropriate: 'Conteúdo Inapropriado', spam: 'Spam', copyright: 'Direitos Autorais', malware: 'Malware', broken: 'Jogo Quebrado', other: 'Outro' };
+            try {
+                await fetch(DISCORD_WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [{ title: '🚨 Report de Jogo', color: 0xef4444, fields: [{ name: '🎮 Jogo', value: gameName || 'Desconhecido', inline: true }, { name: '👤 Autor do Jogo', value: activeGameData?.author || 'Desconhecido', inline: true }, { name: '⚠️ Motivo', value: reasonLabels[reason], inline: true }, { name: '👤 Reportado Por', value: user.name, inline: true }, { name: '📞 Contato', value: contact || 'Não informado', inline: true }, { name: '📝 Descrição', value: message }], timestamp: new Date().toISOString(), footer: { text: 'GameDev Space Report System' } }] }) });
+                showToast('success', 'Report Enviado', 'Obrigado por reportar!');
+                closeModal('report');
+                document.getElementById('report-message').value = '';
+                document.getElementById('report-contact').value = '';
+            } catch (e) { showToast('error', 'Erro', 'Falha ao enviar report'); }
+        }
+        
+        function setFilter(filter, btn) { currentFilter = filter; document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active')); btn.classList.add('active'); renderGames(filter); }
+        function searchGames(query) { renderGames(currentFilter, query); }
+        
+        function showSection(section) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+            currentCategory = null;
+            if (section === 'trending') { currentFilter = 'popular'; renderGames('popular'); }
+            else if (section === 'new') { currentFilter = 'recent'; renderGames('recent'); }
+            else if (section === 'favorites') { renderFavorites(); }
+            else if (section === 'multiplayer') { renderMultiplayer(); }
+            else if (section === 'mygames') { renderMyGames(); }
+            else { currentFilter = 'all'; renderGames('all'); }
+        }
+        
+        function filterCategory(cat) { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); event.target.closest('.nav-item').classList.add('active'); currentCategory = cat; renderGames(currentFilter); }
+        
+        function renderFavorites() {
+            const grid = document.getElementById('games-grid');
+            const empty = document.getElementById('empty-state');
+            grid.innerHTML = '';
+            const favoriteGames = Object.entries(allGames).filter(([id, g]) => interactions.favorites.includes(id));
+            if (favoriteGames.length === 0) { empty.classList.remove('hidden'); document.querySelector('.empty-title').textContent = 'Nenhum favorito'; document.querySelector('.empty-text').textContent = 'Adicione jogos aos favoritos!'; return; }
+            empty.classList.add('hidden');
+            favoriteGames.forEach(([id, g]) => renderGameCard(grid, id, g));
+        }
+        
+        function renderMultiplayer() {
+            const grid = document.getElementById('games-grid');
+            const empty = document.getElementById('empty-state');
+            grid.innerHTML = '';
+            const mpGames = Object.entries(allGames).filter(([id, g]) => g.multiplayer);
+            if (mpGames.length === 0) { empty.classList.remove('hidden'); document.querySelector('.empty-title').textContent = 'Nenhum jogo multiplayer'; return; }
+            empty.classList.add('hidden');
+            mpGames.forEach(([id, g]) => renderGameCard(grid, id, g));
+        }
+        
+        function renderMyGames() {
+            const grid = document.getElementById('games-grid');
+            const empty = document.getElementById('empty-state');
+            grid.innerHTML = '';
+            const myGames = Object.entries(allGames).filter(([id, g]) => g.authorId === user.id);
+            if (myGames.length === 0) { empty.classList.remove('hidden'); document.querySelector('.empty-title').textContent = 'Você não tem jogos'; document.querySelector('.empty-text').textContent = 'Publique seu primeiro jogo!'; return; }
+            empty.classList.add('hidden');
+            myGames.forEach(([id, g]) => renderGameCard(grid, id, g));
+        }
+        
+        // Settings Functions
+        function setThemeFromPicker(color) {
+            if (rainbowMode) toggleRainbowMode();
+            document.documentElement.style.setProperty('--primary', color);
+            document.documentElement.style.setProperty('--primary-glow', color + '80');
+            localStorage.setItem('gds_theme', color);
+        }
+        
+        function setTextColorFromPicker(color) {
+            document.documentElement.style.setProperty('--text-color', color);
+            localStorage.setItem('gds_text_color', color);
+        }
+        
+        function toggleRainbowMode() {
+            rainbowMode = !rainbowMode;
+            if (rainbowMode) {
+                const colors = ['#ef4444', '#f59e0b', '#10b981', '#06b6d4', '#6366f1', '#8b5cf6', '#ec4899'];
+                let i = 0;
+                rainbowInterval = setInterval(() => {
+                    i = (i + 1) % colors.length;
+                    document.documentElement.style.setProperty('--primary', colors[i]);
+                    document.documentElement.style.setProperty('--primary-glow', colors[i] + '80');
+                }, 500);
+                showToast('success', 'Rainbow Mode', 'Modo arco-íris ativado!');
+            } else {
+                clearInterval(rainbowInterval);
+                const savedTheme = localStorage.getItem('gds_theme') || '#6366f1';
+                document.documentElement.style.setProperty('--primary', savedTheme);
+                document.documentElement.style.setProperty('--primary-glow', savedTheme + '80');
+                showToast('info', 'Rainbow Mode', 'Modo arco-íris desativado');
+            }
+        }
+        
+        function setHubBackground(url) { 
+            if (url) { 
+                document.querySelector('.bg-animated').style.backgroundImage = `url('${url}')`; 
+                document.querySelector('.bg-animated').style.backgroundSize = 'cover'; 
+            } else { 
+                document.querySelector('.bg-animated').style.backgroundImage = ''; 
+            } 
+            localStorage.setItem('gds_hub_bg', url); 
+        }
+        
+        function setTitleFont(font) { 
+            document.documentElement.style.setProperty('--font-title', font); 
+            localStorage.setItem('gds_font_title', font); 
+        }
+        
+        function loadSettings() {
+            const savedTheme = localStorage.getItem('gds_theme'); 
+            if (savedTheme) { 
+                document.documentElement.style.setProperty('--primary', savedTheme);
+                document.documentElement.style.setProperty('--primary-glow', savedTheme + '80');
+                document.getElementById('primary-color-picker').value = savedTheme;
+            }
+            const savedTextColor = localStorage.getItem('gds_text_color'); 
+            if (savedTextColor) { 
+                document.documentElement.style.setProperty('--text-color', savedTextColor);
+                document.getElementById('text-color-picker').value = savedTextColor;
+            }
+            const savedHubBg = localStorage.getItem('gds_hub_bg'); 
+            if (savedHubBg) setHubBackground(savedHubBg);
+            const savedTitleFont = localStorage.getItem('gds_font_title'); 
+            if (savedTitleFont) setTitleFont(savedTitleFont);
+        }
+        
+        function timeAgo(ts) { const diff = Date.now() - ts; const mins = Math.floor(diff / 60000); if (mins < 60) return mins + 'm'; const hours = Math.floor(mins / 60); if (hours < 24) return hours + 'h'; return Math.floor(hours / 24) + 'd'; }
+        
+        document.addEventListener('keydown', e => { 
+            if (e.key === 'Escape') { 
+                ['upload', 'profile', 'settings', 'report', 'friends', 'inbox', 'message', 'invite', 'editgame', 'testgame', 'chat'].forEach(m => closeModal(m)); 
+                if (document.getElementById('viewer').style.display === 'block') closeViewer(); 
+                if (document.getElementById('user-profile-page').style.display === 'block') closeUserProfilePage();
+            } 
         });
-
-        document.getElementById('closeShopBtn').addEventListener('click', () => {
-            document.getElementById('skinShop').classList.add('hidden');
-            document.getElementById('lobby').classList.remove('hidden');
-        });
-
-        // Input Handling
-        window.addEventListener('mousemove', e => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-        });
-
-        window.addEventListener('mousedown', () => mouse.active = true);
-        window.addEventListener('mouseup', () => mouse.active = false);
-
-        window.addEventListener('keydown', e => {
-            if (e.code === 'Space') boostKey = true;
-        });
-        window.addEventListener('keyup', e => {
-            if (e.code === 'Space') boostKey = false;
-        });
-
-        document.getElementById('playBtn').addEventListener('click', startGame);
-        document.getElementById('restartBtn').addEventListener('click', () => {
-            document.getElementById('gameOver').classList.add('hidden');
-            document.getElementById('lobby').classList.remove('hidden');
-            gameState = 'LOBBY';
-            updateLobbyUI();
-        });
-
-        // Initialize
-        init();
-
+        document.querySelectorAll('.modal-overlay').forEach(modal => { modal.addEventListener('click', e => { if (e.target === modal) closeModal(modal.id.replace('modal-', '')); }); });
+        document.getElementById('comment-input').addEventListener('keypress', e => { if (e.key === 'Enter') postComment(); });
     </script>
 </body>
 </html>
