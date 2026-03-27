@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TÁ NA PROMO!</title>
-    <link rel="icon" type="image/x-icon" href="fav.ico">
+    
+    <link rel="shortcut icon" href="fav.ico" type="image/x-icon">
+    <link rel="icon" href="fav.ico" type="image/x-icon">
     
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -18,10 +20,10 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: #fff; display: flex; min-height: 100vh; overflow-x: hidden; }
 
-        /* --- INTRO COM LOGO.PNG --- */
+        /* --- INTRO (LOGO GRANDE) --- */
         #intro { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: 1s ease-in-out; }
-        #intro img { width: 180px; height: auto; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 0.4; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1); } }
+        #intro img { width: 320px; height: auto; animation: pulse 1.5s infinite; } /* Aumentado para 320px */
+        @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1.05); } }
 
         /* --- SIDEBAR --- */
         aside { width: 260px; background: var(--glass); border-right: 1px solid var(--border); height: 100vh; position: fixed; padding: 30px 20px; z-index: 100; backdrop-filter: blur(20px); }
@@ -34,44 +36,49 @@
         .section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .search-bar { width: 100%; background: #0a0a0a; border: 1px solid var(--border); padding: 15px 25px; border-radius: 30px; color: #fff; outline: none; margin-bottom: 25px; }
+        .search-bar { width: 100%; background: #0a0a0a; border: 1px solid var(--border); padding: 15px 25px; border-radius: 30px; color: #fff; outline: none; margin-bottom: 25px; border: 1px solid #111; }
+        .search-bar:focus { border-color: var(--blue); }
 
         /* --- CARDS & AUTOR --- */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
-        .card-p { background: #080808; border-radius: 18px; border: 1px solid var(--border); overflow: hidden; position: relative; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .card-p { background: #080808; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; position: relative; transition: 0.3s; }
+        .card-p:hover { border-color: #222; transform: translateY(-5px); }
         .card-img { width: 100%; aspect-ratio: 1; object-fit: cover; cursor: pointer; }
         
-        /* FOTO DE QUEM POSTOU NO CARD */
-        .author-tag { position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border); z-index: 10; }
-        .author-img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; border: 1px solid #fff; }
+        .author-tag { position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.8); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); z-index: 10; }
+        .author-img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: 1px solid #fff; }
         .author-name { font-size: 0.65rem; font-weight: 800; color: #fff; }
 
-        .card-info { padding: 15px; }
+        .card-info { padding: 18px; }
         .vote-sys { display: flex; gap: 12px; align-items: center; }
-        .vote-btn { background: none; border: none; cursor: pointer; color: #444; display: flex; align-items: center; gap: 4px; font-weight: 800; }
+        .vote-btn { background: none; border: none; cursor: pointer; color: #333; display: flex; align-items: center; gap: 4px; font-weight: 800; transition: 0.2s; }
         .vote-btn.voted-up { color: var(--red); }
+        
+        .del-btn { color: #1a1a1a; cursor: pointer; transition: 0.2s; }
+        .del-btn:hover { color: var(--red); }
 
         /* --- CATEGORIAS --- */
-        .cat-btn { padding: 8px 18px; border-radius: 20px; border: 1px solid var(--border); background: #080808; color: #666; cursor: pointer; font-size: 0.7rem; font-weight: 700; margin-right: 8px; }
-        .cat-btn.active { background: var(--blue); color: #000; border-color: var(--blue); }
+        .cat-btn { padding: 10px 20px; border-radius: 30px; border: 1px solid var(--border); background: #080808; color: #555; cursor: pointer; font-size: 0.7rem; font-weight: 800; margin-right: 8px; transition: 0.3s; }
+        .cat-btn.active { background: #fff; color: #000; border-color: #fff; }
 
         /* --- MODAL --- */
-        #modal-p { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; display: none; padding: 40px; }
-        .modal-body { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        #modal-p { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; display: none; padding: 40px; overflow-y: auto; }
+        .modal-body { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 1fr; gap: 50px; }
 
-        input, textarea, select { width: 100%; background: #0a0a0a; border: 1px solid #222; padding: 15px; color: #fff; border-radius: 12px; margin-bottom: 12px; outline: none; }
-        .btn-action { width: 100%; padding: 18px; background: #fff; color: #000; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; }
+        input, textarea, select { width: 100%; background: #0a0a0a; border: 1px solid #222; padding: 18px; color: #fff; border-radius: 15px; margin-bottom: 12px; outline: none; }
+        .btn-action { width: 100%; padding: 20px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
 
         @media (max-width: 900px) {
-            aside { width: 100%; height: 60px; bottom: 0; top: auto; flex-direction: row; padding: 5px; justify-content: space-around; }
+            aside { width: 100%; height: 65px; bottom: 0; top: auto; flex-direction: row; padding: 5px; justify-content: space-around; border-right: none; border-top: 1px solid var(--border); }
             main { margin-left: 0; padding: 20px 20px 100px 20px; }
             .modal-body { grid-template-columns: 1fr; }
+            #intro img { width: 200px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="intro"><img src="logo.png" alt="Logo"></div>
+    <div id="intro"><img src="logo.png" alt="Logo Principal"></div>
 
     <aside>
         <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="layout-grid"></i> <span>Mural</span></div>
@@ -82,8 +89,8 @@
 
     <main>
         <section id="feed" class="section active">
-            <input type="text" class="search-bar" id="search-input" placeholder="O que você procura?" oninput="filterPosts()">
-            <div style="margin-bottom: 25px;">
+            <input type="text" class="search-bar" id="search-input" placeholder="Pesquisar itens no mural..." oninput="filterPosts()">
+            <div style="margin-bottom: 30px; display: flex; overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
                 <button class="cat-btn active" onclick="filterCat('Tudo', this)">Tudo</button>
                 <button class="cat-btn" onclick="filterCat('Tech', this)">Tech</button>
                 <button class="cat-btn" onclick="filterCat('Setup', this)">Setup</button>
@@ -93,16 +100,16 @@
         </section>
 
         <section id="cupons" class="section">
-            <h2 style="font-family:'Syncopate'; margin-bottom: 30px;">CUPONS ATIVOS</h2>
+            <h2 style="font-family:'Syncopate'; margin-bottom: 30px; font-size: 1rem; color: var(--blue);">CUPONS ATIVOS</h2>
             <div class="grid" id="cupons-grid"></div>
         </section>
 
         <section id="post" class="section">
             <div style="max-width: 500px; margin: 0 auto;">
-                <h2 style="margin-bottom: 25px; font-family:'Syncopate';">PUBLICAR</h2>
+                <h2 style="margin-bottom: 25px; font-family:'Syncopate'; text-align: center;">NOVA PUBLICAÇÃO</h2>
                 <select id="p-type" onchange="togglePostFields()">
-                    <option value="p">Oferta (Produto)</option>
-                    <option value="c">Cupom (Código)</option>
+                    <option value="p">Produto / Oferta</option>
+                    <option value="c">Cupom Promocional</option>
                 </select>
                 <div id="fields-p">
                     <select id="p-cat">
@@ -110,33 +117,33 @@
                         <option value="Setup">Setup</option>
                         <option value="Hardware">Hardware</option>
                     </select>
-                    <input type="text" id="p-title" placeholder="Nome do Produto">
-                    <input type="text" id="p-price" placeholder="Preço (Ex: 450,00)">
-                    <input type="url" id="p-img" placeholder="Link da Imagem ou GIF">
-                    <input type="url" id="p-link" placeholder="Link do Site/Loja">
-                    <textarea id="p-desc" placeholder="Descrição rápida..."></textarea>
+                    <input type="text" id="p-title" placeholder="O que é o produto?">
+                    <input type="text" id="p-price" placeholder="Preço (Ex: 1.499,00)">
+                    <input type="url" id="p-img" placeholder="URL da Imagem ou GIF">
+                    <input type="url" id="p-link" placeholder="Link para compra">
+                    <textarea id="p-desc" rows="4" placeholder="Fale um pouco sobre essa oferta..."></textarea>
                 </div>
                 <div id="fields-c" style="display:none;">
-                    <input type="text" id="c-store" placeholder="Loja">
-                    <input type="text" id="c-code" placeholder="CÓDIGO">
+                    <input type="text" id="c-store" placeholder="Nome da Loja">
+                    <input type="text" id="c-code" placeholder="CÓDIGO DO CUPOM">
                 </div>
-                <button class="btn-action" onclick="publish()">ENVIAR PARA O MURAL</button>
+                <button class="btn-action" onclick="publish()">LANÇAR NO MURAL</button>
             </div>
         </section>
 
         <section id="settings" class="section">
-            <div style="max-width: 400px; margin: 0 auto; text-align: center;">
-                <img src="" id="display-avatar" style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #fff; margin-bottom:20px;">
-                <h1 id="display-name" style="font-weight: 800; margin-bottom: 30px;">Exiled</h1>
-                <input type="text" id="set-name" placeholder="Mudar Nome">
-                <input type="url" id="set-avatar" placeholder="Link do seu GIF animado">
-                <button class="btn-action" onclick="saveProfile()">SALVAR ALTERAÇÕES</button>
+            <div style="max-width: 400px; margin: 0 auto; text-align: center; background: #080808; padding: 40px; border-radius: 30px; border: 1px solid var(--border);">
+                <img src="" id="display-avatar" style="width:130px; height:130px; border-radius:50%; object-fit:cover; border:4px solid #fff; margin-bottom:20px;">
+                <h1 id="display-name" style="font-weight: 800; margin-bottom: 30px; font-size: 1.5rem;">Exiled</h1>
+                <input type="text" id="set-name" placeholder="Mudar Apelido">
+                <input type="url" id="set-avatar" placeholder="Link do seu GIF de perfil">
+                <button class="btn-action" onclick="saveProfile()">SALVAR PERFIL</button>
             </div>
         </section>
     </main>
 
     <div id="modal-p">
-        <button style="position:fixed; top:20px; right:20px; background:#fff; border:none; width:40px; height:40px; border-radius:50%;" onclick="closeM()"><i data-lucide="x"></i></button>
+        <button style="position:fixed; top:20px; right:20px; background:#fff; border:none; width:45px; height:45px; border-radius:50%; cursor:pointer; z-index: 2001;" onclick="closeM()"><i data-lucide="x"></i></button>
         <div class="modal-body" id="modal-content"></div>
     </div>
 
@@ -155,13 +162,19 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        // --- SISTEMA DE DONO (TRAVA UID) ---
+        if(!localStorage.getItem('userToken')) {
+            localStorage.setItem('userToken', 'user_' + Math.random().toString(36).substr(2, 9));
+        }
+        const myToken = localStorage.getItem('userToken');
+
         // --- INTRO & IDENTITY ---
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const intro = document.getElementById('intro');
                 intro.style.opacity = '0';
                 setTimeout(() => intro.style.display = 'none', 1000);
-            }, 1800);
+            }, 2000);
         });
 
         if(!localStorage.getItem('tnp_name')) {
@@ -179,7 +192,7 @@
             location.reload();
         };
 
-        // --- FIREBASE OPS ---
+        // --- FIREBASE CORE ---
         let allPosts = [];
         let curCat = 'Tudo';
 
@@ -187,6 +200,7 @@
             const type = document.getElementById('p-type').value;
             const p = { 
                 type, likes: 0, time: Date.now(),
+                owner: myToken, // Grava quem é o dono do post
                 authorName: localStorage.getItem('tnp_name'),
                 authorImg: localStorage.getItem('tnp_avatar')
             };
@@ -217,6 +231,8 @@
             
             data.forEach(([id, p]) => {
                 const voted = localStorage.getItem(`voted_${id}`);
+                const isOwner = p.owner === myToken; // Verifica se você é o dono
+
                 if(p.type === 'p') {
                     if(curCat !== 'Tudo' && p.cat !== curCat) return;
                     grid.innerHTML += `
@@ -228,23 +244,25 @@
                             <img src="${p.img}" class="card-img" onclick='openM("${id}", ${JSON.stringify(p).replace(/"/g, '&quot;')})'>
                             <div class="card-info">
                                 <div style="font-weight:900; font-size:1.1rem; color:var(--blue)">R$ ${p.price}</div>
-                                <div style="font-size:0.75rem; color:#888; margin:5px 0 15px 0; height:32px; overflow:hidden;">${p.title}</div>
+                                <div style="font-size:0.75rem; color:#666; margin:8px 0 18px 0; height:32px; overflow:hidden; line-height:1.2;">${p.title}</div>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <div class="vote-sys">
-                                        <button class="vote-btn ${voted?'voted-up':''}" onclick="vote('${id}', 1)"><i data-lucide="arrow-big-up"></i> ${p.likes}</button>
-                                        <button class="vote-btn" onclick="vote('${id}', -1)"><i data-lucide="arrow-big-down"></i></button>
+                                        <button class="vote-btn ${voted?'voted-up':''}" onclick="vote('${id}', 1)"><i data-lucide="arrow-big-up" size="18"></i> ${p.likes}</button>
+                                        <button class="vote-btn" onclick="vote('${id}', -1)"><i data-lucide="arrow-big-down" size="18"></i></button>
                                     </div>
-                                    <i data-lucide="trash-2" size="14" style="color:#222; cursor:pointer;" onclick="del('${id}')"></i>
+                                    ${isOwner ? `<i data-lucide="trash-2" size="16" class="del-btn" onclick="del('${id}')"></i>` : ''}
                                 </div>
                             </div>
                         </div>
                     `;
                 } else {
                     cGrid.innerHTML += `
-                        <div class="card-p" style="padding:25px; border:2px dashed #333; text-align:center;">
-                            <h2 style="background:#fff; color:#000; padding:2px 10px; font-size:1rem;">${p.code}</h2>
-                            <p style="margin-top:10px; font-size:0.7rem; color:#555;">${p.store}</p>
-                            <i data-lucide="trash-2" size="14" style="margin-top:15px; cursor:pointer; color:#111;" onclick="del('${id}')"></i>
+                        <div class="card-p" style="padding:30px; border:2px dashed #222; text-align:center;">
+                            <h2 style="background:#fff; color:#000; padding:4px 15px; font-size:1.1rem; display:inline-block; border-radius:5px;">${p.code}</h2>
+                            <p style="margin-top:12px; font-size:0.8rem; font-weight:700;">${p.store}</p>
+                            <div style="margin-top:20px;">
+                                ${isOwner ? `<i data-lucide="trash-2" size="16" class="del-btn" onclick="del('${id}')"></i>` : ''}
+                            </div>
                         </div>
                     `;
                 }
@@ -258,7 +276,7 @@
             localStorage.setItem(`voted_${id}`, 'true');
         };
 
-        window.del = (id) => { if(confirm("Apagar postagem?")) remove(ref(db, `tnp_posts/${id}`)); };
+        window.del = (id) => { if(confirm("Deseja mesmo apagar sua postagem?")) remove(ref(db, `tnp_posts/${id}`)); };
 
         window.filterPosts = () => {
             const term = document.getElementById('search-input').value.toLowerCase();
@@ -275,16 +293,16 @@
         window.openM = (id, p) => {
             document.getElementById('modal-p').style.display = 'block';
             document.getElementById('modal-content').innerHTML = `
-                <img src="${p.img}" style="width:100%; border-radius:15px;">
+                <img src="${p.img}" style="width:100%; border-radius:20px; border: 1px solid #111;">
                 <div>
-                    <h1 style="font-family:'Syncopate'; font-size:1.2rem;">${p.title}</h1>
-                    <h2 style="color:var(--blue); margin:20px 0;">R$ ${p.price}</h2>
-                    <p style="opacity:0.6; line-height:1.6; font-size:0.9rem;">${p.desc || ''}</p>
-                    <div style="margin-top:20px; display:flex; align-items:center; gap:10px;">
-                        <img src="${p.authorImg}" style="width:30px; height:30px; border-radius:50%">
-                        <span style="font-size:0.75rem;">${p.authorName}</span>
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+                        <img src="${p.authorImg}" style="width:35px; height:35px; border-radius:50%; border:2px solid var(--blue)">
+                        <span style="font-weight:800; font-size:0.8rem;">${p.authorName} postou isso:</span>
                     </div>
-                    <a href="${p.link}" target="_blank" style="text-decoration:none;"><button class="btn-action" style="margin-top:30px">RESGATAR AGORA</button></a>
+                    <h1 style="font-family:'Syncopate'; font-size:1.4rem; line-height:1.2;">${p.title}</h1>
+                    <h2 style="color:var(--blue); margin:25px 0; font-size:2rem; font-weight:900;">R$ ${p.price}</h2>
+                    <p style="opacity:0.6; line-height:1.8; font-size:0.95rem; background:#0c0c0c; padding:20px; border-radius:15px;">${p.desc || 'Sem descrição adicional disponível.'}</p>
+                    <a href="${p.link}" target="_blank" style="text-decoration:none;"><button class="btn-action" style="margin-top:30px">PEGAR AGORA</button></a>
                 </div>
             `;
             lucide.createIcons();
