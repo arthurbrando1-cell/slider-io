@@ -10,78 +10,110 @@
 
     <style>
         :root { 
-            --bg: #050505; 
-            --glass: rgba(15, 15, 15, 0.8); 
-            --border: rgba(255, 255, 255, 0.08); 
+            --bg: #030303; 
+            --glass: rgba(10, 10, 10, 0.85); 
+            --border: rgba(255, 255, 255, 0.05); 
             --accent: #ff4747; 
-            --green: #00ff88; 
+            --gray-grad: linear-gradient(45deg, #111, #222, #111);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: #fff; display: flex; min-height: 100vh; overflow-x: hidden; }
+        
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            display: flex; 
+            min-height: 100vh; 
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #111 0%, #030303 100%);
+        }
 
-        /* --- INTRO SCRIPTADA --- */
+        /* --- FUNDO ANIMADO (MESH) --- */
+        body::before {
+            content: "";
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            opacity: 0.05; z-index: -1;
+        }
+
+        /* --- INTRO --- */
         #intro-screen { 
             position: fixed; inset: 0; background: #000; z-index: 9999; 
-            display: flex; justify-content: center; align-items: center; transition: 1s ease-in-out; 
+            display: flex; justify-content: center; align-items: center; transition: 0.8s; 
         }
-        .intro-logo { width: 250px; animation: float3d 2.5s infinite ease-in-out; filter: drop-shadow(0 0 20px var(--accent)); }
-        @keyframes float3d { 0%, 100% { transform: translateY(0) rotateY(0); } 50% { transform: translateY(-20px) rotateY(15deg); } }
+        .intro-logo { width: 220px; animation: float 3s infinite ease-in-out; filter: drop-shadow(0 0 15px var(--accent)); }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        /* --- SIDEBAR REFEITA --- */
+        /* --- SIDEBAR --- */
         aside { 
-            width: 280px; background: var(--glass); backdrop-filter: blur(30px); 
+            width: 280px; background: var(--glass); backdrop-filter: blur(40px); 
             height: 100vh; border-right: 1px solid var(--border); position: fixed; 
-            padding: 40px 20px; z-index: 100; display: flex; flex-direction: column; 
+            padding: 40px 20px; z-index: 100;
         }
-        .sidebar-logo { width: 100%; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px; text-align: center; }
-        .sidebar-logo img { width: 180px; animation: pulse 2s infinite; }
+        .sidebar-logo img { width: 100%; margin-bottom: 30px; }
         
         .nav-link { 
-            display: flex; align-items: center; gap: 15px; padding: 16px; 
-            border-radius: 12px; color: #888; cursor: pointer; transition: 0.4s; 
-            margin-bottom: 10px; font-weight: 600; 
+            display: flex; align-items: center; gap: 15px; padding: 15px; 
+            border-radius: 12px; color: #666; cursor: pointer; transition: 0.3s; 
+            margin-bottom: 8px; font-weight: 700; text-transform: uppercase; font-size: 0.75rem;
         }
-        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.03); }
-        .nav-link.active { color: #fff; background: var(--accent); box-shadow: 0 10px 20px rgba(255, 71, 71, 0.2); }
-
-        /* --- MAIN CONTENT --- */
-        main { flex: 1; margin-left: 280px; padding: 60px; transition: 0.5s; }
-        .section { display: none; opacity: 0; transform: translateY(20px); transition: 0.5s forwards; }
-        .section.active { display: block; opacity: 1; transform: translateY(0); }
-
-        /* --- INPUTS PRO --- */
-        .form-group { max-width: 700px; margin: 0 auto; background: rgba(20,20,20,0.5); padding: 40px; border-radius: 24px; border: 1px solid var(--border); }
-        input, textarea, select { 
-            width: 100%; background: #111; border: 1px solid var(--border); 
-            padding: 18px; color: #fff; border-radius: 14px; margin-bottom: 20px; 
-            font-size: 1rem; transition: 0.3s; outline: none;
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.02); }
+        .nav-link.active { 
+            color: #fff; background: var(--accent); 
+            box-shadow: 0 8px 15px rgba(255, 71, 71, 0.2); 
         }
-        input:focus { border-color: var(--accent); background: #151515; box-shadow: 0 0 15px rgba(255, 71, 71, 0.1); }
 
-        .btn-action { 
-            width: 100%; padding: 20px; background: var(--accent); color: white; 
-            font-weight: 800; border: none; border-radius: 14px; cursor: pointer; 
-            text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; 
+        /* --- MAIN --- */
+        main { flex: 1; margin-left: 280px; padding: 50px; }
+        .section { display: none; animation: slideUp 0.6s ease forwards; }
+        .section.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- SEARCH BAR GRADIENTE --- */
+        .search-wrapper { position: relative; margin-bottom: 40px; }
+        #search-input { 
+            width: 100%; background: #080808; border: 1px solid var(--border); 
+            padding: 20px 25px; color: #fff; border-radius: 15px;
+            font-size: 1rem; outline: none; transition: 0.3s;
+            border-image: linear-gradient(to right, #222, #444) 1;
         }
-        .btn-action:hover { transform: translateY(-3px); filter: brightness(1.2); box-shadow: 0 10px 20px rgba(255, 71, 71, 0.3); }
+        #search-input:focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(255, 71, 71, 0.1); }
 
-        /* --- CARDS FEED --- */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; }
-        .card { 
-            background: #0d0d0d; border-radius: 18px; overflow: hidden; 
-            border: 1px solid var(--border); transition: 0.4s; position: relative; 
-        }
-        .card:hover { border-color: #555; transform: scale(1.02); }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-bottom: 1px solid var(--border); }
-        .badge { position: absolute; top: 15px; left: 15px; background: var(--green); color: #000; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 900; z-index: 10; }
-
-        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+        /* --- CARDS & GRIDS --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px; }
         
+        /* Estilo Produto */
+        .card-prod { 
+            background: #0a0a0a; border-radius: 20px; overflow: hidden; 
+            border: 1px solid var(--border); transition: 0.4s;
+        }
+        .card-prod:hover { transform: translateY(-10px); border-color: #333; }
+        .card-prod img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+
+        /* Estilo Cupom */
+        .card-cupom {
+            background: var(--gray-grad); border-radius: 15px; padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05); position: relative;
+            animation: gradientAnim 5s infinite linear; background-size: 200% 200%;
+        }
+        @keyframes gradientAnim { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .btn-copy {
+            width: 100%; background: #fff; color: #000; border: none; padding: 12px;
+            border-radius: 8px; font-weight: 900; margin-top: 15px; cursor: pointer;
+        }
+
+        /* --- FORMULÁRIOS --- */
+        .form-box { max-width: 600px; margin: 0 auto; background: #080808; padding: 40px; border-radius: 25px; border: 1px solid var(--border); }
+        input, select, textarea { 
+            width: 100%; background: #111; border: 1px solid #222; padding: 15px; 
+            color: #fff; border-radius: 12px; margin-bottom: 15px;
+        }
+
         @media (max-width: 900px) {
-            aside { width: 100%; height: 70px; bottom: 0; top: auto; flex-direction: row; border-right: none; border-top: 1px solid var(--border); padding: 10px; }
-            main { margin-left: 0; padding: 20px 20px 100px 20px; }
-            .sidebar-logo, #user-info { display: none; }
+            aside { width: 100%; height: 70px; bottom: 0; top: auto; flex-direction: row; border-right: none; }
+            main { margin-left: 0; padding-bottom: 100px; }
+            .sidebar-logo { display: none; }
         }
     </style>
 </head>
@@ -90,131 +122,125 @@
     <div id="intro-screen"><img src="logo.png" class="intro-logo"></div>
 
     <aside>
-        <div class="sidebar-logo">
-            <img src="logo.png" alt="TA NA PROMO">
-        </div>
-        <div id="user-info" style="text-align: center; margin-bottom: 30px;">
-            <img id="my-avatar" src="" style="width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover;">
-            <p id="my-name" style="font-weight: 800; margin-top: 10px; color: #fff; font-size: 0.8rem;"></p>
-        </div>
-        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="layout-grid"></i> <span>Feed</span></div>
-        <div class="nav-link" onclick="tab('post-area', this)"><i data-lucide="plus-circle"></i> <span>Postar</span></div>
+        <div class="sidebar-logo"><img src="logo.png"></div>
+        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="shopping-bag"></i> <span>Produtos</span></div>
+        <div class="nav-link" onclick="tab('cupons-feed', this)"><i data-lucide="ticket"></i> <span>Cupons</span></div>
+        <div class="nav-link" onclick="tab('post-area', this)"><i data-lucide="plus-square"></i> <span>Postar</span></div>
         <div class="nav-link" onclick="tab('profile', this)"><i data-lucide="user"></i> <span>Perfil</span></div>
     </aside>
 
     <main id="app-content">
         <section id="feed" class="section active">
-            <div style="display: flex; gap: 15px; margin-bottom: 40px;">
-                <input type="text" id="search-input" placeholder="Buscar no market elite..." oninput="filterProducts()" style="margin-bottom:0">
-                <select id="cat-filter" onchange="filterProducts()" style="width: 200px; margin-bottom:0">
-                    <option value="all">Todas</option>
-                    <option value="hardware">Hardware</option>
-                    <option value="cupons">Cupons</option>
-                </select>
+            <div class="search-wrapper">
+                <input type="text" id="search-input" placeholder="Buscar no Ta na Promo!..." oninput="filter()">
             </div>
-            <div class="grid" id="market-grid"></div>
+            <div class="grid" id="grid-produtos"></div>
+        </section>
+
+        <section id="cupons-feed" class="section">
+            <h2 style="font-family:'Syncopate'; margin-bottom: 30px;">CUPONS ATIVOS</h2>
+            <div class="grid" id="grid-cupons"></div>
         </section>
 
         <section id="post-area" class="section">
-            <div class="form-group">
-                <h2 style="font-family:'Syncopate'; margin-bottom: 30px; text-align:center;">Nova Publicação</h2>
-                <select id="p-cat">
-                    <option value="hardware">Hardware</option>
-                    <option value="perifericos">Periféricos</option>
-                    <option value="cupons">Cupom de Desconto</option>
+            <div class="form-box">
+                <h2 style="font-family:'Syncopate'; margin-bottom: 25px;">O QUE VAMOS POSTAR?</h2>
+                <select id="p-type" onchange="togglePostFields()">
+                    <option value="produto">Produto em Oferta</option>
+                    <option value="cupom">Apenas Cupom</option>
                 </select>
-                <input type="text" id="p-title" placeholder="Nome do Produto">
-                <input type="text" id="p-code" placeholder="Código do Cupom (Opcional)">
+                <input type="text" id="p-title" placeholder="Nome do Item / Loja">
                 <input type="number" id="p-price" placeholder="Preço Final (R$)">
-                <input type="url" id="p-img" placeholder="Link da Imagem/GIF">
+                <div id="field-cupom" style="display:none;">
+                    <input type="text" id="p-code" placeholder="Código do Cupom">
+                </div>
+                <input type="url" id="p-img" placeholder="Link da Imagem / GIF">
                 <input type="url" id="p-url" placeholder="Link de Compra">
-                <textarea id="p-desc" placeholder="Review ou descrição do produto..." rows="4"></textarea>
-                <button class="btn-action" onclick="publish()">Publicar Agora</button>
+                <textarea id="p-desc" placeholder="Descrição rápida..." rows="3"></textarea>
+                <button class="btn-copy" style="background:var(--accent); color:#fff;" onclick="publish()">PUBLICAR AGORA</button>
             </div>
         </section>
 
         <section id="profile" class="section">
-            <div class="form-group" style="max-width: 500px; text-align: center;">
-                <h2 style="font-family:'Syncopate'; margin-bottom:30px;">Meu Perfil</h2>
-                <input type="text" id="u-name" placeholder="Nome de Usuário">
-                <input type="text" id="u-photo" placeholder="Link da Foto (Avatar)">
-                <button class="btn-action" onclick="saveProfile()">Salvar Perfil</button>
+            <div class="form-box" style="text-align:center;">
+                <input type="text" id="u-name" placeholder="Nome">
+                <input type="text" id="u-photo" placeholder="Link Foto">
+                <button class="btn-copy" onclick="saveProfile()">SALVAR</button>
             </div>
         </section>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAMoxCYuvhRQtRzPm4KSpRo5qtPr3keu0I",
             authDomain: "devgram-f7c0d.firebaseapp.com",
             databaseURL: "https://devgram-f7c0d-default-rtdb.firebaseio.com",
             projectId: "devgram-f7c0d",
-            storageBucket: "devgram-f7c0d.firebasestorage.app",
-            messagingSenderId: "813511319694",
             appId: "1:813511319694:web:ed579ca37622e84ed7e9df"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const UID = localStorage.getItem('tnp_uid') || 'U'+Math.floor(Math.random()*9999);
-        localStorage.setItem('tnp_uid', UID);
 
-        window.onload = () => {
-            setTimeout(() => {
-                document.getElementById('intro-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('intro-screen').style.display = 'none';
-                }, 1000);
-            }, 2500);
+        // Intro
+        window.onload = () => setTimeout(() => document.getElementById('intro-screen').style.opacity = '0', 2000);
+
+        // Renderização Dual (Produtos e Cupons)
+        onValue(ref(db, 'market'), (snap) => {
+            const data = snap.val();
+            const list = data ? Object.entries(data).reverse().map(([id,v])=>({id,...v})) : [];
+            
+            const gridProd = document.getElementById('grid-produtos');
+            const gridCupom = document.getElementById('grid-cupons');
+            gridProd.innerHTML = ''; gridCupom.innerHTML = '';
+
+            list.forEach(p => {
+                if(p.type === 'cupom' || p.code) {
+                    gridCupom.innerHTML += `
+                        <div class="card-cupom">
+                            <h3 style="font-size:0.9rem;">${p.title}</h3>
+                            <div style="margin-top:10px; font-weight:900; color:var(--accent)">CÓDIGO: ${p.code}</div>
+                            <button class="btn-copy" onclick="copy('${p.code}')">COPIAR</button>
+                        </div>
+                    `;
+                } else {
+                    gridProd.innerHTML += `
+                        <div class="card-prod">
+                            <img src="${p.img}">
+                            <div style="padding:15px">
+                                <div style="color:var(--accent); font-weight:900">R$ ${p.price}</div>
+                                <div style="font-size:0.7rem; opacity:0.6">${p.title}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        });
+
+        window.togglePostFields = () => {
+            const type = document.getElementById('p-type').value;
+            document.getElementById('field-cupom').style.display = type === 'cupom' ? 'block' : 'none';
         };
 
-        let products = [];
-
-        onValue(ref(db, 'market'), (snap) => {
-            const val = snap.val();
-            products = val ? Object.entries(val).reverse().map(([id,v])=>({id,...v})) : [];
-            renderGrid(products);
-        });
-
-        onValue(ref(db, `users/${UID}`), (snap) => {
-            const u = snap.val() || { name: 'ELITE USER', photo: 'https://via.placeholder.com/150' };
-            document.getElementById('my-avatar').src = u.photo;
-            document.getElementById('my-name').innerText = u.name;
-        });
-
-        function renderGrid(list) {
-            const grid = document.getElementById('market-grid');
-            grid.innerHTML = '';
-            list.forEach(p => {
-                grid.innerHTML += `
-                    <div class="card" onclick="alert('Funcionalidade de modal expandida!')">
-                        ${p.code ? '<div class="badge">CUPOM</div>' : ''}
-                        <img src="${p.img || 'https://via.placeholder.com/300'}">
-                        <div style="padding:20px">
-                            <div style="font-weight:900; color:var(--accent); font-size:1.2rem">R$ ${p.price}</div>
-                            <div style="font-size:0.8rem; font-weight:700; color:#888; margin-top:5px; text-transform:uppercase;">${p.title}</div>
-                        </div>
-                    </div>
-                `;
-            });
-            lucide.createIcons();
-        }
-
         window.publish = async () => {
+            const type = document.getElementById('p-type').value;
             const title = document.getElementById('p-title').value;
+            const code = document.getElementById('p-code').value;
             const price = document.getElementById('p-price').value;
             const img = document.getElementById('p-img').value;
             const url = document.getElementById('p-url').value;
             const desc = document.getElementById('p-desc').value;
-            const code = document.getElementById('p-code').value;
-            const category = document.getElementById('p-cat').value;
 
-            if(!title || !url) return alert("Erro crítico: Título e Link são vitais.");
-            await push(ref(db, 'market'), { title, price, img, url, desc, code, category, owner: UID });
-            window.location.reload();
+            await push(ref(db, 'market'), { type, title, code, price, img, url, desc });
+            alert("Publicado!");
+        };
+
+        window.copy = (txt) => {
+            navigator.clipboard.writeText(txt);
+            alert("Cupom Copiado!");
         };
 
         window.tab = (id, el) => {
@@ -222,13 +248,6 @@
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
-        };
-
-        window.saveProfile = async () => {
-            const name = document.getElementById('u-name').value;
-            const photo = document.getElementById('u-photo').value;
-            await set(ref(db, `users/${UID}`), { name, photo });
-            alert("Perfil sincronizado com a rede.");
         };
 
         lucide.createIcons();
