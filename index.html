@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TÁ NA PROMO!</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/x-icon" href="fav.ico">
+    
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -17,9 +18,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: #fff; display: flex; min-height: 100vh; overflow-x: hidden; }
 
-        /* --- INTRO --- */
+        /* --- INTRO COM LOGO.PNG --- */
         #intro { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: 1s ease-in-out; }
-        #intro img { width: 180px; animation: pulse 1.5s infinite; }
+        #intro img { width: 180px; height: auto; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 0.4; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1); } }
 
         /* --- SIDEBAR --- */
@@ -35,22 +36,24 @@
 
         .search-bar { width: 100%; background: #0a0a0a; border: 1px solid var(--border); padding: 15px 25px; border-radius: 30px; color: #fff; outline: none; margin-bottom: 25px; }
 
-        .cat-btn { padding: 8px 18px; border-radius: 20px; border: 1px solid var(--border); background: #080808; color: #666; cursor: pointer; font-size: 0.7rem; font-weight: 700; margin-right: 8px; transition: 0.2s; }
-        .cat-btn.active { background: var(--blue); color: #000; border-color: var(--blue); }
-
-        /* --- CARDS --- */
+        /* --- CARDS & AUTOR --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
         .card-p { background: #080808; border-radius: 18px; border: 1px solid var(--border); overflow: hidden; position: relative; }
         .card-img { width: 100%; aspect-ratio: 1; object-fit: cover; cursor: pointer; }
         
-        .author-tag { position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); z-index: 10; }
-        .author-img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; }
-        .author-name { font-size: 0.6rem; font-weight: 800; color: #fff; }
+        /* FOTO DE QUEM POSTOU NO CARD */
+        .author-tag { position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border); z-index: 10; }
+        .author-img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; border: 1px solid #fff; }
+        .author-name { font-size: 0.65rem; font-weight: 800; color: #fff; }
 
         .card-info { padding: 15px; }
         .vote-sys { display: flex; gap: 12px; align-items: center; }
         .vote-btn { background: none; border: none; cursor: pointer; color: #444; display: flex; align-items: center; gap: 4px; font-weight: 800; }
         .vote-btn.voted-up { color: var(--red); }
+
+        /* --- CATEGORIAS --- */
+        .cat-btn { padding: 8px 18px; border-radius: 20px; border: 1px solid var(--border); background: #080808; color: #666; cursor: pointer; font-size: 0.7rem; font-weight: 700; margin-right: 8px; }
+        .cat-btn.active { background: var(--blue); color: #000; border-color: var(--blue); }
 
         /* --- MODAL --- */
         #modal-p { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; display: none; padding: 40px; }
@@ -68,7 +71,7 @@
 </head>
 <body>
 
-    <div id="intro"><img src="log.png" alt="Logo"></div>
+    <div id="intro"><img src="logo.png" alt="Logo"></div>
 
     <aside>
         <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="layout-grid"></i> <span>Mural</span></div>
@@ -79,7 +82,7 @@
 
     <main>
         <section id="feed" class="section active">
-            <input type="text" class="search-bar" id="search-input" placeholder="Buscar promoções..." oninput="filterPosts()">
+            <input type="text" class="search-bar" id="search-input" placeholder="O que você procura?" oninput="filterPosts()">
             <div style="margin-bottom: 25px;">
                 <button class="cat-btn active" onclick="filterCat('Tudo', this)">Tudo</button>
                 <button class="cat-btn" onclick="filterCat('Tech', this)">Tech</button>
@@ -98,8 +101,8 @@
             <div style="max-width: 500px; margin: 0 auto;">
                 <h2 style="margin-bottom: 25px; font-family:'Syncopate';">PUBLICAR</h2>
                 <select id="p-type" onchange="togglePostFields()">
-                    <option value="p">Produto/Oferta</option>
-                    <option value="c">Cupom de Desconto</option>
+                    <option value="p">Oferta (Produto)</option>
+                    <option value="c">Cupom (Código)</option>
                 </select>
                 <div id="fields-p">
                     <select id="p-cat">
@@ -107,27 +110,27 @@
                         <option value="Setup">Setup</option>
                         <option value="Hardware">Hardware</option>
                     </select>
-                    <input type="text" id="p-title" placeholder="Título do Produto">
-                    <input type="text" id="p-price" placeholder="Preço (Ex: 299,00)">
-                    <input type="url" id="p-img" placeholder="URL da Imagem ou GIF">
-                    <input type="url" id="p-link" placeholder="Link Direto da Loja">
-                    <textarea id="p-desc" placeholder="Detalhes extras..."></textarea>
+                    <input type="text" id="p-title" placeholder="Nome do Produto">
+                    <input type="text" id="p-price" placeholder="Preço (Ex: 450,00)">
+                    <input type="url" id="p-img" placeholder="Link da Imagem ou GIF">
+                    <input type="url" id="p-link" placeholder="Link do Site/Loja">
+                    <textarea id="p-desc" placeholder="Descrição rápida..."></textarea>
                 </div>
                 <div id="fields-c" style="display:none;">
                     <input type="text" id="c-store" placeholder="Loja">
-                    <input type="text" id="c-code" placeholder="CÓDIGO DO CUPOM">
+                    <input type="text" id="c-code" placeholder="CÓDIGO">
                 </div>
-                <button class="btn-action" onclick="publish()">SUBIR PARA O FEED</button>
+                <button class="btn-action" onclick="publish()">ENVIAR PARA O MURAL</button>
             </div>
         </section>
 
         <section id="settings" class="section">
             <div style="max-width: 400px; margin: 0 auto; text-align: center;">
-                <img src="" id="display-avatar" style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #fff; margin-bottom:20px; box-shadow: 0 0 20px rgba(0,210,255,0.2);">
+                <img src="" id="display-avatar" style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #fff; margin-bottom:20px;">
                 <h1 id="display-name" style="font-weight: 800; margin-bottom: 30px;">Exiled</h1>
                 <input type="text" id="set-name" placeholder="Mudar Nome">
-                <input type="url" id="set-avatar" placeholder="Link do seu GIF de perfil">
-                <button class="btn-action" onclick="saveProfile()">ATUALIZAR MEU PERFIL</button>
+                <input type="url" id="set-avatar" placeholder="Link do seu GIF animado">
+                <button class="btn-action" onclick="saveProfile()">SALVAR ALTERAÇÕES</button>
             </div>
         </section>
     </main>
@@ -158,7 +161,7 @@
                 const intro = document.getElementById('intro');
                 intro.style.opacity = '0';
                 setTimeout(() => intro.style.display = 'none', 1000);
-            }, 1500);
+            }, 1800);
         });
 
         if(!localStorage.getItem('tnp_name')) {
@@ -225,7 +228,7 @@
                             <img src="${p.img}" class="card-img" onclick='openM("${id}", ${JSON.stringify(p).replace(/"/g, '&quot;')})'>
                             <div class="card-info">
                                 <div style="font-weight:900; font-size:1.1rem; color:var(--blue)">R$ ${p.price}</div>
-                                <div style="font-size:0.75rem; color:#888; margin:5px 0 15px 0;">${p.title}</div>
+                                <div style="font-size:0.75rem; color:#888; margin:5px 0 15px 0; height:32px; overflow:hidden;">${p.title}</div>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <div class="vote-sys">
                                         <button class="vote-btn ${voted?'voted-up':''}" onclick="vote('${id}', 1)"><i data-lucide="arrow-big-up"></i> ${p.likes}</button>
@@ -255,7 +258,7 @@
             localStorage.setItem(`voted_${id}`, 'true');
         };
 
-        window.del = (id) => { if(confirm("Remover post permanentemente?")) remove(ref(db, `tnp_posts/${id}`)); };
+        window.del = (id) => { if(confirm("Apagar postagem?")) remove(ref(db, `tnp_posts/${id}`)); };
 
         window.filterPosts = () => {
             const term = document.getElementById('search-input').value.toLowerCase();
@@ -276,10 +279,10 @@
                 <div>
                     <h1 style="font-family:'Syncopate'; font-size:1.2rem;">${p.title}</h1>
                     <h2 style="color:var(--blue); margin:20px 0;">R$ ${p.price}</h2>
-                    <p style="opacity:0.6; line-height:1.6; font-size:0.9rem;">${p.desc || 'Nenhuma descrição detalhada.'}</p>
+                    <p style="opacity:0.6; line-height:1.6; font-size:0.9rem;">${p.desc || ''}</p>
                     <div style="margin-top:20px; display:flex; align-items:center; gap:10px;">
                         <img src="${p.authorImg}" style="width:30px; height:30px; border-radius:50%">
-                        <span style="font-size:0.7rem; color:#444">Postado por: ${p.authorName}</span>
+                        <span style="font-size:0.75rem;">${p.authorName}</span>
                     </div>
                     <a href="${p.link}" target="_blank" style="text-decoration:none;"><button class="btn-action" style="margin-top:30px">RESGATAR AGORA</button></a>
                 </div>
