@@ -3,171 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TA NA PROMO! | Extreme Market</title>
+    <title>TA NA PROMO! | Elite Market Pro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        :root {
-            --bg: #000; --glass: rgba(12, 12, 12, 0.95); --border: rgba(255, 255, 255, 0.1);
-            --primary: #fff; --accent: #00ff88;
-        }
-
+        :root { --bg: #000; --glass: rgba(12, 12, 12, 0.95); --border: rgba(255, 255, 255, 0.1); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: #fff; min-height: 100vh; display: flex; overflow-x: hidden; }
+        body { background: var(--bg); color: #fff; display: flex; overflow-x: hidden; }
 
         /* --- SIDEBAR --- */
-        aside {
-            width: 260px; background: var(--glass); backdrop-filter: blur(20px); height: 100vh;
-            border-right: 1px solid var(--border); position: fixed; display: flex; flex-direction: column; padding: 30px 15px; z-index: 100;
-        }
-        .user-profile { display: flex; align-items: center; gap: 10px; padding: 12px; background: #111; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border); }
-        .user-profile img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
-        
+        aside { width: 260px; background: var(--glass); backdrop-filter: blur(20px); height: 100vh; border-right: 1px solid var(--border); position: fixed; padding: 30px 15px; z-index: 100; }
         .nav-link { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 10px; color: #555; cursor: pointer; transition: 0.3s; margin-bottom: 5px; }
-        .nav-link:hover, .nav-link.active { color: #fff; background: rgba(255,255,255,0.05); }
-        .nav-link.active { border-left: 4px solid #fff; border-radius: 0 10px 10px 0; background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent); }
+        .nav-link.active { color: #fff; background: rgba(255,255,255,0.05); border-left: 4px solid #fff; }
 
         /* --- MAIN --- */
         main { flex: 1; margin-left: 260px; padding: 40px; }
         .section { display: none; }
-        .section.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .section.active { display: block; }
 
-        /* --- SEARCH & FILTERS --- */
-        .top-bar { display: flex; gap: 20px; margin-bottom: 30px; }
-        .search-box { flex: 1; position: relative; }
-        .search-box input { width: 100%; padding: 15px 15px 15px 45px; background: #080808; border: 1px solid #222; border-radius: 8px; color: #fff; }
-        .search-box i { position: absolute; left: 15px; top: 15px; color: #444; }
-
-        /* --- GRID ALI STYLE --- */
+        /* --- GRID --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-        .ali-card { background: #0d0d0d; border-radius: 8px; overflow: hidden; transition: 0.2s; cursor: pointer; border: 1px solid transparent; }
-        .ali-card:hover { border-color: #fff; transform: translateY(-3px); }
-        .ali-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        .ali-info { padding: 10px; }
-        .ali-price { font-size: 1.3rem; font-weight: 800; color: #fff; }
+        .card { background: #0d0d0d; border-radius: 8px; overflow: hidden; transition: 0.2s; cursor: pointer; border: 1px solid transparent; position: relative; }
+        .card:hover { border-color: #fff; }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .delete-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.8); border: none; color: white; padding: 5px; border-radius: 5px; cursor: pointer; z-index: 10; display: none; }
 
-        /* --- MODAL ALIEXPRESS (AMONTUADO) --- */
+        /* --- MODAL --- */
         #modal { position: fixed; inset: 0; background: #000; z-index: 500; display: none; overflow-y: auto; padding: 20px; }
-        .ali-modal-content { max-width: 1200px; margin: 0 auto; display: flex; gap: 40px; background: #080808; padding: 30px; border-radius: 20px; }
-        .ali-left { flex: 1; position: sticky; top: 0; }
-        .ali-right { flex: 1.2; }
-        .ali-main-img { width: 100%; border-radius: 12px; border: 1px solid #222; }
+        .modal-content { max-width: 1200px; margin: 0 auto; display: flex; gap: 40px; background: #080808; padding: 30px; border-radius: 20px; }
+        .ali-left { flex: 1; } .ali-right { flex: 1.2; }
+        .btn-buy { width: 100%; padding: 20px; background: #fff; color: #000; font-weight: 900; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; margin-bottom: 10px; display: block; text-align: center; text-decoration: none; }
+        .btn-shop { background: #ff4747; color: white; } /* Cor AliExpress */
 
-        /* --- REVIEW SYSTEM --- */
-        .review-box { margin-top: 40px; border-top: 1px solid #222; padding-top: 20px; }
-        .review-card { background: #111; padding: 15px; border-radius: 12px; margin-bottom: 15px; display: flex; gap: 15px; }
-        .rev-user-img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
-        .rev-content { flex: 1; }
-        .rev-photo { width: 120px; border-radius: 8px; margin-top: 10px; cursor: pointer; }
-
-        /* --- FORMS --- */
-        .post-card { max-width: 600px; background: #0a0a0a; padding: 30px; border-radius: 15px; border: 1px solid #222; margin-bottom: 20px; }
-        input, textarea, select { width: 100%; background: #000; border: 1px solid #333; padding: 14px; color: #fff; border-radius: 8px; margin-bottom: 15px; }
-        .btn-buy { width: 100%; padding: 20px; background: #fff; color: #000; font-weight: 900; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; }
+        input, textarea { width: 100%; background: #000; border: 1px solid #333; padding: 14px; color: #fff; border-radius: 8px; margin-bottom: 15px; }
 
         @media (max-width: 900px) {
-            aside { width: 100%; height: 60px; bottom: 0; top: auto; flex-direction: row; padding: 5px; }
+            aside { width: 100%; height: 60px; bottom: 0; top: auto; flex-direction: row; }
             main { margin-left: 0; padding-bottom: 100px; }
-            .ali-modal-content { flex-direction: column; }
+            .modal-content { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
     <aside>
-        <div class="user-profile">
-            <img id="my-avatar" src="https://via.placeholder.com/80">
-            <div id="my-name" style="font-weight: 800; font-size: 0.8rem;">Gamer</div>
+        <div id="user-info" style="margin-bottom: 20px; text-align: center;">
+            <img id="my-avatar" src="" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid #fff;">
+            <p id="my-name" style="font-weight: 800; font-size: 0.7rem; margin-top: 5px;"></p>
         </div>
-        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="shopping-bag"></i> <span>Produtos</span></div>
-        <div class="nav-link" onclick="tab('coupons', this)"><i data-lucide="ticket"></i> <span>Cupons</span></div>
-        <div class="nav-link" onclick="tab('cart', this)"><i data-lucide="heart"></i> <span>Meu Setup</span></div>
-        <div class="nav-link" onclick="tab('post-area', this)"><i data-lucide="plus-circle"></i> <span>Vender/Postar</span></div>
-        <div class="nav-link" onclick="tab('profile-page', this)"><i data-lucide="user"></i> <span>Perfil</span></div>
+        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="layout-grid"></i> <span>Feed</span></div>
+        <div class="nav-link" onclick="tab('post-area', this)"><i data-lucide="plus-circle"></i> <span>Postar</span></div>
+        <div class="nav-link" onclick="tab('profile', this)"><i data-lucide="user"></i> <span>Perfil</span></div>
     </aside>
 
     <main>
         <section id="feed" class="section active">
-            <div class="top-bar">
-                <div class="search-box"><i data-lucide="search"></i><input type="text" placeholder="Buscar no TA NA PROMO..." oninput="search(this.value)"></div>
-            </div>
+            <h2 style="font-family:'Syncopate'; margin-bottom:20px;">OFERTAS DA COMUNIDADE</h2>
             <div class="grid" id="market-grid"></div>
         </section>
 
-        <section id="coupons" class="section">
-            <h2 style="font-family:'Syncopate'; margin-bottom:20px;">CUPONS ATIVOS</h2>
-            <div class="grid" id="coupon-grid"></div>
-        </section>
-
-        <section id="cart" class="section">
-            <div style="background:#fff; color:#000; padding:20px; border-radius:10px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
-                <h2 style="font-family:'Syncopate'">TOTAL: <span id="setup-total">R$ 0,00</span></h2>
-            </div>
-            <div class="grid" id="setup-grid"></div>
-        </section>
-
         <section id="post-area" class="section">
-            <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <button onclick="togglePostType('prod')" class="nav-link active" id="btn-post-prod">Postar Produto</button>
-                <button onclick="togglePostType('cupom')" class="nav-link" id="btn-post-cupom">Postar Cupom</button>
-            </div>
-
-            <div id="form-product" class="post-card">
-                <input type="text" id="p-title" placeholder="Nome do Hardware">
+            <div style="max-width: 600px; margin: 0 auto; background: #0a0a0a; padding: 30px; border-radius: 15px; border: 1px solid #222;">
+                <h2 style="margin-bottom:20px;">NOVA PROMOÇÃO</h2>
+                <input type="text" id="p-title" placeholder="Nome do Produto">
                 <input type="number" id="p-price" placeholder="Preço (R$)">
-                <input type="url" id="p-img" placeholder="URL da Imagem ou GIF">
-                <textarea id="p-desc" placeholder="Descrição técnica completa..." rows="4"></textarea>
-                <button class="btn-buy" onclick="publish('prod')">Publicar Produto</button>
-            </div>
-
-            <div id="form-coupon" class="post-card" style="display:none">
-                <input type="text" id="c-store" placeholder="Loja (Amazon, Kabum...)">
-                <input type="text" id="c-code" placeholder="CÓDIGO DO CUPOM">
-                <input type="text" id="c-desc" placeholder="Ex: 10% OFF em Placas de Vídeo">
-                <button class="btn-buy" onclick="publish('cupom')">Publicar Cupom</button>
+                <input type="url" id="p-img" placeholder="Link da Imagem/GIF">
+                <input type="url" id="p-url" placeholder="Link de Compra (AliExpress, Amazon, etc)">
+                <textarea id="p-desc" placeholder="Descrição..." rows="4"></textarea>
+                <button class="btn-buy" onclick="publish()">Publicar Agora</button>
             </div>
         </section>
 
-        <section id="profile-page" class="section">
-            <div class="post-card" style="text-align:center;">
-                <img id="profile-preview" src="https://via.placeholder.com/100" style="width:100px; height:100px; border-radius:20px; margin-bottom:15px; border:2px solid #fff;">
+        <section id="profile" class="section">
+            <div style="max-width: 400px; margin: 0 auto; text-align: center;">
                 <input type="text" id="u-name" placeholder="Seu Nome">
-                <input type="text" id="u-photo" placeholder="URL da Foto/GIF de Perfil" oninput="document.getElementById('profile-preview').src=this.value">
-                <button class="btn-buy" onclick="saveProfile()">Atualizar Perfil</button>
+                <input type="text" id="u-photo" placeholder="Link Foto Perfil">
+                <button class="btn-buy" onclick="saveProfile()">Salvar Perfil</button>
             </div>
         </section>
     </main>
 
     <div id="modal">
-        <button onclick="closeModal()" style="position:fixed; top:20px; right:20px; background:#fff; border:none; padding:10px; border-radius:50%; cursor:pointer; z-index:1000;"><i data-lucide="x" color="#000"></i></button>
-        <div class="ali-modal-content">
-            <div class="ali-left"><img id="m-img" class="ali-main-img"></div>
+        <button onclick="closeModal()" style="position:fixed; top:20px; right:20px; background:#fff; border:none; padding:10px; border-radius:50%; cursor:pointer;"><i data-lucide="x" color="#000"></i></button>
+        <div class="modal-content">
+            <div class="ali-left"><img id="m-img" style="width:100%; border-radius:12px;"></div>
             <div class="ali-right">
-                <h1 id="m-title" style="font-family:'Syncopate'; font-size:1.8rem;"></h1>
-                <div id="m-price" style="font-size:2.5rem; font-weight:900; color:#fff; margin:15px 0;"></div>
-                <p id="m-desc" style="color:#888; line-height:1.6; margin-bottom:30px;"></p>
+                <h1 id="m-title" style="font-family:'Syncopate';"></h1>
+                <div id="m-price" style="font-size:2.5rem; font-weight:900; margin:15px 0;"></div>
+                <p id="m-desc" style="color:#888; margin-bottom:30px;"></p>
                 
-                <button id="m-setup-btn" class="btn-buy" style="margin-bottom:10px;"></button>
-                
-                <div class="review-box">
-                    <h3>Avaliações de Clientes</h3>
-                    <div style="margin-top:15px; background:#0a0a0a; padding:15px; border-radius:10px;">
-                        <textarea id="r-text" placeholder="Escreva sua review..." rows="2"></textarea>
-                        <input type="text" id="r-img" placeholder="Link de foto/GIF da sua peça (opcional)">
-                        <button onclick="addReview()" style="background:#fff; color:#000; border:none; padding:10px 20px; border-radius:5px; font-weight:800; cursor:pointer;">POSTAR REVIEW</button>
-                    </div>
-                    <div id="m-reviews-list" style="margin-top:20px;"></div>
-                </div>
+                <a id="m-link" href="#" target="_blank" class="btn-buy btn-shop">IR PARA A LOJA <i data-lucide="external-link" style="width:16px;"></i></a>
+                <button id="m-setup-btn" class="btn-buy" style="background: #222; color: #fff;">SALVAR NO SETUP</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAMoxCYuvhRQtRzPm4KSpRo5qtPr3keu0I",
@@ -184,159 +119,83 @@
         const UID = localStorage.getItem('tnp_uid') || 'U'+Math.floor(Math.random()*9999);
         localStorage.setItem('tnp_uid', UID);
 
-        let data_products = [];
-        let my_setup = JSON.parse(localStorage.getItem('my_setup')) || [];
-        let activeId = null;
+        let products = [];
 
         // Carregar Perfil
         onValue(ref(db, `users/${UID}`), (snap) => {
             const u = snap.val() || { name: 'Gamer', photo: 'https://via.placeholder.com/80' };
             document.getElementById('my-avatar').src = u.photo;
             document.getElementById('my-name').innerText = u.name;
-            document.getElementById('profile-preview').src = u.photo;
-            document.getElementById('u-name').value = u.name;
-            document.getElementById('u-photo').value = u.photo;
         });
 
-        // Sync Produtos
+        // Carregar Feed
         onValue(ref(db, 'market'), (snap) => {
             const val = snap.val();
-            data_products = val ? Object.entries(val).reverse().map(([id,v])=>({id,...v})) : [];
-            render(data_products);
-            renderSetup();
-            if(activeId) openModal(activeId);
-        });
-
-        // Sync Cupons
-        onValue(ref(db, 'coupons'), (snap) => {
-            const val = snap.val();
-            const grid = document.getElementById('coupon-grid');
-            grid.innerHTML = '';
-            if(val) Object.values(val).reverse().forEach(c => {
-                grid.innerHTML += `<div class="ali-card" style="padding:20px; border:2px dashed #333;"><small>${c.store}</small><h2 style="color:#00ff88">${c.code}</h2><p>${c.desc}</p></div>`;
-            });
-        });
-
-        function render(items) {
+            products = val ? Object.entries(val).reverse().map(([id,v])=>({id,...v})) : [];
             const grid = document.getElementById('market-grid');
             grid.innerHTML = '';
-            items.forEach(p => {
+            products.forEach(p => {
+                const isOwner = p.owner === UID;
                 grid.innerHTML += `
-                    <div class="ali-card" onclick="openModal('${p.id}')">
-                        <img src="${p.img}">
-                        <div class="ali-info">
-                            <div class="ali-price">R$ ${p.price}</div>
-                            <div style="font-size:0.75rem; color:#555; height:32px; overflow:hidden;">${p.title}</div>
+                    <div class="card">
+                        <button class="delete-btn" style="display:${isOwner?'block':'none'}" onclick="deleteItem('${p.id}', event)"><i data-lucide="trash-2" size="16"></i></button>
+                        <div onclick="openModal('${p.id}')">
+                            <img src="${p.img}">
+                            <div style="padding:10px">
+                                <div style="font-weight:900">R$ ${p.price}</div>
+                                <div style="font-size:0.7rem; color:#555">${p.title}</div>
+                            </div>
                         </div>
                     </div>
                 `;
             });
             lucide.createIcons();
-        }
+        });
+
+        window.publish = async () => {
+            const title = document.getElementById('p-title').value;
+            const price = document.getElementById('p-price').value;
+            const img = document.getElementById('p-img').value;
+            const url = document.getElementById('p-url').value;
+            const desc = document.getElementById('p-desc').value;
+            if(!title || !url) return alert("Nome e Link de compra são obrigatórios!");
+            
+            await push(ref(db, 'market'), { title, price, img, url, desc, owner: UID });
+            tab('feed', document.querySelector('.nav-link'));
+        };
+
+        window.deleteItem = async (id, e) => {
+            e.stopPropagation();
+            if(confirm("Deseja apagar sua postagem?")) {
+                await remove(ref(db, `market/${id}`));
+            }
+        };
 
         window.openModal = (id) => {
-            const p = data_products.find(x => x.id === id);
-            activeId = id;
+            const p = products.find(x => x.id === id);
             document.getElementById('m-img').src = p.img;
             document.getElementById('m-title').innerText = p.title;
             document.getElementById('m-price').innerText = 'R$ ' + p.price;
             document.getElementById('m-desc').innerText = p.desc;
-            
-            const isSaved = my_setup.some(s => s.id === id);
-            const btn = document.getElementById('m-setup-btn');
-            btn.innerText = isSaved ? 'Remover do Meu Setup' : 'Adicionar ao Meu Setup';
-            btn.style.background = isSaved ? '#111' : '#fff';
-            btn.style.color = isSaved ? '#ff4444' : '#000';
-            btn.onclick = () => toggleSetup(p);
-
-            // Reviews com Foto
-            const revList = document.getElementById('m-reviews-list');
-            revList.innerHTML = p.reviews ? Object.values(p.reviews).reverse().map(r => `
-                <div class="review-card">
-                    <img src="${r.uPhoto}" class="rev-user-img">
-                    <div class="rev-content">
-                        <strong style="font-size:0.8rem;">${r.uName}</strong>
-                        <p style="font-size:0.9rem; color:#ccc; margin-top:5px;">${r.text}</p>
-                        ${r.img ? `<img src="${r.img}" class="rev-photo" onclick="window.open('${r.img}')">` : ''}
-                    </div>
-                </div>
-            `).join('') : '<p style="color:#444">Nenhuma avaliação ainda.</p>';
-
+            document.getElementById('m-link').href = p.url;
             document.getElementById('modal').style.display = 'block';
-            document.body.style.overflow = 'hidden';
             lucide.createIcons();
-        };
-
-        window.toggleSetup = (p) => {
-            const idx = my_setup.findIndex(s => s.id === p.id);
-            if(idx > -1) my_setup.splice(idx, 1);
-            else my_setup.push(p);
-            localStorage.setItem('my_setup', JSON.stringify(my_setup));
-            renderSetup();
-            openModal(p.id);
-        };
-
-        window.renderSetup = () => {
-            const grid = document.getElementById('setup-grid');
-            grid.innerHTML = '';
-            let total = 0;
-            my_setup.forEach(p => {
-                total += parseFloat(p.price);
-                grid.innerHTML += `<div class="ali-card" onclick="openModal('${p.id}')"><img src="${p.img}"><div class="ali-info"><div class="ali-price">R$ ${p.price}</div></div></div>`;
-            });
-            document.getElementById('setup-total').innerText = total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-        };
-
-        window.publish = async (type) => {
-            if(type === 'prod') {
-                const title = document.getElementById('p-title').value;
-                const price = document.getElementById('p-price').value;
-                const img = document.getElementById('p-img').value;
-                const desc = document.getElementById('p-desc').value;
-                await push(ref(db, 'market'), { title, price, img, desc });
-            } else {
-                const store = document.getElementById('c-store').value;
-                const code = document.getElementById('c-code').value;
-                const desc = document.getElementById('c-desc').value;
-                await push(ref(db, 'coupons'), { store, code, desc });
-            }
-            tab('feed', document.querySelector('.nav-link'));
-        };
-
-        window.addReview = async () => {
-            const text = document.getElementById('r-text').value;
-            const img = document.getElementById('r-img').value;
-            const uName = document.getElementById('my-name').innerText;
-            const uPhoto = document.getElementById('my-avatar').src;
-            if(!text) return;
-            await push(ref(db, `market/${activeId}/reviews`), { uName, uPhoto, text, img });
-            document.getElementById('r-text').value = '';
-            document.getElementById('r-img').value = '';
         };
 
         window.saveProfile = async () => {
             const name = document.getElementById('u-name').value;
             const photo = document.getElementById('u-photo').value;
             await set(ref(db, `users/${UID}`), { name, photo });
-            alert("Perfil Atualizado!");
+            alert("Perfil salvo!");
         };
 
-        window.togglePostType = (t) => {
-            document.getElementById('form-product').style.display = t === 'prod' ? 'block' : 'none';
-            document.getElementById('form-coupon').style.display = t === 'cupom' ? 'block' : 'none';
-            document.getElementById('btn-post-prod').classList.toggle('active', t === 'prod');
-            document.getElementById('btn-post-cupom').classList.toggle('active', t === 'cupom');
-        };
-
-        window.search = (t) => render(data_products.filter(p => p.title.toLowerCase().includes(t.toLowerCase())));
-        window.closeModal = () => { document.getElementById('modal').style.display = 'none'; document.body.style.overflow = 'auto'; activeId = null; };
+        window.closeModal = () => document.getElementById('modal').style.display = 'none';
         window.tab = (id, el) => {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             if(el.classList.contains('nav-link')) el.classList.add('active');
         };
-
         lucide.createIcons();
     </script>
 </body>
