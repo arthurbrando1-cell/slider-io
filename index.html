@@ -3,46 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE MARKET | PRO PLATFORM</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Plus+Jakarta+Sans:wght@300;500;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <title>Sua Plataforma de Cupons</title>
+    <link rel="icon" href="fav.ico" type="image/x-icon">
     <style>
-        :root {
-            --accent: #ff004c;
-            --bg: #050505;
-            --card-bg: #111;
-            --border: rgba(255,255,255,0.08);
-            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        /* Reset e Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #1a1a1a; color: white; overflow-x: hidden; }
+
+        /* Intro Blackout 3D */
+        #intro {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: black; display: flex; justify-content: center; align-items: center;
+            z-index: 9999; transition: opacity 1s ease-out;
+        }
+        .logo-3d {
+            width: 300px;
+            animation: float3d 3s infinite ease-in-out;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
+        }
+        @keyframes float3d {
+            0%, 100% { transform: perspective(1000px) rotateY(0deg) scale(1); }
+            50% { transform: perspective(1000px) rotateY(20deg) scale(1.1); }
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
-        body { background: var(--bg); color: #fff; overflow-x: hidden; }
-
-        /* --- ANIMAÇÕES DE ENTRADA --- */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .section { animation: fadeIn 0.6s ease-out forwards; display: none; }
-        .section.active { display: block; }
-
-        /* --- SIDEBAR LUXURY --- */
-        aside { 
-            width: 280px; height: 100vh; position: fixed; 
-            background: rgba(8, 8, 8, 0.8); backdrop-filter: blur(30px);
-            border-right: 1px solid var(--border); padding: 40px 20px; z-index: 100;
+        /* Layout Principal */
+        #main-content { display: none; padding-top: 60px; }
+        
+        /* Nav / Tabs */
+        nav {
+            background: #222; padding: 10px; position: fixed; top: 0; width: 100%;
+            display: flex; gap: 10px; border-bottom: 2px solid #333; z-index: 100;
         }
-        .nav-link { 
-            display: flex; align-items: center; gap: 15px; padding: 16px; 
-            border-radius: 12px; color: #666; cursor: pointer; transition: var(--transition);
-            margin-bottom: 8px; font-weight: 500;
+        .tab-btn {
+            background: #333; border: none; color: white; padding: 10px 20px;
+            cursor: pointer; border-radius: 5px; transition: 0.3s;
         }
-        .nav-link:hover { background: rgba(255,255,255,0.03); color: #fff; }
-        .nav-link.active { background: var(--accent); color: #fff; box-shadow: 0 10px 30px rgba(255, 0, 76, 0.2); }
+        .tab-btn.active { background: #e74c3c; font-weight: bold; }
 
-        /* --- MURAL DE CUPONS --- */
-        .coupon-banner {
-            background: linear-gradient(90deg, #ff004c, #7000ff);
-            padding: 15px; border-radius: 12px; margin-bottom: 30px;
-            display: flex; justify-content: space-between; align-items: center;
+        /* Container de Conteúdo */
+        .tab-content { display: none; padding: 20px; max-width: 1200px; margin: auto; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Estilo Produtos/Cupons */
+        .product-card {
+            background: #333; padding: 15px; border-radius: 10px; margin-bottom: 20px;
+            display: flex; gap: 20px; align-items: center;
         }
-        .coupon-card { 
-            background:
+        .product-img { width: 150px; border-radius: 8px; }
+        .btn-cupom { background: #27ae60; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="intro">
+        <img src="logo.png" alt="Logo" class="logo-3d">
+    </div>
+
+    <nav id="nav-tabs">
+        <button class="tab-btn active" onclick="openTab('home')">Início</button>
+        <button class="tab-btn" onclick="openTab('cupons')">Postar Cupom</button>
+        <button class="tab-btn" onclick="openTab('produto1')">Produto 01 (Exemplo)</button>
+    </nav>
+
+    <main id="main-content">
+        
+        <section id="home" class="tab-content active">
+            <h2>Destaques do Dia</h2>
+            <div class="product-card" onclick="openTab('produto1')" style="cursor: pointer;">
+                <img src="https://via.placeholder.com/150" class="product-img">
+                <div>
+                    <h3>Teclado Mecânico RGB</h3>
+                    <p>Melhor custo benefício de 2026.</p>
+                    <button class="btn-cupom">Ver Oferta</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="cupons" class="tab-content">
+            <h2>Compartilhar Cupom</h2>
+            <form style="display: flex; flex-direction: column; gap: 10px; max-width: 400px;">
+                <input type="text" placeholder="Nome do Produto" style="padding: 10px;">
+                <input type="text" placeholder="Código do Cupom" style="padding: 10px;">
+                <button type="submit" class="btn-cupom">Publicar Agora</button>
+            </form>
+        </section>
+
+        <section id="produto1" class="tab-content">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <img src="https://via.placeholder.com/400" style="width: 100%; border-radius: 10px;">
+                    <div style="margin-top: 10px; display: flex; gap: 5px;">
+                        <img src="https://via.placeholder.com/80" alt="thumb">
+                        <img src="https://via.placeholder.com/80" alt="thumb">
+                    </div>
+                </div>
+                <div>
+                    <h1>Teclado Mecânico RGB Pro</h1>
+                    <h2 style="color: #e74c3c;">R$ 159,90</h2>
+                    <p style="margin: 20px 0;">Reviews: ⭐⭐⭐⭐⭐ (450 avaliações)</p>
+                    <div style="background: #222; padding: 15px; border-left: 4px solid #e74c3c;">
+                        <p><strong>CUPOM:</strong> PROMO2026</p>
+                    </div>
+                    <button class="btn-cupom" style="width: 100%; margin-top: 20px; font-size: 1.2rem;">IR PARA A LOJA</button>
+                </div>
+            </div>
+            <hr style="margin: 40px 0; border: 0; border-top: 1px solid #444;">
+            <h3>Análises e Gifs</h3>
+            <p>Imagine aqui o GIF do produto funcionando...</p>
+        </section>
+
+    </main>
+
+    <script>
+        // Lógica da Intro
+        window.onload = () => {
+            setTimeout(() => {
+                const intro = document.getElementById('intro');
+                intro.style.opacity = '0';
+                setTimeout(() => {
+                    intro.style.display = 'none';
+                    document.getElementById('main-content').style.display = 'block';
+                }, 1000);
+            }, 3000); // 3 segundos de intro
+        };
+
+        // Lógica das Abas
+        function openTab(tabId) {
+            const contents = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-btn');
+
+            contents.forEach(content => content.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            // Scroll para o topo ao trocar aba
+            window.scrollTo(0,0);
+        }
+    </script>
+</body>
+</html>
