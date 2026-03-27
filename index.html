@@ -11,7 +11,7 @@
     <style>
         :root { 
             --bg: #000; --glass: rgba(10, 10, 10, 0.98); --border: rgba(255, 255, 255, 0.1); 
-            --blue: #00d2ff; --red: #ff4757; --green: #2ecc71;
+            --blue: #00d2ff; --red: #ff4757;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -33,32 +33,28 @@
         .section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* --- ESTIMATIVA NO TOPO --- */
+        .total-header { background: var(--blue); color: #000; padding: 20px; border-radius: 15px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; font-weight: 900; font-family: 'Syncopate'; font-size: 0.8rem; }
+
         /* --- CARDS --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
         .card-p { background: #080808; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; position: relative; }
         .card-img { width: 100%; aspect-ratio: 1; object-fit: cover; cursor: pointer; }
         
         .author-tag { position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.8); padding: 5px 12px; border-radius: 20px; z-index: 10; }
-        .save-btn { position: absolute; top: 12px; right: 12px; background: #fff; color: #000; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: 0.3s; }
-        .save-btn:hover { background: var(--red); color: #fff; }
+        .save-btn { position: absolute; top: 12px; right: 12px; background: #fff; color: #000; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
 
-        .card-info { padding: 18px; }
-        .price-tag { font-weight: 900; font-size: 1.2rem; color: var(--blue); margin-bottom: 5px; }
-
-        /* --- CARRINHO --- */
-        .cart-item { display: flex; align-items: center; gap: 15px; background: #080808; padding: 15px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 15px; }
-        .cart-img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; }
-        .total-box { background: var(--blue); color: #000; padding: 25px; border-radius: 20px; margin-top: 30px; display: flex; justify-content: space-between; align-items: center; font-weight: 900; }
+        /* --- CUPOM STYLE --- */
+        .coupon-card { background: #0a0a0a; border: 2px dashed #222; padding: 30px; border-radius: 20px; text-align: center; position: relative; }
+        .coupon-code { background: #fff; color: #000; font-weight: 900; padding: 8px 15px; border-radius: 8px; display: inline-block; margin: 15px 0; cursor: pointer; transition: 0.3s; }
+        .coupon-code:active { transform: scale(0.9); }
 
         .btn-action { width: 100%; padding: 18px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; margin-top: 10px; }
-        .btn-outline { background: none; border: 1px solid var(--red); color: var(--red); padding: 10px; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 0.7rem; }
-
         input, textarea, select { width: 100%; background: #0a0a0a; border: 1px solid #222; padding: 15px; color: #fff; border-radius: 12px; margin-bottom: 12px; outline: none; }
 
         @media (max-width: 900px) {
             aside { width: 100%; height: 65px; bottom: 0; top: auto; flex-direction: row; padding: 5px; justify-content: space-around; border-right: none; border-top: 1px solid var(--border); }
             main { margin-left: 0; padding: 20px 20px 100px 20px; }
-            #intro img { width: 220px; }
         }
     </style>
 </head>
@@ -81,41 +77,45 @@
         </section>
 
         <section id="cart" class="section">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-                <h2 style="font-family:'Syncopate';">MEU CARRINHO</h2>
-                <button class="btn-outline" onclick="clearCart()">LIMPAR LISTA</button>
-            </div>
-            <div id="cart-list"></div>
-            <div class="total-box">
-                <span>TOTAL ESTIMADO:</span>
+            <div class="total-header">
+                <span>TOTAL DO CARRINHO:</span>
                 <span id="cart-total">R$ 0,00</span>
             </div>
+            <div id="cart-list"></div>
+            <button class="btn-action" style="background:var(--red); color:#fff; margin-top:20px;" onclick="clearCart()">LIMPAR TUDO</button>
+        </section>
+
+        <section id="cupons" class="section">
+            <h2 style="font-family:'Syncopate'; margin-bottom:30px;">CUPONS DISPONÍVEIS</h2>
+            <div class="grid" id="cupons-grid"></div>
         </section>
 
         <section id="post" class="section">
             <div style="max-width: 500px; margin: 0 auto;">
                 <h2 style="margin-bottom: 25px; font-family:'Syncopate';">PUBLICAR</h2>
-                <select id="p-cat">
-                    <option value="Tech">Tech</option>
-                    <option value="Setup">Setup</option>
-                    <option value="Hardware">Hardware</option>
+                <select id="p-type" onchange="togglePostFields()">
+                    <option value="p">Produto/Oferta</option>
+                    <option value="c">Cupom</option>
                 </select>
-                <input type="text" id="p-title" placeholder="Nome do Produto">
-                <input type="text" id="p-price" placeholder="Preço (Ex: 1200.00)">
-                <input type="url" id="p-img" placeholder="URL da Imagem">
-                <input type="url" id="p-link" placeholder="Link de Compra">
-                <textarea id="p-desc" placeholder="Descrição..."></textarea>
-                <button class="btn-action" onclick="publish()">POSTAR AGORA</button>
+                <div id="fields-p">
+                    <input type="text" id="p-title" placeholder="Nome do Produto">
+                    <input type="text" id="p-price" placeholder="Preço (Ex: 150.00)">
+                    <input type="url" id="p-img" placeholder="URL da Imagem">
+                    <input type="url" id="p-link" placeholder="Link de Compra">
+                </div>
+                <div id="fields-c" style="display:none;">
+                    <input type="text" id="c-store" placeholder="Nome da Loja">
+                    <input type="text" id="c-code" placeholder="CÓDIGO DO CUPOM">
+                </div>
+                <button class="btn-action" onclick="publish()">ENVIAR AGORA</button>
             </div>
         </section>
 
         <section id="settings" class="section">
             <div style="max-width: 400px; margin: 0 auto; text-align: center;">
                 <img src="" id="display-avatar" style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #fff; margin-bottom:20px;">
-                <h1 id="display-name" style="margin-bottom:20px;">Exiled</h1>
-                <input type="text" id="set-name" placeholder="Mudar Nome">
-                <input type="url" id="set-avatar" placeholder="Link do GIF">
-                <button class="btn-action" onclick="saveProfile()">SALVAR</button>
+                <h1 id="display-name">Exiled</h1>
+                <button class="btn-action" onclick="saveProfile()">MUDAR DADOS</button>
             </div>
         </section>
     </main>
@@ -137,118 +137,98 @@
         const myToken = localStorage.getItem('userToken') || 'user_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('userToken', myToken);
 
-        // --- INTRO ---
         window.addEventListener('load', () => setTimeout(() => document.getElementById('intro').style.display = 'none', 2000));
 
-        // --- IDENTITY ---
-        if(!localStorage.getItem('tnp_name')) {
-            localStorage.setItem('tnp_name', 'Exiled');
-            localStorage.setItem('tnp_avatar', 'https://media.giphy.com/media/L3Y45TZEmCcENHL2mg/giphy.gif');
-        }
-        document.getElementById('display-name').innerText = localStorage.getItem('tnp_name');
-        document.getElementById('display-avatar').src = localStorage.getItem('tnp_avatar');
-
-        window.saveProfile = () => {
-            localStorage.setItem('tnp_name', document.getElementById('set-name').value || 'Exiled');
-            localStorage.setItem('tnp_avatar', document.getElementById('set-avatar').value || '');
-            location.reload();
-        };
-
-        // --- DATABASE ---
+        // --- CORE RENDER ---
         let allPosts = [];
-        window.publish = async () => {
-            const p = {
-                title: document.getElementById('p-title').value,
-                price: document.getElementById('p-price').value,
-                img: document.getElementById('p-img').value,
-                link: document.getElementById('p-link').value,
-                cat: document.getElementById('p-cat').value,
-                owner: myToken, authorName: localStorage.getItem('tnp_name'), authorImg: localStorage.getItem('tnp_avatar'),
-                likes: 0, time: Date.now()
-            };
-            await push(ref(db, 'tnp_posts'), p);
-            tab('feed', document.querySelector('.nav-link'));
-        };
-
         onValue(ref(db, 'tnp_posts'), (snap) => {
             allPosts = snap.exists() ? Object.entries(snap.val()).reverse() : [];
             renderGrid();
         });
 
-        window.renderGrid = (data = allPosts) => {
-            const grid = document.getElementById('main-grid');
-            grid.innerHTML = '';
-            data.forEach(([id, p]) => {
+        window.renderGrid = () => {
+            const feed = document.getElementById('main-grid');
+            const cupons = document.getElementById('cupons-grid');
+            feed.innerHTML = ''; cupons.innerHTML = '';
+
+            allPosts.forEach(([id, p]) => {
                 const isOwner = p.owner === myToken;
-                grid.innerHTML += `
-                    <div class="card-p">
-                        <div class="author-tag"><img src="${p.authorImg}" style="width:20px;height:20px;border-radius:50%"> <span style="font-size:0.6rem">${p.authorName}</span></div>
-                        <button class="save-btn" onclick='addToCart(${JSON.stringify(p).replace(/"/g, '&quot;')})'><i data-lucide="heart"></i></button>
-                        <img src="${p.img}" class="card-img">
-                        <div class="card-info">
-                            <div class="price-tag">R$ ${p.price}</div>
-                            <div style="font-size:0.75rem; color:#666; margin-bottom:15px;">${p.title}</div>
-                            <div style="display:flex; justify-content:space-between;">
-                                <div style="display:flex; gap:10px; color:#444; font-weight:800; font-size:0.8rem;"><i data-lucide="arrow-big-up" size="16"></i> ${p.likes}</div>
-                                ${isOwner ? `<i data-lucide="trash-2" size="16" style="cursor:pointer" onclick="del('${id}')"></i>` : ''}
+                if(p.type === 'p' || !p.type) {
+                    feed.innerHTML += `
+                        <div class="card-p">
+                            <div class="author-tag"><img src="${p.authorImg}" style="width:18px;height:18px;border-radius:50%"> <span style="font-size:0.6rem">${p.authorName}</span></div>
+                            <button class="save-btn" onclick='addToCart(${JSON.stringify(p).replace(/"/g, '&quot;')})'><i data-lucide="heart"></i></button>
+                            <img src="${p.img}" class="card-img">
+                            <div class="card-info">
+                                <div style="color:var(--blue); font-weight:900;">R$ ${p.price}</div>
+                                <div style="font-size:0.7rem; color:#666; margin-bottom:10px;">${p.title}</div>
+                                ${isOwner ? `<i data-lucide="trash-2" size="14" style="cursor:pointer; color:#222" onclick="del('${id}')"></i>` : ''}
                             </div>
-                        </div>
-                    </div>
-                `;
+                        </div>`;
+                } else {
+                    cupons.innerHTML += `
+                        <div class="coupon-card">
+                            <span style="font-size:0.7rem; opacity:0.5;">${p.store}</span><br>
+                            <div class="coupon-code" onclick="copyCode('${p.code}')">${p.code}</div>
+                            <p style="font-size:0.5rem;">Clique no código para copiar</p>
+                            ${isOwner ? `<i data-lucide="trash-2" size="14" style="position:absolute; bottom:10px; right:10px; cursor:pointer;" onclick="del('${id}')"></i>` : ''}
+                        </div>`;
+                }
             });
             lucide.createIcons();
         };
 
-        // --- CARRINHO LOGIC ---
-        let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+        // --- ACTIONS ---
+        window.publish = async () => {
+            const type = document.getElementById('p-type').value;
+            const p = { type, owner: myToken, authorName: localStorage.getItem('tnp_name'), authorImg: localStorage.getItem('tnp_avatar'), time: Date.now() };
+            if(type === 'p') {
+                p.title = document.getElementById('p-title').value;
+                p.price = document.getElementById('p-price').value;
+                p.img = document.getElementById('p-img').value;
+                p.link = document.getElementById('p-link').value;
+            } else {
+                p.store = document.getElementById('c-store').value;
+                p.code = document.getElementById('c-code').value;
+            }
+            await push(ref(db, 'tnp_posts'), p);
+            tab('feed', document.querySelector('.nav-link'));
+        };
 
+        window.copyCode = (code) => {
+            navigator.clipboard.writeText(code);
+            alert("Cupom copiado: " + code);
+        };
+
+        // --- CARRINHO ---
+        let cart = JSON.parse(localStorage.getItem('myCart')) || [];
         window.addToCart = (item) => {
             cart.push(item);
             localStorage.setItem('myCart', JSON.stringify(cart));
-            renderCart();
-            alert("Adicionado ao Carrinho!");
+            alert("Salvo no carrinho!");
+            if(document.getElementById('cart').classList.contains('active')) renderCart();
         };
 
         window.renderCart = () => {
             const list = document.getElementById('cart-list');
             const totalEl = document.getElementById('cart-total');
-            list.innerHTML = '';
-            let total = 0;
-
-            cart.forEach((item, index) => {
-                const price = parseFloat(item.price.replace(',', '.'));
-                total += isNaN(price) ? 0 : price;
-
-                list.innerHTML += `
-                    <div class="cart-item">
-                        <img src="${item.img}" class="cart-img">
-                        <div style="flex:1">
-                            <div style="font-weight:800; font-size:0.8rem;">${item.title}</div>
-                            <div style="color:var(--blue); font-weight:900;">R$ ${item.price}</div>
-                        </div>
-                        <a href="${item.link}" target="_blank" style="color:#fff"><i data-lucide="external-link"></i></a>
-                        <i data-lucide="x-circle" style="color:var(--red); cursor:pointer" onclick="removeFromCart(${index})"></i>
+            list.innerHTML = ''; let total = 0;
+            cart.forEach((item, idx) => {
+                total += parseFloat(item.price) || 0;
+                list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; background:#080808; padding:15px; border-radius:12px; margin-bottom:10px;">
+                    <span style="font-size:0.7rem;">${item.title}</span>
+                    <div style="display:flex; gap:15px; align-items:center;">
+                        <b style="color:var(--blue)">R$ ${item.price}</b>
+                        <i data-lucide="trash" size="14" style="color:var(--red); cursor:pointer;" onclick="removeFromCart(${idx})"></i>
                     </div>
-                `;
+                </div>`;
             });
-
-            totalEl.innerText = `R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            totalEl.innerText = `R$ ${total.toFixed(2)}`;
             lucide.createIcons();
         };
 
-        window.removeFromCart = (index) => {
-            cart.splice(index, 1);
-            localStorage.setItem('myCart', JSON.stringify(cart));
-            renderCart();
-        };
-
-        window.clearCart = () => {
-            cart = [];
-            localStorage.removeItem('myCart');
-            renderCart();
-        };
-
-        window.del = (id) => remove(ref(db, `tnp_posts/${id}`));
+        window.removeFromCart = (idx) => { cart.splice(idx, 1); localStorage.setItem('myCart', JSON.stringify(cart)); renderCart(); };
+        window.clearCart = () => { cart = []; localStorage.removeItem('myCart'); renderCart(); };
 
         window.tab = (id, el) => {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -258,6 +238,13 @@
             if(id === 'cart') renderCart();
         };
 
+        window.togglePostFields = () => {
+            const type = document.getElementById('p-type').value;
+            document.getElementById('fields-p').style.display = type === 'p' ? 'block' : 'none';
+            document.getElementById('fields-c').style.display = type === 'c' ? 'block' : 'none';
+        };
+
+        window.del = (id) => remove(ref(db, `tnp_posts/${id}`));
         lucide.createIcons();
     </script>
 </body>
