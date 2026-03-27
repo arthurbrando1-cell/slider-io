@@ -10,141 +10,110 @@
     <style>
         :root { 
             --bg: #000; --glass: rgba(15, 15, 15, 0.95); --border: rgba(255, 255, 255, 0.1); 
-            --accent: #fff; --gray: #222;
+            --accent: #fff; --gray: #222; --red: #ff4757;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: #fff; display: flex; min-height: 100vh; overflow-x: hidden; }
 
-        /* --- INTRO GIGANTE --- */
         #intro-screen { 
             position: fixed; inset: 0; background: #000; z-index: 9999; 
-            display: flex; justify-content: center; align-items: center; transition: 0.8s; 
+            display: flex; justify-content: center; align-items: center; transition: 0.8s; pointer-events: none;
         }
-        .intro-logo { width: 500px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
 
-        /* --- SIDEBAR --- */
         aside { 
             width: 280px; background: var(--glass); border-right: 1px solid var(--border); 
             height: 100vh; position: fixed; padding: 40px 20px; z-index: 100;
         }
+
         .nav-link { 
             display: flex; align-items: center; gap: 15px; padding: 18px; border-radius: 12px; 
             color: #555; cursor: pointer; transition: 0.3s; margin-bottom: 10px; font-weight: 800; text-transform: uppercase; font-size: 0.7rem;
         }
-        .nav-link.active { color: #000; background: #fff; box-shadow: 0 0 20px rgba(255,255,255,0.1); }
+        .nav-link.active { color: #000; background: #fff; }
 
-        /* --- CONTENT --- */
         main { flex: 1; margin-left: 280px; padding: 40px; }
         .section { display: none; animation: fadeIn 0.5s ease; }
         .section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- FILTROS --- */
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 30px; overflow-x: auto; padding-bottom: 10px; }
-        .chip { padding: 8px 18px; background: #111; border: 1px solid var(--border); border-radius: 20px; font-size: 0.7rem; cursor: pointer; white-space: nowrap; }
-        .chip:hover { border-color: #fff; }
-
-        /* --- SEARCH --- */
-        #search-input { 
-            width: 100%; background: #0a0a0a; border: 1px solid var(--border); 
-            padding: 20px; color: #fff; border-radius: 15px; margin-bottom: 30px; font-size: 1rem;
-        }
-
-        /* --- GRIDS --- */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
         
-        /* Card Produto */
-        .card-p { background: #080808; border-radius: 15px; border: 1px solid var(--border); overflow: hidden; transition: 0.3s; }
-        .card-p:hover { border-color: #fff; transform: translateY(-5px); }
+        /* CARD PRODUTO REFEITO */
+        .card-p { background: #080808; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; transition: 0.3s; position: relative; }
+        .card-p:hover { border-color: #444; }
         .card-p img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
         
-        /* Card Cupom (Separado) */
-        .card-c { 
-            background: linear-gradient(145deg, #111, #000); padding: 30px; border-radius: 15px; 
-            border: 2px dashed #333; text-align: center; transition: 0.3s;
-        }
-        .card-c:hover { border-color: #fff; }
-        .code-box { background: #fff; color: #000; padding: 10px; border-radius: 8px; font-weight: 900; margin: 15px 0; letter-spacing: 2px; }
+        .card-content { padding: 20px; }
+        .price-tag { font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 5px; }
+        .product-title { font-size: 0.85rem; color: #888; margin-bottom: 15px; height: 35px; overflow: hidden; }
 
-        /* --- BOTÕES --- */
-        .btn-black { 
-            width: 100%; padding: 15px; background: #fff; color: #000; border: none; 
-            border-radius: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase;
-        }
+        /* INTERAÇÕES */
+        .actions { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--border); pt: 15px; padding-top: 15px;}
+        .btn-icon { background: transparent; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.8rem; transition: 0.2s; }
+        .btn-icon:hover { color: var(--red); }
+        .btn-icon i { width: 18px; }
 
-        /* --- FORMS --- */
+        .btn-buy { 
+            width: 100%; background: #fff; color: #000; padding: 12px; border-radius: 10px; 
+            text-decoration: none; display: block; text-align: center; font-weight: 800; margin-top: 15px; transition: 0.3s;
+        }
+        .btn-buy:hover { background: #ccc; }
+
+        /* ESTRELAS */
+        .rating { color: #f1c40f; display: flex; gap: 2px; margin-bottom: 10px; }
+        .rating i { width: 14px; }
+
         .form-container { max-width: 600px; margin: 0 auto; background: #0a0a0a; padding: 40px; border-radius: 20px; border: 1px solid var(--border); }
-        input, select, textarea { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; border-radius: 10px; margin-bottom: 15px; }
+        input, select { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; border-radius: 10px; margin-bottom: 15px; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         @media (max-width: 900px) {
-            aside { width: 100%; height: 70px; bottom: 0; top: auto; flex-direction: row; padding: 10px; border-right: none; border-top: 1px solid var(--border); }
-            main { margin-left: 0; padding-bottom: 100px; }
-            .intro-logo { width: 80%; }
+            aside { width: 100%; height: 70px; bottom: 0; top: auto; display: flex; padding: 10px; border-top: 1px solid var(--border); }
+            main { margin-left: 0; padding: 20px; padding-bottom: 100px; }
+            .hide-mobile { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div id="intro-screen"><img src="logo.png" class="intro-logo"></div>
+    <div id="intro-screen"><h1 style="font-family:Syncopate">TÁ NA PROMO!</h1></div>
 
     <aside>
-        <div style="text-align: center; margin-bottom: 30px;" class="hide-mobile">
-            <img src="logo.png" style="width: 120px;">
-        </div>
-        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="shopping-cart"></i> <span>Produtos</span></div>
-        <div class="nav-link" onclick="tab('cupons', this)"><i data-lucide="ticket"></i> <span>Cupons</span></div>
-        <div class="nav-link" onclick="tab('post', this)"><i data-lucide="plus-circle"></i> <span>Postar</span></div>
+        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="shopping-bag"></i> <span class="hide-mobile">Feed</span></div>
+        <div class="nav-link" onclick="tab('cupons', this)"><i data-lucide="ticket"></i> <span class="hide-mobile">Cupons</span></div>
+        <div class="nav-link" onclick="tab('post', this)"><i data-lucide="plus-square"></i> <span class="hide-mobile">Postar</span></div>
     </aside>
 
     <main>
         <section id="feed" class="section active">
-            <input type="text" id="search-input" placeholder="Buscar no Tá na Promo!..." oninput="filter()">
-            <div class="filter-bar">
-                <div class="chip">Hardware</div>
-                <div class="chip">Periféricos</div>
-                <div class="chip">Monitores</div>
-                <div class="chip">Cadeiras</div>
-                <div class="chip">Games</div>
-            </div>
+            <input type="text" id="search-input" placeholder="O que você está procurando?">
             <div class="grid" id="grid-p"></div>
         </section>
 
         <section id="cupons" class="section">
-            <h2 style="font-family:'Syncopate'; margin-bottom: 30px;">CUPONS DE DESCONTO</h2>
             <div class="grid" id="grid-c"></div>
         </section>
 
         <section id="post" class="section">
             <div class="form-container">
-                <h2 style="text-align:center; margin-bottom:20px;">O QUE VAI POSTAR?</h2>
-                <select id="post-type" onchange="toggleForm()">
-                    <option value="p">Produto em Promoção</option>
-                    <option value="c">Cupom de Desconto</option>
+                <h2>POSTAR PROMOÇÃO</h2><br>
+                <select id="post-type">
+                    <option value="p">Produto</option>
+                    <option value="c">Cupom</option>
                 </select>
-
-                <div id="form-p">
-                    <input type="text" id="p-title" placeholder="Nome do Produto">
-                    <input type="number" id="p-price" placeholder="Preço R$">
-                    <input type="url" id="p-img" placeholder="Link da Imagem">
-                    <input type="url" id="p-link" placeholder="Link da Loja">
-                </div>
-
-                <div id="form-c" style="display:none;">
-                    <input type="text" id="c-store" placeholder="Nome da Loja (Ex: Amazon)">
-                    <input type="text" id="c-code" placeholder="CÓDIGO DO CUPOM">
-                    <input type="text" id="c-desc" placeholder="Regras (Ex: Acima de R$100)">
-                </div>
-                
-                <button class="btn-black" onclick="sendPost()">PUBLICAR AGORA</button>
+                <input type="text" id="p-title" placeholder="Nome do Produto">
+                <input type="text" id="p-price" placeholder="Preço (Ex: 199,90)">
+                <input type="url" id="p-img" placeholder="Link da Imagem">
+                <input type="url" id="p-link" placeholder="Link de Compra">
+                <button class="btn-buy" onclick="sendPost()" style="cursor:pointer">PUBLICAR</button>
             </div>
         </section>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAMoxCYuvhRQtRzPm4KSpRo5qtPr3keu0I",
@@ -157,66 +126,73 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Intro
-        window.onload = () => setTimeout(() => document.getElementById('intro-screen').style.opacity = '0', 2000);
+        // Esconder Intro
+        setTimeout(() => document.getElementById('intro-screen').style.opacity = '0', 1000);
 
-        // Troca de Form
-        window.toggleForm = () => {
-            const type = document.getElementById('post-type').value;
-            document.getElementById('form-p').style.display = type === 'p' ? 'block' : 'none';
-            document.getElementById('form-c').style.display = type === 'c' ? 'block' : 'none';
-        }
-
-        // Sync Data
+        // Renderizar Produtos com TODAS as funções
         onValue(ref(db, 'tnp_posts'), (snap) => {
             const data = snap.val();
-            const list = data ? Object.entries(data).reverse() : [];
             const gp = document.getElementById('grid-p');
-            const gc = document.getElementById('grid-c');
-            gp.innerHTML = ''; gc.innerHTML = '';
+            gp.innerHTML = '';
+            
+            if(data) {
+                Object.entries(data).reverse().forEach(([id, p]) => {
+                    if(p.type === 'p') {
+                        gp.innerHTML += `
+                            <div class="card-p">
+                                <img src="${p.img}" alt="produto">
+                                <div class="card-content">
+                                    <div class="rating">
+                                        <i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i>
+                                        <span style="font-size:0.7rem; color:#666; margin-left:5px;">(4.8)</span>
+                                    </div>
+                                    <div class="price-tag">R$ ${p.price}</div>
+                                    <div class="product-title">${p.title}</div>
+                                    
+                                    <a href="${p.link}" target="_blank" class="btn-buy">IR PARA A LOJA</a>
 
-            list.forEach(([id, p]) => {
-                if(p.type === 'c') {
-                    gc.innerHTML += `
-                        <div class="card-c">
-                            <div style="font-size:0.7rem; opacity:0.6">${p.store}</div>
-                            <div class="code-box" id="cp-${id}">${p.code}</div>
-                            <div style="font-size:0.8rem; margin-bottom:15px;">${p.desc}</div>
-                            <button class="btn-black" onclick="copy('${p.code}')">COPIAR</button>
-                        </div>
-                    `;
-                } else {
-                    gp.innerHTML += `
-                        <div class="card-p">
-                            <img src="${p.img}">
-                            <div style="padding:15px">
-                                <div style="font-weight:900; font-size:1.1rem">R$ ${p.price}</div>
-                                <div style="font-size:0.75rem; color:#888;">${p.title}</div>
+                                    <div class="actions">
+                                        <button class="btn-icon" onclick="like('${id}', ${p.likes || 0})">
+                                            <i data-lucide="heart"></i> <span>${p.likes || 0}</span>
+                                        </button>
+                                        <button class="btn-icon" onclick="alert('Salvo no carrinho!')">
+                                            <i data-lucide="shopping-cart"></i>
+                                        </button>
+                                        <button class="btn-icon" onclick="share('${p.link}')">
+                                            <i data-lucide="share-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                }
-            });
+                        `;
+                    }
+                });
+                lucide.createIcons();
+            }
         });
 
-        window.sendPost = async () => {
-            const type = document.getElementById('post-type').value;
-            let payload = { type };
-            
-            if(type === 'p') {
-                payload.title = document.getElementById('p-title').value;
-                payload.price = document.getElementById('p-price').value;
-                payload.img = document.getElementById('p-img').value;
-            } else {
-                payload.store = document.getElementById('c-store').value;
-                payload.code = document.getElementById('c-code').value;
-                payload.desc = document.getElementById('c-desc').value;
-            }
-            await push(ref(db, 'tnp_posts'), payload);
-            alert("Postado!");
+        // Funções Globais
+        window.like = (id, current) => {
+            update(ref(db, `tnp_posts/${id}`), { likes: current + 1 });
         };
 
-        window.copy = (t) => { navigator.clipboard.writeText(t); alert("Copiado: " + t); };
+        window.share = (link) => {
+            navigator.clipboard.writeText(link);
+            alert("Link copiado para compartilhar!");
+        };
+
+        window.sendPost = async () => {
+            const payload = {
+                type: document.getElementById('post-type').value,
+                title: document.getElementById('p-title').value,
+                price: document.getElementById('p-price').value,
+                img: document.getElementById('p-img').value,
+                link: document.getElementById('p-link').value,
+                likes: 0
+            };
+            await push(ref(db, 'tnp_posts'), payload);
+            alert("Promoção enviada!");
+        };
 
         window.tab = (id, el) => {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
