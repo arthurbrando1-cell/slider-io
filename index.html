@@ -4,26 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TÁ NA PROMO!</title>
-    
-    <link rel="shortcut icon" href="fav.ico" type="image/x-icon">
     <link rel="icon" href="fav.ico" type="image/x-icon">
-    
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         :root { 
             --bg: #000; --glass: rgba(10, 10, 10, 0.98); --border: rgba(255, 255, 255, 0.1); 
-            --blue: #00d2ff; --red: #ff4757;
+            --blue: #00d2ff; --red: #ff4757; --green: #2ecc71;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: #fff; display: flex; min-height: 100vh; overflow-x: hidden; }
 
-        /* --- INTRO (LOGO GRANDE) --- */
-        #intro { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: 1s ease-in-out; }
-        #intro img { width: 320px; height: auto; animation: pulse 1.5s infinite; } /* Aumentado para 320px */
-        @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1.05); } }
+        /* --- INTRO --- */
+        #intro { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: 1s; }
+        #intro img { width: 320px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
 
         /* --- SIDEBAR --- */
         aside { width: 260px; background: var(--glass); border-right: 1px solid var(--border); height: 100vh; position: fixed; padding: 30px 20px; z-index: 100; backdrop-filter: blur(20px); }
@@ -32,56 +29,46 @@
 
         /* --- CONTENT --- */
         main { flex: 1; margin-left: 260px; padding: 40px; }
-        .section { display: none; animation: fadeIn 0.4s ease-out; }
+        .section { display: none; animation: fadeIn 0.4s ease; }
         .section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .search-bar { width: 100%; background: #0a0a0a; border: 1px solid var(--border); padding: 15px 25px; border-radius: 30px; color: #fff; outline: none; margin-bottom: 25px; border: 1px solid #111; }
-        .search-bar:focus { border-color: var(--blue); }
-
-        /* --- CARDS & AUTOR --- */
+        /* --- CARDS --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-        .card-p { background: #080808; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; position: relative; transition: 0.3s; }
-        .card-p:hover { border-color: #222; transform: translateY(-5px); }
+        .card-p { background: #080808; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; position: relative; }
         .card-img { width: 100%; aspect-ratio: 1; object-fit: cover; cursor: pointer; }
         
-        .author-tag { position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.8); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); z-index: 10; }
-        .author-img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: 1px solid #fff; }
-        .author-name { font-size: 0.65rem; font-weight: 800; color: #fff; }
+        .author-tag { position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.8); padding: 5px 12px; border-radius: 20px; z-index: 10; }
+        .save-btn { position: absolute; top: 12px; right: 12px; background: #fff; color: #000; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: 0.3s; }
+        .save-btn:hover { background: var(--red); color: #fff; }
 
         .card-info { padding: 18px; }
-        .vote-sys { display: flex; gap: 12px; align-items: center; }
-        .vote-btn { background: none; border: none; cursor: pointer; color: #333; display: flex; align-items: center; gap: 4px; font-weight: 800; transition: 0.2s; }
-        .vote-btn.voted-up { color: var(--red); }
-        
-        .del-btn { color: #1a1a1a; cursor: pointer; transition: 0.2s; }
-        .del-btn:hover { color: var(--red); }
+        .price-tag { font-weight: 900; font-size: 1.2rem; color: var(--blue); margin-bottom: 5px; }
 
-        /* --- CATEGORIAS --- */
-        .cat-btn { padding: 10px 20px; border-radius: 30px; border: 1px solid var(--border); background: #080808; color: #555; cursor: pointer; font-size: 0.7rem; font-weight: 800; margin-right: 8px; transition: 0.3s; }
-        .cat-btn.active { background: #fff; color: #000; border-color: #fff; }
+        /* --- CARRINHO --- */
+        .cart-item { display: flex; align-items: center; gap: 15px; background: #080808; padding: 15px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 15px; }
+        .cart-img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; }
+        .total-box { background: var(--blue); color: #000; padding: 25px; border-radius: 20px; margin-top: 30px; display: flex; justify-content: space-between; align-items: center; font-weight: 900; }
 
-        /* --- MODAL --- */
-        #modal-p { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; display: none; padding: 40px; overflow-y: auto; }
-        .modal-body { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 1fr; gap: 50px; }
+        .btn-action { width: 100%; padding: 18px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; margin-top: 10px; }
+        .btn-outline { background: none; border: 1px solid var(--red); color: var(--red); padding: 10px; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 0.7rem; }
 
-        input, textarea, select { width: 100%; background: #0a0a0a; border: 1px solid #222; padding: 18px; color: #fff; border-radius: 15px; margin-bottom: 12px; outline: none; }
-        .btn-action { width: 100%; padding: 20px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        input, textarea, select { width: 100%; background: #0a0a0a; border: 1px solid #222; padding: 15px; color: #fff; border-radius: 12px; margin-bottom: 12px; outline: none; }
 
         @media (max-width: 900px) {
             aside { width: 100%; height: 65px; bottom: 0; top: auto; flex-direction: row; padding: 5px; justify-content: space-around; border-right: none; border-top: 1px solid var(--border); }
             main { margin-left: 0; padding: 20px 20px 100px 20px; }
-            .modal-body { grid-template-columns: 1fr; }
-            #intro img { width: 200px; }
+            #intro img { width: 220px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="intro"><img src="logo.png" alt="Logo Principal"></div>
+    <div id="intro"><img src="logo.png"></div>
 
     <aside>
         <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="layout-grid"></i> <span>Mural</span></div>
+        <div class="nav-link" onclick="tab('cart', this)"><i data-lucide="shopping-cart"></i> <span>Carrinho</span></div>
         <div class="nav-link" onclick="tab('cupons', this)"><i data-lucide="ticket"></i> <span>Cupons</span></div>
         <div class="nav-link" onclick="tab('post', this)"><i data-lucide="plus-square"></i> <span>Postar</span></div>
         <div class="nav-link" onclick="tab('settings', this)"><i data-lucide="user"></i> <span>Perfil</span></div>
@@ -89,63 +76,49 @@
 
     <main>
         <section id="feed" class="section active">
-            <input type="text" class="search-bar" id="search-input" placeholder="Pesquisar itens no mural..." oninput="filterPosts()">
-            <div style="margin-bottom: 30px; display: flex; overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
-                <button class="cat-btn active" onclick="filterCat('Tudo', this)">Tudo</button>
-                <button class="cat-btn" onclick="filterCat('Tech', this)">Tech</button>
-                <button class="cat-btn" onclick="filterCat('Setup', this)">Setup</button>
-                <button class="cat-btn" onclick="filterCat('Hardware', this)">Hardware</button>
-            </div>
+            <input type="text" class="search-bar" style="width:100%; background:#0a0a0a; border:1px solid #111; padding:15px; border-radius:30px; color:#fff; margin-bottom:25px;" placeholder="Pesquisar ofertas..." oninput="filterPosts()">
             <div class="grid" id="main-grid"></div>
         </section>
 
-        <section id="cupons" class="section">
-            <h2 style="font-family:'Syncopate'; margin-bottom: 30px; font-size: 1rem; color: var(--blue);">CUPONS ATIVOS</h2>
-            <div class="grid" id="cupons-grid"></div>
+        <section id="cart" class="section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                <h2 style="font-family:'Syncopate';">MEU CARRINHO</h2>
+                <button class="btn-outline" onclick="clearCart()">LIMPAR LISTA</button>
+            </div>
+            <div id="cart-list"></div>
+            <div class="total-box">
+                <span>TOTAL ESTIMADO:</span>
+                <span id="cart-total">R$ 0,00</span>
+            </div>
         </section>
 
         <section id="post" class="section">
             <div style="max-width: 500px; margin: 0 auto;">
-                <h2 style="margin-bottom: 25px; font-family:'Syncopate'; text-align: center;">NOVA PUBLICAÇÃO</h2>
-                <select id="p-type" onchange="togglePostFields()">
-                    <option value="p">Produto / Oferta</option>
-                    <option value="c">Cupom Promocional</option>
+                <h2 style="margin-bottom: 25px; font-family:'Syncopate';">PUBLICAR</h2>
+                <select id="p-cat">
+                    <option value="Tech">Tech</option>
+                    <option value="Setup">Setup</option>
+                    <option value="Hardware">Hardware</option>
                 </select>
-                <div id="fields-p">
-                    <select id="p-cat">
-                        <option value="Tech">Tech</option>
-                        <option value="Setup">Setup</option>
-                        <option value="Hardware">Hardware</option>
-                    </select>
-                    <input type="text" id="p-title" placeholder="O que é o produto?">
-                    <input type="text" id="p-price" placeholder="Preço (Ex: 1.499,00)">
-                    <input type="url" id="p-img" placeholder="URL da Imagem ou GIF">
-                    <input type="url" id="p-link" placeholder="Link para compra">
-                    <textarea id="p-desc" rows="4" placeholder="Fale um pouco sobre essa oferta..."></textarea>
-                </div>
-                <div id="fields-c" style="display:none;">
-                    <input type="text" id="c-store" placeholder="Nome da Loja">
-                    <input type="text" id="c-code" placeholder="CÓDIGO DO CUPOM">
-                </div>
-                <button class="btn-action" onclick="publish()">LANÇAR NO MURAL</button>
+                <input type="text" id="p-title" placeholder="Nome do Produto">
+                <input type="text" id="p-price" placeholder="Preço (Ex: 1200.00)">
+                <input type="url" id="p-img" placeholder="URL da Imagem">
+                <input type="url" id="p-link" placeholder="Link de Compra">
+                <textarea id="p-desc" placeholder="Descrição..."></textarea>
+                <button class="btn-action" onclick="publish()">POSTAR AGORA</button>
             </div>
         </section>
 
         <section id="settings" class="section">
-            <div style="max-width: 400px; margin: 0 auto; text-align: center; background: #080808; padding: 40px; border-radius: 30px; border: 1px solid var(--border);">
-                <img src="" id="display-avatar" style="width:130px; height:130px; border-radius:50%; object-fit:cover; border:4px solid #fff; margin-bottom:20px;">
-                <h1 id="display-name" style="font-weight: 800; margin-bottom: 30px; font-size: 1.5rem;">Exiled</h1>
-                <input type="text" id="set-name" placeholder="Mudar Apelido">
-                <input type="url" id="set-avatar" placeholder="Link do seu GIF de perfil">
-                <button class="btn-action" onclick="saveProfile()">SALVAR PERFIL</button>
+            <div style="max-width: 400px; margin: 0 auto; text-align: center;">
+                <img src="" id="display-avatar" style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #fff; margin-bottom:20px;">
+                <h1 id="display-name" style="margin-bottom:20px;">Exiled</h1>
+                <input type="text" id="set-name" placeholder="Mudar Nome">
+                <input type="url" id="set-avatar" placeholder="Link do GIF">
+                <button class="btn-action" onclick="saveProfile()">SALVAR</button>
             </div>
         </section>
     </main>
-
-    <div id="modal-p">
-        <button style="position:fixed; top:20px; right:20px; background:#fff; border:none; width:45px; height:45px; border-radius:50%; cursor:pointer; z-index: 2001;" onclick="closeM()"><i data-lucide="x"></i></button>
-        <div class="modal-body" id="modal-content"></div>
-    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -161,22 +134,13 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const myToken = localStorage.getItem('userToken') || 'user_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('userToken', myToken);
 
-        // --- SISTEMA DE DONO (TRAVA UID) ---
-        if(!localStorage.getItem('userToken')) {
-            localStorage.setItem('userToken', 'user_' + Math.random().toString(36).substr(2, 9));
-        }
-        const myToken = localStorage.getItem('userToken');
+        // --- INTRO ---
+        window.addEventListener('load', () => setTimeout(() => document.getElementById('intro').style.display = 'none', 2000));
 
-        // --- INTRO & IDENTITY ---
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const intro = document.getElementById('intro');
-                intro.style.opacity = '0';
-                setTimeout(() => intro.style.display = 'none', 1000);
-            }, 2000);
-        });
-
+        // --- IDENTITY ---
         if(!localStorage.getItem('tnp_name')) {
             localStorage.setItem('tnp_name', 'Exiled');
             localStorage.setItem('tnp_avatar', 'https://media.giphy.com/media/L3Y45TZEmCcENHL2mg/giphy.gif');
@@ -185,36 +149,23 @@
         document.getElementById('display-avatar').src = localStorage.getItem('tnp_avatar');
 
         window.saveProfile = () => {
-            const n = document.getElementById('set-name').value;
-            const a = document.getElementById('set-avatar').value;
-            if(n) localStorage.setItem('tnp_name', n);
-            if(a) localStorage.setItem('tnp_avatar', a);
+            localStorage.setItem('tnp_name', document.getElementById('set-name').value || 'Exiled');
+            localStorage.setItem('tnp_avatar', document.getElementById('set-avatar').value || '');
             location.reload();
         };
 
-        // --- FIREBASE CORE ---
+        // --- DATABASE ---
         let allPosts = [];
-        let curCat = 'Tudo';
-
         window.publish = async () => {
-            const type = document.getElementById('p-type').value;
-            const p = { 
-                type, likes: 0, time: Date.now(),
-                owner: myToken, // Grava quem é o dono do post
-                authorName: localStorage.getItem('tnp_name'),
-                authorImg: localStorage.getItem('tnp_avatar')
+            const p = {
+                title: document.getElementById('p-title').value,
+                price: document.getElementById('p-price').value,
+                img: document.getElementById('p-img').value,
+                link: document.getElementById('p-link').value,
+                cat: document.getElementById('p-cat').value,
+                owner: myToken, authorName: localStorage.getItem('tnp_name'), authorImg: localStorage.getItem('tnp_avatar'),
+                likes: 0, time: Date.now()
             };
-            if(type === 'p') {
-                p.title = document.getElementById('p-title').value;
-                p.price = document.getElementById('p-price').value;
-                p.img = document.getElementById('p-img').value;
-                p.link = document.getElementById('p-link').value;
-                p.desc = document.getElementById('p-desc').value;
-                p.cat = document.getElementById('p-cat').value;
-            } else {
-                p.store = document.getElementById('c-store').value;
-                p.code = document.getElementById('c-code').value;
-            }
             await push(ref(db, 'tnp_posts'), p);
             tab('feed', document.querySelector('.nav-link'));
         };
@@ -226,101 +177,85 @@
 
         window.renderGrid = (data = allPosts) => {
             const grid = document.getElementById('main-grid');
-            const cGrid = document.getElementById('cupons-grid');
-            grid.innerHTML = ''; cGrid.innerHTML = '';
-            
+            grid.innerHTML = '';
             data.forEach(([id, p]) => {
-                const voted = localStorage.getItem(`voted_${id}`);
-                const isOwner = p.owner === myToken; // Verifica se você é o dono
-
-                if(p.type === 'p') {
-                    if(curCat !== 'Tudo' && p.cat !== curCat) return;
-                    grid.innerHTML += `
-                        <div class="card-p">
-                            <div class="author-tag">
-                                <img src="${p.authorImg}" class="author-img">
-                                <span class="author-name">${p.authorName}</span>
-                            </div>
-                            <img src="${p.img}" class="card-img" onclick='openM("${id}", ${JSON.stringify(p).replace(/"/g, '&quot;')})'>
-                            <div class="card-info">
-                                <div style="font-weight:900; font-size:1.1rem; color:var(--blue)">R$ ${p.price}</div>
-                                <div style="font-size:0.75rem; color:#666; margin:8px 0 18px 0; height:32px; overflow:hidden; line-height:1.2;">${p.title}</div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <div class="vote-sys">
-                                        <button class="vote-btn ${voted?'voted-up':''}" onclick="vote('${id}', 1)"><i data-lucide="arrow-big-up" size="18"></i> ${p.likes}</button>
-                                        <button class="vote-btn" onclick="vote('${id}', -1)"><i data-lucide="arrow-big-down" size="18"></i></button>
-                                    </div>
-                                    ${isOwner ? `<i data-lucide="trash-2" size="16" class="del-btn" onclick="del('${id}')"></i>` : ''}
-                                </div>
+                const isOwner = p.owner === myToken;
+                grid.innerHTML += `
+                    <div class="card-p">
+                        <div class="author-tag"><img src="${p.authorImg}" style="width:20px;height:20px;border-radius:50%"> <span style="font-size:0.6rem">${p.authorName}</span></div>
+                        <button class="save-btn" onclick='addToCart(${JSON.stringify(p).replace(/"/g, '&quot;')})'><i data-lucide="heart"></i></button>
+                        <img src="${p.img}" class="card-img">
+                        <div class="card-info">
+                            <div class="price-tag">R$ ${p.price}</div>
+                            <div style="font-size:0.75rem; color:#666; margin-bottom:15px;">${p.title}</div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <div style="display:flex; gap:10px; color:#444; font-weight:800; font-size:0.8rem;"><i data-lucide="arrow-big-up" size="16"></i> ${p.likes}</div>
+                                ${isOwner ? `<i data-lucide="trash-2" size="16" style="cursor:pointer" onclick="del('${id}')"></i>` : ''}
                             </div>
                         </div>
-                    `;
-                } else {
-                    cGrid.innerHTML += `
-                        <div class="card-p" style="padding:30px; border:2px dashed #222; text-align:center;">
-                            <h2 style="background:#fff; color:#000; padding:4px 15px; font-size:1.1rem; display:inline-block; border-radius:5px;">${p.code}</h2>
-                            <p style="margin-top:12px; font-size:0.8rem; font-weight:700;">${p.store}</p>
-                            <div style="margin-top:20px;">
-                                ${isOwner ? `<i data-lucide="trash-2" size="16" class="del-btn" onclick="del('${id}')"></i>` : ''}
-                            </div>
-                        </div>
-                    `;
-                }
+                    </div>
+                `;
             });
             lucide.createIcons();
         };
 
-        window.vote = (id, val) => {
-            if(localStorage.getItem(`voted_${id}`)) return;
-            update(ref(db, `tnp_posts/${id}`), { likes: increment(val) });
-            localStorage.setItem(`voted_${id}`, 'true');
+        // --- CARRINHO LOGIC ---
+        let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+
+        window.addToCart = (item) => {
+            cart.push(item);
+            localStorage.setItem('myCart', JSON.stringify(cart));
+            renderCart();
+            alert("Adicionado ao Carrinho!");
         };
 
-        window.del = (id) => { if(confirm("Deseja mesmo apagar sua postagem?")) remove(ref(db, `tnp_posts/${id}`)); };
+        window.renderCart = () => {
+            const list = document.getElementById('cart-list');
+            const totalEl = document.getElementById('cart-total');
+            list.innerHTML = '';
+            let total = 0;
 
-        window.filterPosts = () => {
-            const term = document.getElementById('search-input').value.toLowerCase();
-            renderGrid(allPosts.filter(p => (p[1].title || p[1].code || '').toLowerCase().includes(term)));
-        };
+            cart.forEach((item, index) => {
+                const price = parseFloat(item.price.replace(',', '.'));
+                total += isNaN(price) ? 0 : price;
 
-        window.filterCat = (cat, btn) => {
-            curCat = cat;
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderGrid();
-        };
-
-        window.openM = (id, p) => {
-            document.getElementById('modal-p').style.display = 'block';
-            document.getElementById('modal-content').innerHTML = `
-                <img src="${p.img}" style="width:100%; border-radius:20px; border: 1px solid #111;">
-                <div>
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
-                        <img src="${p.authorImg}" style="width:35px; height:35px; border-radius:50%; border:2px solid var(--blue)">
-                        <span style="font-weight:800; font-size:0.8rem;">${p.authorName} postou isso:</span>
+                list.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${item.img}" class="cart-img">
+                        <div style="flex:1">
+                            <div style="font-weight:800; font-size:0.8rem;">${item.title}</div>
+                            <div style="color:var(--blue); font-weight:900;">R$ ${item.price}</div>
+                        </div>
+                        <a href="${item.link}" target="_blank" style="color:#fff"><i data-lucide="external-link"></i></a>
+                        <i data-lucide="x-circle" style="color:var(--red); cursor:pointer" onclick="removeFromCart(${index})"></i>
                     </div>
-                    <h1 style="font-family:'Syncopate'; font-size:1.4rem; line-height:1.2;">${p.title}</h1>
-                    <h2 style="color:var(--blue); margin:25px 0; font-size:2rem; font-weight:900;">R$ ${p.price}</h2>
-                    <p style="opacity:0.6; line-height:1.8; font-size:0.95rem; background:#0c0c0c; padding:20px; border-radius:15px;">${p.desc || 'Sem descrição adicional disponível.'}</p>
-                    <a href="${p.link}" target="_blank" style="text-decoration:none;"><button class="btn-action" style="margin-top:30px">PEGAR AGORA</button></a>
-                </div>
-            `;
+                `;
+            });
+
+            totalEl.innerText = `R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
             lucide.createIcons();
         };
 
-        window.closeM = () => document.getElementById('modal-p').style.display = 'none';
-        
+        window.removeFromCart = (index) => {
+            cart.splice(index, 1);
+            localStorage.setItem('myCart', JSON.stringify(cart));
+            renderCart();
+        };
+
+        window.clearCart = () => {
+            cart = [];
+            localStorage.removeItem('myCart');
+            renderCart();
+        };
+
+        window.del = (id) => remove(ref(db, `tnp_posts/${id}`));
+
         window.tab = (id, el) => {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
-        };
-
-        window.togglePostFields = () => {
-            const type = document.getElementById('p-type').value;
-            document.getElementById('fields-p').style.display = type === 'p' ? 'block' : 'none';
-            document.getElementById('fields-c').style.display = type === 'c' ? 'block' : 'none';
+            if(id === 'cart') renderCart();
         };
 
         lucide.createIcons();
