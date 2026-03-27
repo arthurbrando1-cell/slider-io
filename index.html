@@ -3,73 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TÁ NA PROMO! | Oficial</title>
+    <title>TÁ NA PROMO! | A Rede Social do Desconto</title>
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         :root { 
-            --bg: #000; --glass: rgba(15, 15, 15, 0.95); --border: rgba(255, 255, 255, 0.1); 
+            --bg: #000; --glass: rgba(15, 15, 15, 0.98); --border: rgba(255, 255, 255, 0.1); 
             --accent: #fff; --gray: #222; --red: #ff4757;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
         body { background: var(--bg); color: #fff; display: flex; min-height: 100vh; overflow-x: hidden; }
 
+        /* --- INTRO CINEMATOGRÁFICA --- */
         #intro-screen { 
-            position: fixed; inset: 0; background: #000; z-index: 9999; 
-            display: flex; justify-content: center; align-items: center; transition: 0.8s; pointer-events: none;
+            position: fixed; inset: 0; background: #000; z-index: 10000; 
+            display: flex; justify-content: center; align-items: center; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); 
         }
+        .intro-logo { width: 300px; filter: drop-shadow(0 0 20px rgba(255,255,255,0.3)); animation: zoomPulse 2s infinite; }
+        @keyframes zoomPulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
 
+        /* --- SIDEBAR --- */
         aside { 
             width: 280px; background: var(--glass); border-right: 1px solid var(--border); 
-            height: 100vh; position: fixed; padding: 40px 20px; z-index: 100;
+            height: 100vh; position: fixed; padding: 40px 20px; z-index: 100; backdrop-filter: blur(10px);
         }
-
         .nav-link { 
-            display: flex; align-items: center; gap: 15px; padding: 18px; border-radius: 12px; 
-            color: #555; cursor: pointer; transition: 0.3s; margin-bottom: 10px; font-weight: 800; text-transform: uppercase; font-size: 0.7rem;
+            display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 12px; 
+            color: #666; cursor: pointer; transition: 0.3s; margin-bottom: 8px; font-weight: 800; text-transform: uppercase; font-size: 0.75rem;
         }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: #fff; }
         .nav-link.active { color: #000; background: #fff; }
 
-        main { flex: 1; margin-left: 280px; padding: 40px; }
-        .section { display: none; animation: fadeIn 0.5s ease; }
+        /* --- CONTENT AREA --- */
+        main { flex: 1; margin-left: 280px; padding: 40px; transition: 0.5s; }
+        .section { display: none; animation: slideUp 0.6s ease-out; }
         .section.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        /* --- GRID E CARDS --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
         
-        /* CARD PRODUTO REFEITO */
-        .card-p { background: #080808; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; transition: 0.3s; position: relative; }
-        .card-p:hover { border-color: #444; }
-        .card-p img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .card-p { background: #0a0a0a; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; transition: 0.4s; position: relative; }
+        .card-p:hover { border-color: #fff; transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .card-p img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-bottom: 1px solid var(--border); }
         
-        .card-content { padding: 20px; }
-        .price-tag { font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 5px; }
-        .product-title { font-size: 0.85rem; color: #888; margin-bottom: 15px; height: 35px; overflow: hidden; }
+        .card-info { padding: 20px; }
+        .price-tag { font-size: 1.5rem; font-weight: 900; color: #fff; margin-bottom: 5px; }
+        
+        /* --- INTERAÇÕES --- */
+        .actions { display: flex; gap: 15px; padding: 15px 20px; border-top: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+        .action-btn { background: none; border: none; color: #555; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 600; transition: 0.2s; }
+        .action-btn:hover { color: #fff; }
+        .action-btn.liked { color: var(--red); }
 
-        /* INTERAÇÕES */
-        .actions { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--border); pt: 15px; padding-top: 15px;}
-        .btn-icon { background: transparent; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.8rem; transition: 0.2s; }
-        .btn-icon:hover { color: var(--red); }
-        .btn-icon i { width: 18px; }
+        /* --- REVIEWS --- */
+        .review-section { padding: 15px 20px; border-top: 1px solid var(--border); font-size: 0.85rem; }
+        .comment-input { width: 100%; background: #111; border: 1px solid var(--border); padding: 10px; border-radius: 8px; color: #fff; margin-top: 10px; }
 
-        .btn-buy { 
-            width: 100%; background: #fff; color: #000; padding: 12px; border-radius: 10px; 
-            text-decoration: none; display: block; text-align: center; font-weight: 800; margin-top: 15px; transition: 0.3s;
+        /* --- BOTÕES --- */
+        .btn-black { 
+            width: 100%; padding: 16px; background: #fff; color: #000; border: none; 
+            border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.3s;
         }
-        .btn-buy:hover { background: #ccc; }
+        .btn-black:hover { transform: scale(1.02); filter: brightness(0.9); }
 
-        /* ESTRELAS */
-        .rating { color: #f1c40f; display: flex; gap: 2px; margin-bottom: 10px; }
-        .rating i { width: 14px; }
-
-        .form-container { max-width: 600px; margin: 0 auto; background: #0a0a0a; padding: 40px; border-radius: 20px; border: 1px solid var(--border); }
-        input, select { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; border-radius: 10px; margin-bottom: 15px; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* --- FORMS --- */
+        .form-container { max-width: 600px; margin: 0 auto; background: #0a0a0a; padding: 40px; border-radius: 24px; border: 1px solid var(--border); }
+        input, select, textarea { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; border-radius: 12px; margin-bottom: 15px; outline: none; transition: 0.3s; }
+        input:focus { border-color: #fff; }
 
         @media (max-width: 900px) {
-            aside { width: 100%; height: 70px; bottom: 0; top: auto; display: flex; padding: 10px; border-top: 1px solid var(--border); }
+            aside { width: 100%; height: 70px; bottom: 0; top: auto; flex-direction: row; padding: 5px; border-top: 1px solid var(--border); display: flex; justify-content: space-around; }
             main { margin-left: 0; padding: 20px; padding-bottom: 100px; }
             .hide-mobile { display: none; }
         }
@@ -77,44 +83,62 @@
 </head>
 <body>
 
-    <div id="intro-screen"><h1 style="font-family:Syncopate">TÁ NA PROMO!</h1></div>
+    <div id="intro-screen">
+        <h1 style="font-family:'Syncopate'; font-size: 2rem;">TÁ NA PROMO!</h1>
+    </div>
 
     <aside>
-        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="shopping-bag"></i> <span class="hide-mobile">Feed</span></div>
-        <div class="nav-link" onclick="tab('cupons', this)"><i data-lucide="ticket"></i> <span class="hide-mobile">Cupons</span></div>
-        <div class="nav-link" onclick="tab('post', this)"><i data-lucide="plus-square"></i> <span class="hide-mobile">Postar</span></div>
+        <div class="hide-mobile" style="text-align: center; margin-bottom: 40px;">
+            <h2 style="font-family:'Syncopate'; font-size: 1.2rem;">TNP!</h2>
+        </div>
+        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="layout-grid"></i> <span>Feed</span></div>
+        <div class="nav-link" onclick="tab('cupons', this)"><i data-lucide="ticket"></i> <span>Cupons</span></div>
+        <div class="nav-link" onclick="tab('post', this)"><i data-lucide="plus-square"></i> <span>Anunciar</span></div>
     </aside>
 
     <main>
         <section id="feed" class="section active">
-            <input type="text" id="search-input" placeholder="O que você está procurando?">
-            <div class="grid" id="grid-p"></div>
+            <input type="text" id="search-input" placeholder="Pesquisar produtos, marcas ou hardware..." oninput="filter()">
+            <div class="grid" id="grid-p">
+                </div>
         </section>
 
         <section id="cupons" class="section">
+            <h2 style="font-family:'Syncopate'; margin-bottom: 30px; letter-spacing: -1px;">MURAL DE CUPONS</h2>
             <div class="grid" id="grid-c"></div>
         </section>
 
         <section id="post" class="section">
             <div class="form-container">
-                <h2>POSTAR PROMOÇÃO</h2><br>
-                <select id="post-type">
-                    <option value="p">Produto</option>
-                    <option value="c">Cupom</option>
+                <h2 style="font-family:'Syncopate'; margin-bottom: 25px; text-align: center;">NOVA PUBLICAÇÃO</h2>
+                <select id="post-type" onchange="toggleForm()">
+                    <option value="p">Produto/Promoção</option>
+                    <option value="c">Cupom de Desconto</option>
                 </select>
-                <input type="text" id="p-title" placeholder="Nome do Produto">
-                <input type="text" id="p-price" placeholder="Preço (Ex: 199,90)">
-                <input type="url" id="p-img" placeholder="Link da Imagem">
-                <input type="url" id="p-link" placeholder="Link de Compra">
-                <button class="btn-buy" onclick="sendPost()" style="cursor:pointer">PUBLICAR</button>
+
+                <div id="form-p">
+                    <input type="text" id="p-title" placeholder="Nome do Produto (Ex: Teclado Mecânico)">
+                    <input type="text" id="p-price" placeholder="Preço (Ex: 299,90)">
+                    <input type="url" id="p-img" placeholder="URL da Imagem do Produto">
+                    <input type="url" id="p-link" placeholder="Link Direto da Loja">
+                </div>
+
+                <div id="form-c" style="display:none;">
+                    <input type="text" id="c-store" placeholder="Loja (Ex: Kabum)">
+                    <input type="text" id="c-code" placeholder="CÓDIGO">
+                    <input type="text" id="c-desc" placeholder="Regras de uso">
+                </div>
+                
+                <button class="btn-black" onclick="sendPost()">PUBLICAR NO MURAL</button>
             </div>
         </section>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, update, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+        // SUA CONFIGURAÇÃO DO FIREBASE (MANTIDA)
         const firebaseConfig = {
             apiKey: "AIzaSyAMoxCYuvhRQtRzPm4KSpRo5qtPr3keu0I",
             authDomain: "devgram-f7c0d.firebaseapp.com",
@@ -126,74 +150,17 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Esconder Intro
-        setTimeout(() => document.getElementById('intro-screen').style.opacity = '0', 1000);
-
-        // Renderizar Produtos com TODAS as funções
-        onValue(ref(db, 'tnp_posts'), (snap) => {
-            const data = snap.val();
-            const gp = document.getElementById('grid-p');
-            gp.innerHTML = '';
-            
-            if(data) {
-                Object.entries(data).reverse().forEach(([id, p]) => {
-                    if(p.type === 'p') {
-                        gp.innerHTML += `
-                            <div class="card-p">
-                                <img src="${p.img}" alt="produto">
-                                <div class="card-content">
-                                    <div class="rating">
-                                        <i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i>
-                                        <span style="font-size:0.7rem; color:#666; margin-left:5px;">(4.8)</span>
-                                    </div>
-                                    <div class="price-tag">R$ ${p.price}</div>
-                                    <div class="product-title">${p.title}</div>
-                                    
-                                    <a href="${p.link}" target="_blank" class="btn-buy">IR PARA A LOJA</a>
-
-                                    <div class="actions">
-                                        <button class="btn-icon" onclick="like('${id}', ${p.likes || 0})">
-                                            <i data-lucide="heart"></i> <span>${p.likes || 0}</span>
-                                        </button>
-                                        <button class="btn-icon" onclick="alert('Salvo no carrinho!')">
-                                            <i data-lucide="shopping-cart"></i>
-                                        </button>
-                                        <button class="btn-icon" onclick="share('${p.link}')">
-                                            <i data-lucide="share-2"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-                lucide.createIcons();
-            }
-        });
-
-        // Funções Globais
-        window.like = (id, current) => {
-            update(ref(db, `tnp_posts/${id}`), { likes: current + 1 });
+        // --- LÓGICA DE INTRO ---
+        window.onload = () => {
+            setTimeout(() => {
+                const intro = document.getElementById('intro-screen');
+                intro.style.opacity = '0';
+                setTimeout(() => intro.style.display = 'none', 1000);
+            }, 1500);
+            lucide.createIcons();
         };
 
-        window.share = (link) => {
-            navigator.clipboard.writeText(link);
-            alert("Link copiado para compartilhar!");
-        };
-
-        window.sendPost = async () => {
-            const payload = {
-                type: document.getElementById('post-type').value,
-                title: document.getElementById('p-title').value,
-                price: document.getElementById('p-price').value,
-                img: document.getElementById('p-img').value,
-                link: document.getElementById('p-link').value,
-                likes: 0
-            };
-            await push(ref(db, 'tnp_posts'), payload);
-            alert("Promoção enviada!");
-        };
-
+        // --- TROCA DE TABS ---
         window.tab = (id, el) => {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
@@ -201,7 +168,106 @@
             el.classList.add('active');
         };
 
-        lucide.createIcons();
+        window.toggleForm = () => {
+            const type = document.getElementById('post-type').value;
+            document.getElementById('form-p').style.display = type === 'p' ? 'block' : 'none';
+            document.getElementById('form-c').style.display = type === 'c' ? 'block' : 'none';
+        }
+
+        // --- SISTEMA DE POSTAGEM ---
+        window.sendPost = async () => {
+            const type = document.getElementById('post-type').value;
+            let payload = { 
+                type, 
+                likes: 0, 
+                timestamp: Date.now(),
+                comments: [] 
+            };
+            
+            if(type === 'p') {
+                payload.title = document.getElementById('p-title').value;
+                payload.price = document.getElementById('p-price').value;
+                payload.img = document.getElementById('p-img').value;
+                payload.link = document.getElementById('p-link').value;
+            } else {
+                payload.store = document.getElementById('c-store').value;
+                payload.code = document.getElementById('c-code').value;
+                payload.desc = document.getElementById('c-desc').value;
+            }
+
+            if(!payload.img && type === 'p') return alert("Insira uma imagem!");
+
+            await push(ref(db, 'tnp_posts'), payload);
+            alert("Publicado com sucesso!");
+            tab('feed', document.querySelector('.nav-link'));
+        };
+
+        // --- RENDERIZAÇÃO REAL-TIME ---
+        onValue(ref(db, 'tnp_posts'), (snap) => {
+            const data = snap.val();
+            const gp = document.getElementById('grid-p');
+            const gc = document.getElementById('grid-c');
+            gp.innerHTML = ''; gc.innerHTML = '';
+
+            if(!data) return;
+
+            Object.entries(data).reverse().forEach(([id, p]) => {
+                if(p.type === 'c') {
+                    gc.innerHTML += `
+                        <div class="card-p" style="padding: 30px; border: 2px dashed #333; text-align:center;">
+                            <span style="font-size:0.7rem; color: #888; text-transform: uppercase;">${p.store}</span>
+                            <div style="background:#fff; color:#000; padding:12px; border-radius:8px; font-weight:900; margin:15px 0; letter-spacing:2px;">${p.code}</div>
+                            <p style="font-size:0.8rem; margin-bottom:20px; opacity:0.7;">${p.desc}</p>
+                            <button class="btn-black" onclick="copyText('${p.code}')">COPIAR CUPOM</button>
+                        </div>
+                    `;
+                } else {
+                    gp.innerHTML += `
+                        <div class="card-p">
+                            <img src="${p.img}" loading="lazy">
+                            <div class="card-info">
+                                <div class="price-tag">R$ ${p.price}</div>
+                                <div style="font-size:0.9rem; font-weight:600; color:#aaa; margin-bottom:15px;">${p.title}</div>
+                                <a href="${p.link}" target="_blank" style="text-decoration:none;">
+                                    <button class="btn-black" style="font-size:0.7rem; padding:10px;">IR PARA A LOJA</button>
+                                </a>
+                            </div>
+                            <div class="actions">
+                                <button class="action-btn" onclick="likePost('${id}')">
+                                    <i data-lucide="heart" size="18"></i> <span>${p.likes || 0}</span>
+                                </button>
+                                <button class="action-btn">
+                                    <i data-lucide="message-circle" size="18"></i> <span>Review</span>
+                                </button>
+                            </div>
+                            <div class="review-section">
+                                <input type="text" class="comment-input" placeholder="Escreva uma review..." onkeydown="addComment(event, '${id}')">
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            lucide.createIcons();
+        });
+
+        // --- INTERAÇÕES (LIKE & COPY) ---
+        window.likePost = (id) => {
+            const postRef = ref(db, `tnp_posts/${id}`);
+            update(postRef, { likes: increment(1) });
+        };
+
+        window.copyText = (text) => {
+            navigator.clipboard.writeText(text);
+            alert("Cupom copiado: " + text);
+        };
+
+        window.addComment = (e, id) => {
+            if(e.key === 'Enter' && e.target.value !== '') {
+                alert("Review enviada! (Simulação de sistema de comentários)");
+                e.target.value = '';
+            }
+        };
+
     </script>
 </body>
 </html>
