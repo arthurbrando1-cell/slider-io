@@ -3,170 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TA NA PROMO! | Ofertas Gamer</title>
+    <title>TA NA PROMO! | Elite Market</title>
     <link rel="icon" type="image/x-icon" href="fav.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         :root {
-            --bg: #000; --side: #080808; --card: #111; --border: #222;
-            --primary: #fff; --text: #eee; --dim: #888;
+            --bg: #050505;
+            --glass: rgba(15, 15, 15, 0.8);
+            --border: rgba(255, 255, 255, 0.1);
+            --primary: #ffffff;
+            --accent: #222;
+            --gradient: linear-gradient(135deg, #ffffff 0%, #666666 100%);
+            --grad-bg: radial-gradient(circle at top right, #111, #000);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
-        body { background: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); background-image: var(--grad-bg); color: #fff; min-height: 100vh; overflow-x: hidden; display: flex; }
 
-        /* --- INTRO 3D --- */
+        /* --- INTRO PREMIUM --- */
         #intro {
             position: fixed; inset: 0; z-index: 9999; background: #000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: transform 0.8s cubic-bezier(0.8, 0, 0.2, 1); perspective: 1000px;
+            transition: 1s cubic-bezier(0.8, 0, 0.2, 1);
         }
-        .intro-logo {
-            width: 320px; height: auto; animation: logo3D 3s infinite ease-in-out;
-        }
-        @keyframes logo3D {
-            0%, 100% { transform: rotateY(-15deg) rotateX(10deg); }
-            50% { transform: rotateY(15deg) rotateX(-10deg) translateY(-20px); }
-        }
+        .intro-title { font-family: 'Syncopate'; font-size: 2.5rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: pulse 2s infinite; }
 
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR GLASS --- */
         aside {
-            width: 260px; background: var(--side); height: 100vh; border-right: 1px solid var(--border);
-            position: fixed; display: flex; flex-direction: column; padding: 30px 15px; z-index: 100;
+            width: 280px; background: var(--glass); backdrop-filter: blur(20px); height: 100vh;
+            border-right: 1px solid var(--border); position: fixed; display: flex; flex-direction: column; padding: 40px 20px; z-index: 100;
         }
         .nav-link {
-            display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 8px;
-            color: var(--dim); cursor: pointer; transition: 0.3s; margin-bottom: 5px; position: relative;
+            display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 12px;
+            color: #666; cursor: pointer; transition: 0.4s; margin-bottom: 8px; border: 1px solid transparent;
         }
-        .nav-link.active { background: var(--primary); color: #000; font-weight: 700; }
-        .badge { position: absolute; right: 10px; background: #333; color: #fff; font-size: 0.7rem; padding: 2px 7px; border-radius: 10px; }
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav-link.active { background: #fff; color: #000; font-weight: 800; box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
 
-        /* --- CONTENT --- */
-        main { flex: 1; margin-left: 260px; padding: 40px; }
-        .section { display: none; opacity: 0; transition: 0.5s; }
-        .section.active { display: block; opacity: 1; }
+        /* --- MAIN AREA --- */
+        main { flex: 1; margin-left: 280px; padding: 40px; }
+        .section { display: none; animation: fadeIn 0.6s ease-out forwards; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- GRID ALIEXPRESS --- */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        /* --- CATEGORIAS --- */
+        .cat-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 20px; margin-bottom: 30px; scrollbar-width: none; }
+        .cat-chip { background: var(--glass); padding: 10px 20px; border-radius: 50px; border: 1px solid var(--border); cursor: pointer; white-space: nowrap; transition: 0.3s; font-size: 0.85rem; font-weight: 600; }
+        .cat-chip:hover, .cat-chip.active { background: #fff; color: #000; border-color: #fff; }
+
+        /* --- CARDS ALIEXPRESS PRO --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
         .item-card {
-            background: var(--card); border-radius: 4px; overflow: hidden; border: 1px solid var(--border);
-            cursor: pointer; transition: 0.3s; position: relative;
+            background: var(--glass); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer;
         }
-        .item-card:hover { border-color: #fff; transform: translateY(-5px); }
-        .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        .item-info { padding: 12px; }
-        .item-price { font-size: 1.2rem; font-weight: 700; color: #fff; }
-        
-        /* --- MODAL PRODUTO (TELA CHEIA) --- */
-        #product-modal {
-            position: fixed; inset: 0; background: #000; z-index: 200;
-            display: none; overflow-y: auto; padding: 40px; animation: slideUp 0.4s ease;
+        .item-card:hover { transform: scale(1.03); border-color: rgba(255,255,255,0.4); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; transition: 0.6s; }
+        .item-card:hover .item-img { filter: brightness(1.1); }
+        .item-info { padding: 16px; background: linear-gradient(to top, #000, transparent); }
+        .item-price { font-size: 1.4rem; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* --- CUPONS ÁREA --- */
+        .coupon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .coupon-card {
+            background: linear-gradient(45deg, #111, #1a1a1a); border: 1px dashed #444; padding: 25px;
+            border-radius: 16px; position: relative; overflow: hidden; transition: 0.3s;
         }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .close-modal { position: fixed; top: 20px; right: 20px; background: #222; border: none; color: white; padding: 10px; border-radius: 50%; cursor: pointer; z-index: 220; }
+        .coupon-card::before { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(transparent, #fff, transparent 30%); animation: rotate 4s linear infinite; opacity: 0.1; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .cp-code { font-family: 'Syncopate'; font-size: 1.2rem; color: #fff; margin-top: 10px; display: block; letter-spacing: 2px; }
 
-        .prod-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 1fr; gap: 50px; }
-        .prod-img-big { width: 100%; border-radius: 8px; border: 1px solid var(--border); }
+        /* --- FORMULÁRIO ESTILIZADO --- */
+        .form-group { background: var(--glass); border: 1px solid var(--border); padding: 30px; border-radius: 20px; max-width: 600px; margin: 0 auto; }
+        input, textarea, select {
+            width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 15px; outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: #fff; background: rgba(255,255,255,0.07); }
+        .btn-post { background: #fff; color: #000; border: none; padding: 20px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; font-size: 1rem; text-transform: uppercase; transition: 0.3s; }
+        .btn-post:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255,255,255,0.2); }
 
-        .coupon-tag { background: #1a1a1a; border: 1px dashed #555; padding: 10px; border-radius: 4px; display: inline-block; margin: 15px 0; color: #00ff88; font-weight: 700; }
+        /* --- MODAL --- */
+        #modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); z-index: 200; display: none; padding: 40px; overflow-y: auto; }
+        .modal-body { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* --- BUTTONS --- */
-        .btn-action { width: 100%; padding: 18px; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; border: none; margin-top: 10px; transition: 0.2s; }
-        .btn-save { background: white; color: black; }
-        .btn-remove { background: #111; color: #ff4444; border: 1px solid #ff4444; }
-        .btn-save:hover { background: #ccc; }
-
-        .vote-btn { background: #111; border: 1px solid var(--border); color: white; padding: 10px 20px; border-radius: 4px; cursor: pointer; display: flex; gap: 8px; }
-
-        /* --- CALCULADORA --- */
-        .calc-header { background: #fff; color: #000; padding: 30px; border-radius: 4px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-
-        @media (max-width: 800px) {
-            aside { width: 100%; height: 60px; bottom: 0; top: auto; flex-direction: row; padding: 5px; border-right: none; border-top: 1px solid var(--border); }
+        @media (max-width: 900px) {
+            aside { width: 100%; height: 70px; bottom: 0; top: auto; flex-direction: row; padding: 5px; }
             main { margin-left: 0; padding: 20px 20px 100px; }
             .nav-link span { display: none; }
-            .prod-grid { grid-template-columns: 1fr; }
+            .modal-body { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <div id="intro">
-        <h1 style="font-family: 'Syncopate'; margin-bottom: 20px; letter-spacing: 5px;">TA NA PROMO!</h1>
-        <img src="logo.png" class="intro-logo" onerror="this.style.display='none'">
-    </div>
+    <div id="intro"><div class="intro-title">TA NA PROMO!</div></div>
 
     <aside>
-        <h2 style="font-family: 'Syncopate'; font-size: 0.7rem; margin-bottom: 30px; text-align: center;">TA NA PROMO!</h2>
-        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="shopping-bag"></i> <span>Ofertas</span></div>
-        <div class="nav-link" onclick="tab('cart', this)"><i data-lucide="heart"></i> <span>Favoritos</span> <span class="badge" id="cart-badge">0</span></div>
-        <div class="nav-link" onclick="tab('post', this)"><i data-lucide="plus-circle"></i> <span>Anunciar</span></div>
+        <div style="font-family: 'Syncopate'; font-size: 0.8rem; margin-bottom: 40px; text-align: center; letter-spacing: 2px;">TN PROMO.</div>
+        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="layout-grid"></i> <span>Feed</span></div>
+        <div class="nav-link" onclick="tab('coupons', this)"><i data-lucide="ticket"></i> <span>Cupons</span></div>
+        <div class="nav-link" onclick="tab('setup', this)"><i data-lucide="cpu"></i> <span>Meu Setup</span></div>
+        <div class="nav-link" onclick="tab('post-area', this)"><i data-lucide="plus-circle"></i> <span>Postar</span></div>
     </aside>
 
     <main>
         <section id="feed" class="section active">
-            <div style="margin-bottom: 30px;">
-                <input type="text" id="search" placeholder="O que você busca hoje?" style="width:100%; max-width:400px; padding:12px; background:#111; border:1px solid #333; color:white; border-radius:30px; outline:none;" oninput="search(this.value)">
+            <div class="cat-bar">
+                <div class="cat-chip active">Tudo</div>
+                <div class="cat-chip">Hardware</div>
+                <div class="cat-chip">Periféricos</div>
+                <div class="cat-chip">Consoles</div>
+                <div class="cat-chip">Cadeiras</div>
             </div>
-            <div class="grid" id="grid-feed"></div>
+            <div class="grid" id="market-grid"></div>
         </section>
 
-        <section id="cart" class="section">
-            <div class="calc-header">
-                <div><p style="font-size: 0.7rem; font-weight: 700;">TOTAL DO SETUP</p><div style="font-family:'Syncopate'; font-size:2rem;" id="total-price">R$ 0,00</div></div>
-                <i data-lucide="shopping-cart" size="40"></i>
-            </div>
-            <div class="grid" id="grid-cart"></div>
+        <section id="coupons" class="section">
+            <h1 style="font-family: 'Syncopate'; margin-bottom: 30px;">CUPONS ATIVOS</h1>
+            <div class="coupon-grid" id="coupon-list"></div>
         </section>
 
-        <section id="post" class="section">
-            <div style="max-width: 500px; margin: 0 auto; background: var(--side); padding: 30px; border: 1px solid var(--border);">
-                <h3 style="margin-bottom: 20px; font-family:'Syncopate'; font-size:0.8rem;">NOVO ANÚNCIO</h3>
-                <input type="text" id="p-title" placeholder="Nome do Produto (ou GIF URL)">
-                <input type="number" id="p-price" placeholder="Preço (R$)">
-                <input type="text" id="p-coupon" placeholder="Cupom (Ex: GAMER10)">
-                <input type="url" id="p-img" placeholder="Link da Imagem ou GIF">
-                <textarea id="p-desc" placeholder="Descrição e detalhes..." rows="5" style="width:100%; background:#000; border:1px solid #333; color:white; padding:10px; margin-bottom:15px; resize:none;"></textarea>
-                <button onclick="publish()" class="btn-action btn-save">Postar Agora</button>
+        <section id="post-area" class="section">
+            <div class="form-group">
+                <h2 style="margin-bottom: 20px; text-align: center;">O QUE VOCÊ QUER POSTAR?</h2>
+                <select id="post-type" onchange="toggleForm()">
+                    <option value="prod">Novo Produto</option>
+                    <option value="cupom">Novo Cupom</option>
+                </select>
+                
+                <div id="form-prod">
+                    <input type="text" id="p-title" placeholder="Nome do Produto">
+                    <input type="number" id="p-price" placeholder="Preço (R$)">
+                    <input type="url" id="p-img" placeholder="Link da Imagem/GIF">
+                    <textarea id="p-desc" placeholder="Descrição detalhada..." rows="4"></textarea>
+                </div>
+
+                <div id="form-cupom" style="display:none">
+                    <input type="text" id="c-store" placeholder="Loja (Ex: Amazon, Kabum)">
+                    <input type="text" id="c-code" placeholder="CÓDIGO DO CUPOM">
+                    <input type="text" id="c-desc" placeholder="Desconto (Ex: 10% OFF em tudo)">
+                </div>
+
+                <button class="btn-post" onclick="publish()">Postar Agora</button>
             </div>
         </section>
     </main>
 
-    <div id="product-modal">
-        <button class="close-modal" onclick="closeModal()"><i data-lucide="x"></i></button>
-        <div class="prod-grid">
-            <div class="modal-left">
-                <img id="m-img" class="prod-img-big">
-            </div>
-            <div class="modal-right">
-                <h1 id="m-title" style="font-family:'Syncopate'; font-size: 1.8rem;"></h1>
-                <div id="m-coupon" class="coupon-tag"></div>
-                <p id="m-price" style="font-size: 2.5rem; font-weight: 700; margin: 10px 0;"></p>
-                <p id="m-desc" style="color: var(--dim); line-height: 1.6; margin-bottom: 20px;"></p>
-                
-                <div style="display:flex; gap:10px; margin-bottom:20px;">
-                    <button class="vote-btn" onclick="vote('up')"><i data-lucide="thumbs-up"></i> <span id="m-up">0</span></button>
-                    <button class="vote-btn" onclick="vote('down')"><i data-lucide="thumbs-down"></i> <span id="m-down">0</span></button>
-                </div>
-
-                <button id="m-btn-save" class="btn-action"></button>
-
-                <div style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px;">
-                    <h4>Reviews e Comentários</h4>
-                    <textarea id="rev-input" placeholder="Escreva o que achou..." style="width:100%; background:#111; border:1px solid #222; color:white; padding:10px; margin-top:15px; border-radius:4px;"></textarea>
-                    <button onclick="sendReview()" style="background:none; border:1px solid #fff; color:#fff; padding:8px 15px; margin-top:10px; cursor:pointer; font-size:0.7rem;">ENVIAR REVIEW</button>
-                    <div id="m-reviews" style="margin-top: 20px;"></div>
-                </div>
+    <div id="modal">
+        <button onclick="closeModal()" style="position:fixed; top:20px; right:20px; background:white; border:none; padding:10px; border-radius:50%; cursor:pointer;"><i data-lucide="x" color="black"></i></button>
+        <div class="modal-body">
+            <img id="m-img" style="width:100%; border-radius:20px;">
+            <div>
+                <h1 id="m-title" style="font-size: 2.5rem; margin-bottom: 10px;"></h1>
+                <div id="m-price" style="font-size: 2rem; font-weight: 800; margin-bottom: 20px;"></div>
+                <p id="m-desc" style="color:#888; line-height:1.8; margin-bottom:30px;"></p>
+                <button class="btn-post" style="background: #00ff88; color:#000">Salvar no Setup</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAMoxCYuvhRQtRzPm4KSpRo5qtPr3keu0I",
@@ -180,133 +183,84 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const UID = localStorage.getItem('user_id') || 'U-' + Math.random().toString(36).substr(2, 4).toUpperCase();
-        localStorage.setItem('user_id', UID);
 
-        let data = [];
-        let saved = JSON.parse(localStorage.getItem('saved_promo')) || [];
-        let activeId = null;
-
-        // --- SYNC ---
-        onValue(ref(db, 'promo'), (snap) => {
-            const val = snap.val();
-            data = val ? Object.entries(val).map(([id,v])=>({id,...v})).reverse() : [];
-            render();
-            if(activeId) openModal(activeId);
-            setTimeout(() => document.getElementById('intro').style.transform = 'translateY(-100%)', 2500);
+        // --- CARREGAMENTO ---
+        onValue(ref(db, 'market'), (snap) => {
+            const data = snap.val();
+            const list = data ? Object.entries(data).reverse() : [];
+            const grid = document.getElementById('market-grid');
+            grid.innerHTML = '';
+            list.forEach(([id, p]) => {
+                grid.innerHTML += `
+                    <div class="item-card" onclick="openModal('${p.img}', '${p.title}', '${p.price}', '${p.desc}')">
+                        <img src="${p.img}" class="item-img">
+                        <div class="item-info">
+                            <div class="item-price">R$ ${p.price}</div>
+                            <div style="font-size:0.8rem; color:#666">${p.title}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+            setTimeout(() => document.getElementById('intro').style.transform = 'translateY(-100%)', 2000);
         });
 
-        function render(filtered = data) {
-            const grid = document.getElementById('grid-feed');
+        onValue(ref(db, 'cupons'), (snap) => {
+            const data = snap.val();
+            const list = data ? Object.entries(data).reverse() : [];
+            const grid = document.getElementById('coupon-list');
             grid.innerHTML = '';
-            filtered.forEach(p => {
+            list.forEach(([id, c]) => {
                 grid.innerHTML += `
-                    <div class="item-card" onclick="openModal('${p.id}')">
-                        ${p.owner === UID ? `<button onclick="event.stopPropagation(); deletePost('${p.id}')" style="position:absolute; top:5px; right:5px; background:rgba(255,0,0,0.6); border:none; color:white; padding:5px; border-radius:4px; z-index:10;"><i data-lucide="trash-2" size="14"></i></button>` : ''}
-                        <img src="${p.img}" class="item-img">
-                        <div class="item-info">
-                            <div class="item-price">R$ ${p.price}</div>
-                            <div style="font-size:0.8rem; color:#888; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.title}</div>
-                        </div>
+                    <div class="coupon-card">
+                        <small style="color:#888">${c.store}</small>
+                        <strong class="cp-code">${c.code}</strong>
+                        <p style="margin-top:10px; color:#fff; font-weight:600">${c.desc}</p>
                     </div>
                 `;
             });
-            renderCart();
-            lucide.createIcons();
-        }
+        });
 
-        // --- CARRINHO / SETUP ---
-        function renderCart() {
-            const grid = document.getElementById('grid-cart');
-            grid.innerHTML = '';
-            let total = 0;
-            saved.forEach(p => {
-                total += parseFloat(p.price || 0);
-                grid.innerHTML += `
-                    <div class="item-card" onclick="openModal('${p.id}')">
-                        <img src="${p.img}" class="item-img">
-                        <div class="item-info">
-                            <div class="item-price">R$ ${p.price}</div>
-                            <div style="font-size:0.8rem; color:#888;">${p.title}</div>
-                        </div>
-                    </div>
-                `;
-            });
-            document.getElementById('total-price').innerText = total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-            document.getElementById('cart-badge').innerText = saved.length;
-        }
-
-        window.openModal = (id) => {
-            const p = data.find(x => x.id === id);
-            if(!p) return;
-            activeId = id;
-            document.getElementById('m-img').src = p.img;
-            document.getElementById('m-title').innerText = p.title;
-            document.getElementById('m-price').innerText = 'R$ ' + p.price;
-            document.getElementById('m-desc').innerText = p.desc;
-            document.getElementById('m-coupon').innerText = p.coupon ? 'CUPOM: ' + p.coupon : 'SEM CUPOM ATIVO';
-            
-            // Likes
-            const ups = p.votes ? Object.values(p.votes).filter(v => v === 'up').length : 0;
-            const downs = p.votes ? Object.values(p.votes).filter(v => v === 'down').length : 0;
-            document.getElementById('m-up').innerText = ups;
-            document.getElementById('m-down').innerText = downs;
-
-            // Botão Salvar/Remover
-            const btn = document.getElementById('m-btn-save');
-            const isSaved = saved.some(s => s.id === id);
-            btn.innerText = isSaved ? 'REMOVER DO SETUP' : 'SALVAR NO SETUP';
-            btn.className = isSaved ? 'btn-action btn-remove' : 'btn-action btn-save';
-            btn.onclick = () => toggleSave(p);
-
-            // Reviews
-            const revs = document.getElementById('m-reviews');
-            revs.innerHTML = p.reviews ? Object.values(p.reviews).reverse().map(r => `<div style="padding:15px; background:#080808; border-bottom:1px solid #111; margin-bottom:5px;"><small style="color:#555">${r.user}</small><p>${r.text}</p></div>`).join('') : '<p>Nenhuma review.</p>';
-
-            document.getElementById('product-modal').style.display = 'block';
-            lucide.createIcons();
-        };
-
-        window.toggleSave = (p) => {
-            const idx = saved.findIndex(s => s.id === p.id);
-            if(idx > -1) saved.splice(idx, 1);
-            else saved.push(p);
-            localStorage.setItem('saved_promo', JSON.stringify(saved));
-            render();
-            openModal(p.id);
+        // --- FUNÇÕES ---
+        window.toggleForm = () => {
+            const type = document.getElementById('post-type').value;
+            document.getElementById('form-prod').style.display = type === 'prod' ? 'block' : 'none';
+            document.getElementById('form-cupom').style.display = type === 'cupom' ? 'block' : 'none';
         };
 
         window.publish = async () => {
-            const title = document.getElementById('p-title').value;
-            const price = document.getElementById('p-price').value;
-            const img = document.getElementById('p-img').value;
-            const desc = document.getElementById('p-desc').value;
-            const coupon = document.getElementById('p-coupon').value;
-            if(!title || !price) return alert("Preencha título e preço!");
-            await push(ref(db, 'promo'), { owner: UID, title, price, img, desc, coupon, ts: Date.now() });
+            const type = document.getElementById('post-type').value;
+            if(type === 'prod') {
+                const title = document.getElementById('p-title').value;
+                const price = document.getElementById('p-price').value;
+                const img = document.getElementById('p-img').value;
+                const desc = document.getElementById('p-desc').value;
+                await push(ref(db, 'market'), { title, price, img, desc });
+            } else {
+                const store = document.getElementById('c-store').value;
+                const code = document.getElementById('c-code').value;
+                const desc = document.getElementById('c-desc').value;
+                await push(ref(db, 'cupons'), { store, code, desc });
+            }
             tab('feed', document.querySelector('.nav-link'));
         };
 
-        window.vote = async (type) => {
-            await set(ref(db, `promo/${activeId}/votes/${UID}`), type);
+        window.openModal = (img, title, price, desc) => {
+            document.getElementById('m-img').src = img;
+            document.getElementById('m-title').innerText = title;
+            document.getElementById('m-price').innerText = 'R$ ' + price;
+            document.getElementById('m-desc').innerText = desc;
+            document.getElementById('modal').style.display = 'block';
         };
 
-        window.sendReview = async () => {
-            const text = document.getElementById('rev-input').value;
-            if(!text) return;
-            await push(ref(db, `promo/${activeId}/reviews`), { user: UID, text });
-            document.getElementById('rev-input').value = '';
-        };
+        window.closeModal = () => document.getElementById('modal').style.display = 'none';
 
-        window.deletePost = async (id) => { if(confirm("Apagar post?")) await remove(ref(db, `promo/${id}`)); };
-        window.closeModal = () => { document.getElementById('product-modal').style.display = 'none'; activeId = null; };
         window.tab = (id, el) => {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
         };
-        window.search = (t) => render(data.filter(p => p.title.toLowerCase().includes(t.toLowerCase())));
 
         lucide.createIcons();
     </script>
