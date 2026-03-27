@@ -3,146 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sua Plataforma de Cupons</title>
+    <title>TA NA PROMO! | Elite Market Pro</title>
     <link rel="icon" href="fav.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
-        /* Reset e Base */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #1a1a1a; color: white; overflow-x: hidden; }
+        :root { 
+            --bg: #000; 
+            --glass: rgba(12, 12, 12, 0.95); 
+            --border: rgba(255, 255, 255, 0.1); 
+            --accent: #ff4747;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: #fff; overflow-x: hidden; }
 
-        /* Intro Blackout 3D */
-        #intro {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-            background: black; display: flex; justify-content: center; align-items: center;
-            z-index: 9999; transition: opacity 1s ease-out;
+        /* --- INTRO ANIMADA --- */
+        #intro-screen {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 1s ease;
         }
-        .logo-3d {
-            width: 300px;
-            animation: float3d 3s infinite ease-in-out;
-            filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
+        .intro-logo {
+            width: 280px;
+            animation: logo3D 2.5s infinite ease-in-out;
+            filter: drop-shadow(0 0 30px rgba(255,255,255,0.2));
         }
-        @keyframes float3d {
-            0%, 100% { transform: perspective(1000px) rotateY(0deg) scale(1); }
-            50% { transform: perspective(1000px) rotateY(20deg) scale(1.1); }
+        @keyframes logo3D {
+            0%, 100% { transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1); }
+            50% { transform: perspective(1000px) rotateX(10deg) rotateY(20deg) scale(1.1); }
         }
 
-        /* Layout Principal */
-        #main-content { display: none; padding-top: 60px; }
-        
-        /* Nav / Tabs */
-        nav {
-            background: #222; padding: 10px; position: fixed; top: 0; width: 100%;
-            display: flex; gap: 10px; border-bottom: 2px solid #333; z-index: 100;
-        }
-        .tab-btn {
-            background: #333; border: none; color: white; padding: 10px 20px;
-            cursor: pointer; border-radius: 5px; transition: 0.3s;
-        }
-        .tab-btn.active { background: #e74c3c; font-weight: bold; }
+        /* --- SIDEBAR --- */
+        aside { width: 260px; background: var(--glass); backdrop-filter: blur(20px); height: 100vh; border-right: 1px solid var(--border); position: fixed; padding: 30px 15px; z-index: 100; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 10px; color: #555; cursor: pointer; transition: 0.3s; margin-bottom: 5px; }
+        .nav-link.active { color: #fff; background: rgba(255,255,255,0.05); border-left: 4px solid var(--accent); }
 
-        /* Container de Conteúdo */
-        .tab-content { display: none; padding: 20px; max-width: 1200px; margin: auto; }
-        .tab-content.active { display: block; animation: fadeIn 0.5s; }
+        /* --- MAIN --- */
+        main { flex: 1; margin-left: 260px; padding: 40px; opacity: 0; transition: 1s ease; }
+        .section { display: none; animation: fadeIn 0.5s ease forwards; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* --- GRID & CARDS --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .card { background: #0d0d0d; border-radius: 12px; overflow: hidden; transition: 0.3s; cursor: pointer; border: 1px solid var(--border); position: relative; }
+        .card:hover { border-color: #fff; transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .delete-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.8); border: none; color: white; padding: 6px; border-radius: 6px; cursor: pointer; z-index: 10; display: none; }
 
-        /* Estilo Produtos/Cupons */
-        .product-card {
-            background: #333; padding: 15px; border-radius: 10px; margin-bottom: 20px;
-            display: flex; gap: 20px; align-items: center;
+        /* --- MODAL ALIEXPRESS STYLE --- */
+        #modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 500; display: none; overflow-y: auto; padding: 40px 20px; backdrop-filter: blur(10px); }
+        .modal-content { max-width: 1100px; margin: 0 auto; display: flex; gap: 40px; background: #080808; padding: 40px; border-radius: 24px; border: 1px solid var(--border); }
+        .ali-left { flex: 1; } 
+        .ali-right { flex: 1.2; }
+        .btn-buy { width: 100%; padding: 18px; background: #fff; color: #000; font-weight: 900; border: none; border-radius: 12px; cursor: pointer; text-transform: uppercase; margin-bottom: 12px; display: block; text-align: center; text-decoration: none; transition: 0.2s; }
+        .btn-buy:hover { transform: scale(1.02); }
+        .btn-shop { background: var(--accent); color: white; }
+
+        /* REVIEWS */
+        .review-box { margin-top: 30px; border-top: 1px solid #222; padding-top: 20px; }
+        .review-item { background: #111; padding: 15px; border-radius: 10px; margin-bottom: 10px; }
+        .review-imgs { display: flex; gap: 10px; margin-top: 10px; }
+        .review-imgs img { width: 60px; height: 60px; border-radius: 5px; object-fit: cover; }
+
+        input, textarea { width: 100%; background: #111; border: 1px solid #333; padding: 14px; color: #fff; border-radius: 10px; margin-bottom: 15px; outline: none; }
+        input:focus { border-color: var(--accent); }
+
+        @media (max-width: 900px) {
+            aside { width: 100%; height: 70px; bottom: 0; top: auto; flex-direction: row; border-right: none; border-top: 1px solid var(--border); padding: 5px; display: flex; justify-content: space-around; }
+            main { margin-left: 0; padding: 20px; padding-bottom: 100px; }
+            .modal-content { flex-direction: column; padding: 20px; }
         }
-        .product-img { width: 150px; border-radius: 8px; }
-        .btn-cupom { background: #27ae60; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="intro">
-        <img src="logo.png" alt="Logo" class="logo-3d">
+    <div id="intro-screen">
+        <img src="logo.png" class="intro-logo" alt="TA NA PROMO">
     </div>
 
-    <nav id="nav-tabs">
-        <button class="tab-btn active" onclick="openTab('home')">Início</button>
-        <button class="tab-btn" onclick="openTab('cupons')">Postar Cupom</button>
-        <button class="tab-btn" onclick="openTab('produto1')">Produto 01 (Exemplo)</button>
-    </nav>
+    <aside>
+        <div id="user-info" style="margin-bottom: 20px; text-align: center;" class="hidden-mobile">
+            <img id="my-avatar" src="" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover;">
+            <p id="my-name" style="font-weight: 800; font-size: 0.8rem; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px;"></p>
+        </div>
+        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="flame"></i> <span>Feed</span></div>
+        <div class="nav-link" onclick="tab('post-area', this)"><i data-lucide="plus-square"></i> <span>Postar</span></div>
+        <div class="nav-link" onclick="tab('profile', this)"><i data-lucide="settings"></i> <span>Perfil</span></div>
+    </aside>
 
-    <main id="main-content">
-        
-        <section id="home" class="tab-content active">
-            <h2>Destaques do Dia</h2>
-            <div class="product-card" onclick="openTab('produto1')" style="cursor: pointer;">
-                <img src="https://via.placeholder.com/150" class="product-img">
-                <div>
-                    <h3>Teclado Mecânico RGB</h3>
-                    <p>Melhor custo benefício de 2026.</p>
-                    <button class="btn-cupom">Ver Oferta</button>
-                </div>
+    <main id="app-main">
+        <section id="feed" class="section active">
+            <h2 style="font-family:'Syncopate'; margin-bottom:30px; font-size: 1.8rem; border-left: 5px solid var(--accent); padding-left: 15px;">MURAL DE CUPONS</h2>
+            <div class="grid" id="market-grid"></div>
+        </section>
+
+        <section id="post-area" class="section">
+            <div style="max-width: 600px; margin: 0 auto; background: #0a0a0a; padding: 40px; border-radius: 20px; border: 1px solid #222; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+                <h2 style="margin-bottom:25px; font-family:'Syncopate';">NOVA OFERTA</h2>
+                <input type="text" id="p-title" placeholder="Nome do Produto (Ex: Mouse Gamer 3D)">
+                <input type="number" id="p-price" placeholder="Preço (R$)">
+                <input type="url" id="p-img" placeholder="Link da Imagem ou GIF do Produto">
+                <input type="url" id="p-url" placeholder="Link Direto de Compra">
+                <textarea id="p-desc" placeholder="Detalhes técnicos, cupom de desconto ou review rápido..." rows="4"></textarea>
+                <button class="btn-buy btn-shop" onclick="publish()">PUBLICAR NO MURAL</button>
             </div>
         </section>
 
-        <section id="cupons" class="tab-content">
-            <h2>Compartilhar Cupom</h2>
-            <form style="display: flex; flex-direction: column; gap: 10px; max-width: 400px;">
-                <input type="text" placeholder="Nome do Produto" style="padding: 10px;">
-                <input type="text" placeholder="Código do Cupom" style="padding: 10px;">
-                <button type="submit" class="btn-cupom">Publicar Agora</button>
-            </form>
-        </section>
-
-        <section id="produto1" class="tab-content">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-                <div>
-                    <img src="https://via.placeholder.com/400" style="width: 100%; border-radius: 10px;">
-                    <div style="margin-top: 10px; display: flex; gap: 5px;">
-                        <img src="https://via.placeholder.com/80" alt="thumb">
-                        <img src="https://via.placeholder.com/80" alt="thumb">
-                    </div>
-                </div>
-                <div>
-                    <h1>Teclado Mecânico RGB Pro</h1>
-                    <h2 style="color: #e74c3c;">R$ 159,90</h2>
-                    <p style="margin: 20px 0;">Reviews: ⭐⭐⭐⭐⭐ (450 avaliações)</p>
-                    <div style="background: #222; padding: 15px; border-left: 4px solid #e74c3c;">
-                        <p><strong>CUPOM:</strong> PROMO2026</p>
-                    </div>
-                    <button class="btn-cupom" style="width: 100%; margin-top: 20px; font-size: 1.2rem;">IR PARA A LOJA</button>
-                </div>
+        <section id="profile" class="section">
+            <div style="max-width: 400px; margin: 0 auto; text-align: center;">
+                <h2 style="margin-bottom:20px; font-family:'Syncopate';">MEU PERFIL</h2>
+                <input type="text" id="u-name" placeholder="Seu Nome">
+                <input type="text" id="u-photo" placeholder="URL da sua Foto (Avatar)">
+                <button class="btn-buy" onclick="saveProfile()">ATUALIZAR DADOS</button>
             </div>
-            <hr style="margin: 40px 0; border: 0; border-top: 1px solid #444;">
-            <h3>Análises e Gifs</h3>
-            <p>Imagine aqui o GIF do produto funcionando...</p>
         </section>
-
     </main>
 
-    <script>
-        // Lógica da Intro
-        window.onload = () => {
-            setTimeout(() => {
-                const intro = document.getElementById('intro');
-                intro.style.opacity = '0';
-                setTimeout(() => {
-                    intro.style.display = 'none';
-                    document.getElementById('main-content').style.display = 'block';
-                }, 1000);
-            }, 3000); // 3 segundos de intro
+    <div id="modal">
+        <button onclick="closeModal()" style="position:fixed; top:30px; right:30px; background:#fff; border:none; padding:12px; border-radius:50%; cursor:pointer; z-index: 600;"><i data-lucide="x" color="#000"></i></button>
+        <div class="modal-content">
+            <div class="ali-left">
+                <img id="m-img" style="width:100%; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+            </div>
+            <div class="ali-right">
+                <h1 id="m-title" style="font-family:'Syncopate'; line-height: 1.2;"></h1>
+                <div id="m-price" style="font-size:3rem; font-weight:900; margin:15px 0; color: var(--accent);"></div>
+                <p id="m-desc" style="color:#aaa; margin-bottom:30px; line-height: 1.6; font-size: 1.1rem;"></p>
+                
+                <a id="m-link" href="#" target="_blank" class="btn-buy btn-shop">RESGATAR CUPOM / COMPRAR <i data-lucide="external-link" style="width:18px;"></i></a>
+                
+                <div class="review-box">
+                    <h3>REVIEWS DA GALERA (4.9⭐)</h3>
+                    <div id="reviews-container">
+                        <div class="review-item">
+                            <p><strong>@EliteUser:</strong> "Chegou em 10 dias, qualidade absurda!"</p>
+                            <div class="review-imgs">
+                                <img src="https://via.placeholder.com/60">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top:15px;">
+                        <button class="btn-buy" style="font-size:0.7rem; padding:10px; background:#111; color:#fff; border:1px solid #333;"><i data-lucide="thumbs-up" size="14"></i> Útil (12)</button>
+                        <button class="btn-buy" style="font-size:0.7rem; padding:10px; background:#111; color:#fff; border:1px solid #333;"><i data-lucide="message-square" size="14"></i> Comentar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // SUA CONFIG DO FIREBASE (MANTIDA)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMoxCYuvhRQtRzPm4KSpRo5qtPr3keu0I",
+            authDomain: "devgram-f7c0d.firebaseapp.com",
+            databaseURL: "https://devgram-f7c0d-default-rtdb.firebaseio.com",
+            projectId: "devgram-f7c0d",
+            storageBucket: "devgram-f7c0d.firebasestorage.app",
+            messagingSenderId: "813511319694",
+            appId: "1:813511319694:web:ed579ca37622e84ed7e9df"
         };
 
-        // Lógica das Abas
-        function openTab(tabId) {
-            const contents = document.querySelectorAll('.tab-content');
-            const buttons = document.querySelectorAll('.tab-btn');
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const UID = localStorage.getItem('tnp_uid') || 'U'+Math.floor(Math.random()*9999);
+        localStorage.setItem('tnp_uid', UID);
 
-            contents.forEach(content => content.classList.remove('active'));
-            buttons.forEach(btn => btn.classList.remove('active'));
+        let products = [];
 
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+        // Lógica de Intro e Carregamento
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('intro-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('intro-screen').style.display = 'none';
+                    document.getElementById('app-main').style.opacity = '1';
+                }, 1000);
+            }, 2500);
+        });
+
+        // Carregar Perfil
+        onValue(ref(db, `users/${UID}`), (snap) => {
+            const u = snap.val() || { name: 'NOVO MEMBRO', photo: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' };
+            document.getElementById('my-avatar').src = u.photo;
+            document.getElementById('my-name').innerText = u.name;
+        });
+
+        // Carregar Feed com animação nos cards
+        onValue(ref(db, 'market'), (snap) => {
+            const val = snap.val();
+            products = val ? Object.entries(val).reverse().map(([id,v])=>({id,...v})) : [];
+            const grid = document.getElementById('market-grid');
+            grid.innerHTML = '';
+            products.forEach(p => {
+                const isOwner = p.owner === UID;
+                grid.innerHTML += `
+                    <div class="card">
+                        <button class="delete-btn" style="display:${isOwner?'block':'none'}" onclick="deleteItem('${p.id}', event)"><i data-lucide="trash-2"></i></button>
+                        <div onclick="openModal('${p.id}')">
+                            <img src="${p.img || 'https://via.placeholder.com/300?text=Sem+Imagem'}">
+                            <div style="padding:15px">
+                                <div style="font-weight:900; font-size:1.2rem; color:var(--accent)">R$ ${p.price}</div>
+                                <div style="font-size:0.8rem; color:#888; margin-top:5px; text-transform:uppercase; font-weight:600">${p.title}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+        });
+
+        window.publish = async () => {
+            const title = document.getElementById('p-title').value;
+            const price = document.getElementById('p-price').value;
+            const img = document.getElementById('p-img').value;
+            const url = document.getElementById('p-url').value;
+            const desc = document.getElementById('p-desc').value;
+            if(!title || !url) return alert("Preencha os campos obrigatórios!");
             
-            // Scroll para o topo ao trocar aba
+            await push(ref(db, 'market'), { title, price, img, url, desc, owner: UID });
+            alert("Postado com sucesso!");
+            tab('feed', document.querySelector('.nav-link'));
+        };
+
+        window.openModal = (id) => {
+            const p = products.find(x => x.id === id);
+            document.getElementById('m-img').src = p.img;
+            document.getElementById('m-title').innerText = p.title;
+            document.getElementById('m-price').innerText = 'R$ ' + p.price;
+            document.getElementById('m-desc').innerText = p.desc;
+            document.getElementById('m-link').href = p.url;
+            document.getElementById('modal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            lucide.createIcons();
+        };
+
+        window.closeModal = () => {
+            document.getElementById('modal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        };
+
+        window.tab = (id, el) => {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(el) el.classList.add('active');
             window.scrollTo(0,0);
-        }
+        };
+
+        window.saveProfile = async () => {
+            const name = document.getElementById('u-name').value;
+            const photo = document.getElementById('u-photo').value;
+            await set(ref(db, `users/${UID}`), { name, photo });
+            alert("Perfil sincronizado!");
+        };
+
+        window.deleteItem = async (id, e) => {
+            e.stopPropagation();
+            if(confirm("Apagar promoção?")) await remove(ref(db, `market/${id}`));
+        };
+
+        lucide.createIcons();
     </script>
 </body>
 </html>
