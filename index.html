@@ -1,171 +1,317 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>TÁ NA PROMO!</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TÁ NA PROMO! | Gamer Community</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
+    <style>
+        :root {
+            --bg: #050508;
+            --side: #0a0a12;
+            --card: rgba(18, 18, 30, 0.8);
+            --primary: #bc13fe;
+            --secondary: #00f2ff;
+            --hot: #ff0055;
+            --text: #f1f5f9;
+            --dim: #94a3b8;
+            --glow: 0 0 20px rgba(188, 19, 254, 0.3);
+            --glass: rgba(255, 255, 255, 0.03);
+        }
 
-<style>
-body { background:#020205; color:white; font-family:sans-serif; }
-.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
-.card { background:#111; padding:15px; border-radius:10px; }
-img { width:100%; height:200px; object-fit:cover; }
-button { margin-top:5px; cursor:pointer; }
-</style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
+        body { background: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
+
+        /* --- INTRO SCANNER --- */
+        #intro {
+            position: fixed; inset: 0; z-index: 9999; background: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: transform 0.8s cubic-bezier(0.87, 0, 0.13, 1);
+        }
+        .intro-logo {
+            font-family: 'Syncopate'; font-size: 2.5rem; color: var(--primary);
+            text-shadow: 0 0 20px var(--primary); animation: pulse 1.5s infinite;
+            text-align: center; line-height: 1.2;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; filter: brightness(1.5); } 50% { opacity: 0.4; } }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: 260px; background: var(--side); height: 100vh;
+            border-right: 1px solid var(--glass); position: fixed;
+            display: flex; flex-direction: column; padding: 30px 15px; z-index: 100;
+        }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 14px;
+            border-radius: 10px; color: var(--dim); cursor: pointer;
+            transition: 0.3s; margin-bottom: 5px; text-decoration: none;
+        }
+        .nav-link:hover { background: var(--glass); color: white; }
+        .nav-link.active { background: var(--primary); color: white; box-shadow: var(--glow); }
+
+        /* --- MAIN --- */
+        main { flex: 1; margin-left: 260px; padding: 40px; }
+        .section { display: none; opacity: 0; }
+        .section.active { display: block; animation: fadeIn 0.5s forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- GRID & CARDS --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .card {
+            background: var(--card); border: 1px solid var(--glass);
+            border-radius: 16px; overflow: hidden; transition: 0.3s;
+            backdrop-filter: blur(10px); position: relative;
+        }
+        .card:hover { border-color: var(--secondary); transform: translateY(-5px); }
+        .card-img { width: 100%; height: 200px; object-fit: cover; background: #111; }
+        .card-content { padding: 20px; }
+        
+        /* --- VOTING & ACTIONS --- */
+        .vote-bar {
+            display: flex; align-items: center; gap: 15px;
+            padding-top: 15px; border-top: 1px solid var(--glass); margin-top: 15px;
+        }
+        .vote-btn {
+            background: none; border: none; color: var(--dim);
+            cursor: pointer; display: flex; align-items: center; gap: 5px;
+            font-weight: bold; transition: 0.2s;
+        }
+        .vote-btn:hover { color: var(--secondary); }
+        .vote-btn.up.active { color: #00ff88; filter: drop-shadow(0 0 5px #00ff88); }
+        .vote-btn.down.active { color: var(--hot); filter: drop-shadow(0 0 5px var(--hot)); }
+
+        .btn-del {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(255, 0, 0, 0.2); color: #ff4d4d;
+            border: 1px solid #ff4d4d; padding: 6px; border-radius: 8px;
+            cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s;
+        }
+        .btn-del:hover { background: #ff4d4d; color: white; }
+
+        /* --- FORMS --- */
+        .glass-box { background: var(--side); padding: 30px; border-radius: 15px; border: 1px solid var(--glass); max-width: 600px; margin: 0 auto; }
+        input { width: 100%; padding: 12px; background: #000; border: 1px solid #222; border-radius: 8px; color: white; margin: 8px 0 15px; outline: none; }
+        .btn-main {
+            width: 100%; padding: 15px; background: var(--primary); border: none;
+            border-radius: 8px; color: white; font-weight: 800; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+
+        #toast {
+            position: fixed; bottom: 20px; right: 20px; background: var(--secondary);
+            color: #000; padding: 12px 25px; border-radius: 8px; font-weight: 700;
+            transform: translateX(250%); transition: 0.4s; z-index: 10000;
+        }
+
+        @media (max-width: 900px) {
+            aside { width: 100%; height: 65px; bottom: 0; top: auto; flex-direction: row; padding: 5px; }
+            main { margin-left: 0; padding: 20px 20px 100px; }
+            .nav-link span { display: none; }
+            .nav-link { flex: 1; justify-content: center; margin: 0; }
+            .intro-logo { font-size: 1.5rem; }
+        }
+    </style>
 </head>
-
 <body>
 
-<h1>TÁ NA PROMO 🔥</h1>
+    <div id="intro"><div class="intro-logo">INITIALIZING<br>SYSTEM_ID</div></div>
+    <div id="toast">Ação confirmada!</div>
 
-<h2>Postar Promo</h2>
-<form id="promoForm">
-<input id="title" placeholder="Nome" required>
-<input id="price" type="number" step="0.01" min="0.01" placeholder="Preço" required>
-<input id="old" type="number" step="0.01" min="0.01" placeholder="Antigo" required>
-<input id="link" placeholder="Link" required>
-<input id="img" placeholder="Imagem (GIF OK)">
-<button>Postar</button>
-</form>
+    <aside>
+        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="layout"></i> <span>Feed</span></div>
+        <div class="nav-link" onclick="tab('post-promo', this)"><i data-lucide="plus-square"></i> <span>Promo</span></div>
+        <div class="nav-link" onclick="tab('post-coupon', this)"><i data-lucide="ticket"></i> <span>Cupom</span></div>
+        <div style="margin-top:auto; padding:10px; font-size:0.6rem; color:var(--dim); opacity:0.5; word-break:break-all;" id="my-uid"></div>
+    </aside>
 
-<h2>Postar Cupom</h2>
-<form id="couponForm">
-<input id="ctitle" placeholder="Cupom" required>
-<input id="cdesc" placeholder="Descrição" required>
-<button>Postar Cupom</button>
-</form>
+    <main>
+        <section id="feed" class="section active">
+            <h1 style="margin-bottom: 30px;">Promoções</h1>
+            <div class="grid" id="render-promos"></div>
+            
+            <h1 style="margin: 50px 0 30px;">Cupons</h1>
+            <div class="grid" id="render-coupons"></div>
+        </section>
 
-<h2>Promos</h2>
-<div class="grid" id="promos"></div>
+        <section id="post-promo" class="section">
+            <div class="glass-box">
+                <h2>Nova Promoção</h2>
+                <form id="form-promo">
+                    <input type="text" id="p-title" placeholder="Produto" required>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" step="0.01" id="p-price" placeholder="Preço Atual" required>
+                        <input type="number" step="0.01" id="p-old" placeholder="Preço Antigo">
+                    </div>
+                    <input type="url" id="p-link" placeholder="URL da Loja" required>
+                    <input type="url" id="p-img" placeholder="URL da Imagem">
+                    <button class="btn-main"><i data-lucide="send"></i> PUBLICAR</button>
+                </form>
+            </div>
+        </section>
 
-<h2>Cupons</h2>
-<div class="grid" id="coupons"></div>
+        <section id="post-coupon" class="section">
+            <div class="glass-box">
+                <h2>Novo Cupom</h2>
+                <form id="form-coupon">
+                    <input type="text" id="c-shop" placeholder="Loja" required>
+                    <input type="text" id="c-code" placeholder="CÓDIGO" required style="text-transform: uppercase;">
+                    <input type="text" id="c-desc" placeholder="Regra (ex: 10% OFF)" required>
+                    <button class="btn-main" style="background: var(--secondary); color: #000;"><i data-lucide="plus-circle"></i> CRIAR</button>
+                </form>
+            </div>
+        </section>
+    </main>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue, remove, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-const app = initializeApp({
-    apiKey: "SUA KEY",
-    databaseURL: "SUA URL"
-});
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMoxCYuvhRQtRzPm4KSpRo5qtPr3keu0I",
+            authDomain: "devgram-f7c0d.firebaseapp.com",
+            databaseURL: "https://devgram-f7c0d-default-rtdb.firebaseio.com",
+            projectId: "devgram-f7c0d",
+            storageBucket: "devgram-f7c0d.firebasestorage.app",
+            messagingSenderId: "813511319694",
+            appId: "1:813511319694:web:ed579ca37622e84ed7e9df"
+        };
 
-const db = getDatabase(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-const promosRef = ref(db, "promos");
-const couponsRef = ref(db, "coupons");
+        // --- SISTEMA DE IDENTIDADE (UID FIXO POR NAVEGADOR) ---
+        let MY_UID = localStorage.getItem('user_uid');
+        if(!MY_UID) {
+            MY_UID = 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('user_uid', MY_UID);
+        }
+        document.getElementById('my-uid').innerText = "ID: " + MY_UID;
 
-// ID simples do usuário
-let userId = localStorage.getItem("uid");
-if (!userId) {
-    userId = Math.random().toString(36).slice(2);
-    localStorage.setItem("uid", userId);
-}
+        // --- NAVEGAÇÃO ---
+        window.tab = (id, el) => {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(el) el.classList.add('active');
+        };
 
-// POST PROMO
-promoForm.onsubmit = async e => {
-    e.preventDefault();
+        // --- RENDERIZAÇÃO REALTIME ---
+        const startSync = () => {
+            onValue(ref(db, 'content'), (snapshot) => {
+                const data = snapshot.val();
+                const items = data ? Object.entries(data).map(([id,v])=>({id,...v})).reverse() : [];
+                
+                const promos = items.filter(i => i.type === 'promo');
+                const coupons = items.filter(i => i.type === 'coupon');
+                
+                render(promos, 'render-promos');
+                render(coupons, 'render-coupons');
+                
+                setTimeout(() => document.getElementById('intro').style.transform = 'translateY(-100%)', 1200);
+            });
+        };
 
-    await push(promosRef, {
-        title: title.value,
-        price: parseFloat(price.value),
-        old: parseFloat(old.value),
-        link: link.value,
-        img: img.value,
-        likes: 0,
-        dislikes: 0,
-        owner: userId
-    });
+        const render = (data, containerId) => {
+            const container = document.getElementById(containerId);
+            container.innerHTML = data.length ? '' : '<p style="color:var(--dim)">Nenhum item postado.</p>';
+            
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                // Cálculo de Votos
+                const upVotes = item.votes ? Object.values(item.votes).filter(v => v === 'up').length : 0;
+                const downVotes = item.votes ? Object.values(item.votes).filter(v => v === 'down').length : 0;
+                const myVote = item.votes ? item.votes[MY_UID] : null;
 
-    promoForm.reset();
-};
+                card.innerHTML = `
+                    ${item.author === MY_UID ? `<button class="btn-del" onclick="deleteItem('${item.id}')"><i data-lucide="trash-2" style="width:16px"></i></button>` : ''}
+                    ${item.type === 'promo' ? `<img src="${item.img || 'https://via.placeholder.com/400x200/111/fff?text=Produto'}" class="card-img">` : ''}
+                    <div class="card-content">
+                        <small style="color:var(--secondary)">${item.type === 'promo' ? 'OFERTA' : item.shop}</small>
+                        <h3 style="margin:5px 0">${item.type === 'promo' ? item.title : item.desc}</h3>
+                        ${item.type === 'promo' ? `<div style="font-size:1.5rem; color:white; font-weight:700">R$ ${item.price}</div>` : `<div style="background:#000; padding:10px; border-radius:5px; border:1px dashed var(--secondary); font-family:monospace; text-align:center; color:var(--secondary)">${item.code}</div>`}
+                        
+                        <div class="vote-bar">
+                            <button class="vote-btn up ${myVote === 'up' ? 'active' : ''}" onclick="vote('${item.id}', 'up')"><i data-lucide="thumbs-up"></i> ${upVotes}</button>
+                            <button class="vote-btn down ${myVote === 'down' ? 'active' : ''}" onclick="vote('${item.id}', 'down')"><i data-lucide="thumbs-down"></i> ${downVotes}</button>
+                            <span style="margin-left:auto; color:var(--secondary); cursor:pointer" onclick="window.open('${item.link || '#'}')"><i data-lucide="external-link"></i></span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        };
 
-// POST CUPOM
-couponForm.onsubmit = async e => {
-    e.preventDefault();
+        // --- VOTAÇÃO ÚNICA POR UID ---
+        window.vote = async (itemId, type) => {
+            const voteRef = ref(db, `content/${itemId}/votes/${MY_UID}`);
+            const snapshot = await get(voteRef);
+            const currentVote = snapshot.val();
 
-    await push(couponsRef, {
-        title: ctitle.value,
-        desc: cdesc.value,
-        likes: 0,
-        dislikes: 0,
-        owner: userId
-    });
+            if(currentVote === type) {
+                await set(voteRef, null); // Remove voto se clicar de novo no mesmo
+            } else {
+                await set(voteRef, type); // Define novo voto
+            }
+            showToast("Voto processado!");
+        };
 
-    couponForm.reset();
-};
+        // --- EXCLUIR (SOMENTE DONO) ---
+        window.deleteItem = (id) => {
+            if(confirm("Deseja apagar sua postagem?")) {
+                remove(ref(db, `content/${id}`));
+                showToast("Postagem removida!");
+            }
+        };
 
-// RENDER PROMOS
-onValue(promosRef, snap => {
-    promos.innerHTML = "";
-    snap.forEach(item => {
-        const d = item.val();
-        const id = item.key;
+        // --- POSTAGENS ---
+        document.getElementById('form-promo').onsubmit = (e) => {
+            e.preventDefault();
+            push(ref(db, 'content'), {
+                type: 'promo',
+                author: MY_UID,
+                title: document.getElementById('p-title').value,
+                price: document.getElementById('p-price').value,
+                old: document.getElementById('p-old').value,
+                link: document.getElementById('p-link').value,
+                img: document.getElementById('p-img').value,
+                ts: Date.now()
+            });
+            showToast("Promoção online!");
+            e.target.reset();
+            tab('feed');
+        };
 
-        promos.innerHTML += `
-        <div class="card">
-            <img src="${d.img || 'https://via.placeholder.com/400'}">
-            <h3>${d.title}</h3>
-            <p>R$ ${d.price}</p>
-            <small>De R$ ${d.old}</small>
+        document.getElementById('form-coupon').onsubmit = (e) => {
+            e.preventDefault();
+            push(ref(db, 'content'), {
+                type: 'coupon',
+                author: MY_UID,
+                shop: document.getElementById('c-shop').value,
+                code: document.getElementById('c-code').value.toUpperCase(),
+                desc: document.getElementById('c-desc').value,
+                ts: Date.now()
+            });
+            showToast("Cupom adicionado!");
+            e.target.reset();
+            tab('feed');
+        };
 
-            <br>
-            👍 ${d.likes} 👎 ${d.dislikes}
+        const showToast = (m) => {
+            const t = document.getElementById('toast');
+            t.innerText = m;
+            t.style.transform = 'translateX(0)';
+            setTimeout(() => t.style.transform = 'translateX(250%)', 3000);
+        };
 
-            <br>
-            <button onclick="vote('promos','${id}',1)">👍</button>
-            <button onclick="vote('promos','${id}',-1)">👎</button>
-
-            <br>
-            <button onclick="window.open('${d.link}')">Abrir</button>
-
-            ${d.owner === userId ? `<button onclick="del('promos','${id}')">🗑️</button>` : ""}
-        </div>`;
-    });
-});
-
-// RENDER CUPONS
-onValue(couponsRef, snap => {
-    coupons.innerHTML = "";
-    snap.forEach(item => {
-        const d = item.val();
-        const id = item.key;
-
-        coupons.innerHTML += `
-        <div class="card">
-            <h3>${d.title}</h3>
-            <p>${d.desc}</p>
-
-            👍 ${d.likes} 👎 ${d.dislikes}
-
-            <br>
-            <button onclick="vote('coupons','${id}',1)">👍</button>
-            <button onclick="vote('coupons','${id}',-1)">👎</button>
-
-            ${d.owner === userId ? `<button onclick="del('coupons','${id}')">🗑️</button>` : ""}
-        </div>`;
-    });
-});
-
-// VOTAR
-window.vote = (type, id, val) => {
-    const r = ref(db, `${type}/${id}`);
-
-    update(r, val === 1
-        ? { likes: (Math.random()*1)+1 }
-        : { dislikes: (Math.random()*1)+1 }
-    );
-};
-
-// DELETAR
-window.del = (type, id) => {
-    if (confirm("Excluir?")) {
-        remove(ref(db, `${type}/${id}`));
-    }
-};
-</script>
-
+        startSync();
+        lucide.createIcons();
+    </script>
 </body>
 </html>
