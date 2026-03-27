@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAMER SHOP | Pro Edition</title>
+    <title>GAMER SHOP | ULTRA EDITION</title>
     <link rel="icon" type="image/x-icon" href="fav.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
@@ -11,171 +11,156 @@
 
     <style>
         :root {
-            --bg: #000000;
-            --side: #0a0a0a;
-            --card: #111111;
-            --border: #222;
-            --primary: #ffffff;
-            --secondary: #666;
-            --text: #f1f5f9;
-            --dim: #888;
-            --glass: rgba(255, 255, 255, 0.05);
+            --bg: #000; --side: #080808; --card: #111; --border: #222;
+            --primary: #fff; --secondary: #666; --text: #eee; --dim: #888;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
         body { background: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
 
-        /* --- INTRO LOGO 3D --- */
+        /* --- INTRO 3D --- */
         #intro {
             position: fixed; inset: 0; z-index: 9999; background: #000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: transform 1s cubic-bezier(0.8, 0, 0.2, 1);
-            perspective: 1000px;
+            transition: transform 0.8s cubic-bezier(0.8, 0, 0.2, 1); perspective: 1000px;
         }
         .intro-logo {
-            width: 300px; height: auto;
-            filter: drop-shadow(0 20px 50px rgba(255,255,255,0.2));
+            width: 320px; height: auto; filter: drop-shadow(0 0 30px rgba(255,255,255,0.3));
             animation: logo3D 3s infinite ease-in-out;
         }
         @keyframes logo3D {
-            0%, 100% { transform: rotateY(-10deg) rotateX(5deg) translateY(0); }
-            50% { transform: rotateY(10deg) rotateX(-5deg) translateY(-20px); }
+            0%, 100% { transform: rotateY(-15deg) rotateX(10deg); }
+            50% { transform: rotateY(15deg) rotateX(-10deg) translateY(-20px); }
         }
 
         /* --- SIDEBAR --- */
         aside {
-            width: 260px; background: var(--side); height: 100vh;
-            border-right: 1px solid var(--border); position: fixed;
-            display: flex; flex-direction: column; padding: 30px 15px; z-index: 100;
+            width: 260px; background: var(--side); height: 100vh; border-right: 1px solid var(--border);
+            position: fixed; display: flex; flex-direction: column; padding: 30px 15px; z-index: 100;
         }
         .nav-link {
-            display: flex; align-items: center; gap: 12px; padding: 14px;
-            border-radius: 8px; color: var(--dim); cursor: pointer;
-            transition: 0.3s; margin-bottom: 5px; position: relative;
+            display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 8px;
+            color: var(--dim); cursor: pointer; transition: 0.3s; margin-bottom: 5px; position: relative;
         }
         .nav-link.active { background: var(--primary); color: #000; font-weight: 700; }
-        .badge-count { position: absolute; right: 10px; background: #444; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; }
+        .badge { position: absolute; right: 10px; background: #333; color: #fff; font-size: 0.7rem; padding: 2px 7px; border-radius: 10px; }
 
-        /* --- MAIN & FILTERS --- */
+        /* --- CONTENT --- */
         main { flex: 1; margin-left: 260px; padding: 40px; }
         .section { display: none; opacity: 0; transition: 0.5s; }
         .section.active { display: block; opacity: 1; }
 
-        .search-box {
-            width: 100%; max-width: 600px; background: var(--card); border: 1px solid var(--border);
-            padding: 12px 20px; border-radius: 50px; display: flex; align-items: center; gap: 10px; margin-bottom: 30px;
-        }
-        .search-box input { background: none; border: none; color: white; width: 100%; outline: none; }
+        .search-bar { width: 100%; max-width: 500px; background: var(--card); border: 1px solid var(--border); padding: 12px 20px; border-radius: 50px; color: white; outline: none; margin-bottom: 25px; }
 
-        .filter-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 30px; scrollbar-width: none; }
-        .filter-chip { background: var(--card); padding: 8px 18px; border-radius: 50px; border: 1px solid var(--border); cursor: pointer; white-space: nowrap; transition: 0.3s; }
-        .filter-chip.active { background: white; color: black; border-color: white; }
-
-        /* --- GRID ALIEXPRESS STYLE --- */
+        /* --- GRID ALIEXPRESS --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
         .item-card {
-            background: var(--card); border-radius: 8px; overflow: hidden; 
-            cursor: pointer; transition: 0.3s; border: 1px solid var(--border); position: relative;
+            background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid var(--border);
+            cursor: pointer; transition: 0.3s; position: relative;
         }
         .item-card:hover { border-color: #555; transform: translateY(-5px); }
-        .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #000; }
-        .item-info { padding: 12px; }
-        .item-price { font-size: 1.2rem; font-weight: 700; color: #fff; }
+        .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .item-info { padding: 10px; }
+        .item-price { font-size: 1.1rem; font-weight: 700; color: #fff; }
         .item-title { font-size: 0.8rem; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* --- MODAL PRODUTO (ALI STYLE) --- */
-        #product-page {
+        /* --- EXCLUIR BUTTON --- */
+        .btn-del {
+            position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.7); 
+            color: white; border: none; padding: 6px; border-radius: 5px; cursor: pointer; z-index: 10;
+        }
+
+        /* --- MODAL PRODUTO --- */
+        #product-modal {
             position: fixed; inset: 0; background: #000; z-index: 200;
             display: none; overflow-y: auto; padding: 40px; animation: slideUp 0.4s ease;
         }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        
-        .close-btn { position: fixed; top: 20px; right: 20px; background: #222; border: none; color: white; padding: 10px; border-radius: 50%; cursor: pointer; z-index: 210; }
-        .prod-container { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-        .prod-gallery img { width: 100%; border-radius: 10px; border: 1px solid var(--border); }
-        
-        /* --- CALCULADORA --- */
-        .cart-summary { background: #fff; color: #000; padding: 25px; border-radius: 10px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .total-val { font-size: 2rem; font-weight: 800; font-family: 'Syncopate'; }
+        .close-modal { position: fixed; top: 20px; right: 20px; background: #222; border: none; color: white; padding: 10px; border-radius: 50%; cursor: pointer; z-index: 220; }
 
-        /* --- FORMS & BUTTONS --- */
-        textarea, input, select { width: 100%; padding: 12px; background: #111; border: 1px solid var(--border); border-radius: 6px; color: white; margin-bottom: 10px; }
-        .btn-buy { background: white; color: black; border: none; padding: 15px; border-radius: 6px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; }
-        
+        .prod-grid { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .prod-img { width: 100%; border-radius: 12px; border: 1px solid var(--border); }
+
+        /* --- VOTES & BUTTONS --- */
+        .vote-row { display: flex; gap: 15px; margin: 20px 0; align-items: center; }
+        .vote-btn { background: #111; border: 1px solid var(--border); color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; display: flex; gap: 5px; }
+        .vote-btn.active-up { border-color: #00ff88; color: #00ff88; }
+        .vote-btn.active-down { border-color: #ff4444; color: #ff4444; }
+
+        .btn-action { width: 100%; padding: 15px; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; border: none; margin-top: 10px; }
+        .btn-add { background: white; color: black; }
+        .btn-rem { background: #222; color: #ff4444; border: 1px solid #ff4444; }
+
+        /* --- CALCULADORA --- */
+        .calc-box { background: #fff; color: #000; padding: 20px; border-radius: 12px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .total-price { font-size: 2rem; font-weight: 900; font-family: 'Syncopate'; }
+
         #toast { position: fixed; bottom: 20px; right: 20px; background: white; color: black; padding: 12px 25px; border-radius: 6px; font-weight: 700; transform: translateX(250%); transition: 0.4s; z-index: 10000; }
 
-        @media (max-width: 900px) {
-            aside { width: 100%; height: 65px; bottom: 0; top: auto; flex-direction: row; padding: 5px; border-right: none; border-top: 1px solid var(--border); }
+        @media (max-width: 800px) {
+            aside { width: 100%; height: 60px; bottom: 0; top: auto; flex-direction: row; padding: 5px; border-right: none; border-top: 1px solid var(--border); }
             main { margin-left: 0; padding: 20px 20px 100px; }
             .nav-link span { display: none; }
-            .nav-link { flex: 1; justify-content: center; margin: 0; }
-            .prod-container { grid-template-columns: 1fr; }
+            .prod-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
     <div id="intro"><img src="logo.png" class="intro-logo"></div>
-    <div id="toast">Sucesso!</div>
+    <div id="toast">Ação realizada!</div>
 
     <aside>
         <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="layout"></i> <span>Feed</span></div>
-        <div class="nav-link" onclick="tab('cart', this)"><i data-lucide="shopping-cart"></i> <span>Setup</span> <span class="badge-count" id="cart-count">0</span></div>
-        <div class="nav-link" onclick="tab('post', this)"><i data-lucide="plus-circle"></i> <span>Anunciar</span></div>
+        <div class="nav-link" onclick="tab('setup', this)"><i data-lucide="shopping-cart"></i> <span>Meu Setup</span> <span class="badge" id="setup-count">0</span></div>
+        <div class="nav-link" onclick="tab('postar', this)"><i data-lucide="plus-square"></i> <span>Vender</span></div>
     </aside>
 
     <main>
         <section id="feed" class="section active">
-            <div class="search-box">
-                <i data-lucide="search" style="color:#555"></i>
-                <input type="text" id="main-search" placeholder="O que você está procurando?" oninput="filterItems()">
-            </div>
-            <div class="filter-scroll" id="cat-filters">
-                <div class="filter-chip active" onclick="filterCat('all', this)">Tudo</div>
-            </div>
-            <div class="grid" id="items-grid"></div>
+            <input type="text" class="search-bar" placeholder="Buscar no mercado..." oninput="searchItems(this.value)">
+            <div class="grid" id="grid-feed"></div>
         </section>
 
-        <section id="cart" class="section">
-            <div class="cart-summary">
-                <div><p>TOTAL DO SETUP</p><div class="total-val" id="cart-total">R$ 0,00</div></div>
-                <i data-lucide="calculator"></i>
+        <section id="setup" class="section">
+            <div class="calc-box">
+                <div><p style="font-size: 0.8rem; font-weight: 700;">VALOR TOTAL DO SETUP</p><div class="total-price" id="setup-total">R$ 0,00</div></div>
+                <i data-lucide="calculator" size="40"></i>
             </div>
-            <div class="grid" id="render-cart"></div>
+            <div class="grid" id="grid-setup"></div>
         </section>
 
-        <section id="post" class="section">
-            <div style="max-width: 600px; margin: 0 auto; background: var(--side); padding: 30px; border-radius: 12px; border: 1px solid var(--border);">
-                <h2>Vender Produto</h2><br>
-                <input type="text" id="p-title" placeholder="Nome do Produto">
-                <select id="p-cat">
-                    <option value="Hardware">Hardware</option><option value="Periféricos">Periféricos</option>
-                    <option value="Vídeo">Monitores & Vídeo</option><option value="Setup">Setup (Conforto)</option>
-                </select>
-                <input type="number" id="p-price" placeholder="Preço (R$)">
-                <input type="url" id="p-img" placeholder="Link da Imagem">
-                <textarea id="p-desc" placeholder="Descrição Detalhada" rows="5"></textarea>
-                <button class="btn-buy" onclick="publishProduct()">PUBLICAR NO FEED</button>
+        <section id="postar" class="section">
+            <div style="max-width: 500px; margin: 0 auto; background: var(--side); padding: 30px; border-radius: 12px; border: 1px solid var(--border);">
+                <h2 style="margin-bottom: 20px;">Anunciar Produto</h2>
+                <input type="text" id="p-title" placeholder="Nome do Produto" style="width:100%; padding:12px; background:#111; border:1px solid var(--border); color:white; margin-bottom:10px;">
+                <input type="number" id="p-price" placeholder="Preço (R$)" style="width:100%; padding:12px; background:#111; border:1px solid var(--border); color:white; margin-bottom:10px;">
+                <input type="url" id="p-img" placeholder="URL da Imagem" style="width:100%; padding:12px; background:#111; border:1px solid var(--border); color:white; margin-bottom:10px;">
+                <textarea id="p-desc" placeholder="Descrição completa..." rows="5" style="width:100%; padding:12px; background:#111; border:1px solid var(--border); color:white; margin-bottom:15px; resize:none;"></textarea>
+                <button onclick="saveProduct()" class="btn-action btn-add">Publicar Agora</button>
             </div>
         </section>
     </main>
 
-    <div id="product-page">
-        <button class="close-btn" onclick="closeProduct()"><i data-lucide="arrow-left"></i></button>
-        <div class="prod-container">
-            <div class="prod-gallery"><img id="view-img" src=""></div>
-            <div class="prod-details">
-                <h1 id="view-title" style="font-family: 'Syncopate'; font-size: 2rem;"></h1>
-                <p id="view-price" style="font-size: 1.8rem; margin: 20px 0;"></p>
-                <p id="view-desc" style="color: var(--dim); line-height: 1.6;"></p>
-                <br>
-                <button class="btn-buy" style="margin-bottom: 10px;">ADICIONAR AO SETUP</button>
+    <div id="product-modal">
+        <button class="close-modal" onclick="closeModal()"><i data-lucide="x"></i></button>
+        <div class="prod-grid">
+            <div class="prod-left"><img id="m-img" class="prod-img"></div>
+            <div class="prod-right">
+                <h1 id="m-title" style="font-family: 'Syncopate'; font-size: 2rem;"></h1>
+                <p id="m-price" style="font-size: 1.8rem; color: #fff; margin: 15px 0;"></p>
+                <p id="m-desc" style="color: var(--dim); line-height: 1.6;"></p>
+                
+                <div class="vote-row" id="vote-area">
+                    </div>
+
+                <button id="btn-setup-toggle" class="btn-action"></button>
                 
                 <div style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px;">
-                    <h3>Avaliações</h3><br>
-                    <textarea id="rev-text" placeholder="Sua review..."></textarea>
-                    <button onclick="sendReview()" style="background:none; border: 1px solid white; color: white; padding: 10px; cursor: pointer;">Postar Review</button>
-                    <div id="reviews-list" style="margin-top: 20px;"></div>
+                    <h3>Reviews</h3><br>
+                    <textarea id="rev-input" placeholder="O que achou deste item?" style="width:100%; background:#111; border:1px solid var(--border); color:white; padding:10px; border-radius:5px;"></textarea>
+                    <button onclick="postReview()" style="background:none; border: 1px solid white; color:white; padding:8px 15px; margin-top:10px; cursor:pointer;">Enviar</button>
+                    <div id="m-reviews" style="margin-top: 20px;"></div>
                 </div>
             </div>
         </div>
@@ -183,7 +168,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAMoxCYuvhRQtRzPm4KSpRo5qtPr3keu0I",
@@ -197,130 +182,147 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        
         const MY_UID = localStorage.getItem('user_uid') || 'U-' + Math.random().toString(36).substr(2, 5);
         localStorage.setItem('user_uid', MY_UID);
 
-        let allProducts = [];
+        let allData = [];
+        let activeId = null;
         let mySetup = JSON.parse(localStorage.getItem('my_setup')) || [];
-        let activeProductId = null;
 
-        // --- FILTROS ---
-        const cats = ["GPU", "CPU", "RAM", "SSD", "Teclado", "Mouse", "Headset", "Monitor", "Cadeira"];
-        cats.forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'filter-chip';
-            div.innerText = c;
-            div.onclick = (e) => filterCat(c, e.target);
-            document.getElementById('cat-filters').appendChild(div);
-        });
-
-        window.filterCat = (cat, el) => {
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            renderGrid(cat === 'all' ? allProducts : allProducts.filter(p => p.title.includes(cat) || p.cat === cat));
-        };
-
-        // --- CORE SYNC ---
+        // --- CARREGAR DADOS ---
         onValue(ref(db, 'market'), (snap) => {
-            allProducts = snap.val() ? Object.entries(snap.val()).map(([id,v])=>({id,...v})).reverse() : [];
-            renderGrid(allProducts);
-            updateBadges();
-            if(activeProductId) openProduct(activeProductId);
+            const val = snap.val();
+            allData = val ? Object.entries(val).map(([id,v])=>({id,...v})).reverse() : [];
+            renderAll();
+            if(activeId) openModal(activeId);
             setTimeout(() => document.getElementById('intro').style.transform = 'translateY(-100%)', 2500);
         });
 
-        function renderGrid(data, target = 'items-grid') {
-            const container = document.getElementById(target);
+        function renderAll() {
+            renderGrid(allData, 'grid-feed');
+            renderSetup();
+            document.getElementById('setup-count').innerText = mySetup.length;
+        }
+
+        function renderGrid(data, containerId) {
+            const container = document.getElementById(containerId);
             container.innerHTML = '';
             data.forEach(p => {
-                container.innerHTML += `
-                    <div class="item-card" onclick="openProduct('${p.id}')">
-                        ${p.author === MY_UID ? `<button onclick="deleteItem('${p.id}')" style="position:absolute; top:5px; right:5px; z-index:10; background:rgba(0,0,0,0.5); border:none; color:red; padding:5px;"><i data-lucide="trash-2" style="width:12px"></i></button>` : ''}
-                        <img src="${p.img}" class="item-img">
-                        <div class="item-info">
-                            <div class="item-price">R$ ${p.price}</div>
-                            <div class="item-title">${p.title}</div>
-                        </div>
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.onclick = () => openModal(p.id);
+                card.innerHTML = `
+                    ${p.author === MY_UID ? `<button class="btn-del" onclick="event.stopPropagation(); deletePost('${p.id}')"><i data-lucide="trash-2" size="14"></i></button>` : ''}
+                    <img src="${p.img}" class="item-img">
+                    <div class="item-info">
+                        <div class="item-price">R$ ${p.price}</div>
+                        <div class="item-title">${p.title}</div>
                     </div>
                 `;
+                container.appendChild(card);
             });
             lucide.createIcons();
         }
 
-        window.openProduct = (id) => {
-            const p = allProducts.find(x => x.id === id);
-            activeProductId = id;
-            document.getElementById('view-img').src = p.img;
-            document.getElementById('view-title').innerText = p.title;
-            document.getElementById('view-price').innerText = 'R$ ' + p.price;
-            document.getElementById('view-desc').innerText = p.desc || 'Sem detalhes.';
+        // --- MODAL & SETUP ---
+        window.openModal = (id) => {
+            const p = allData.find(x => x.id === id);
+            if(!p) return;
+            activeId = id;
+            document.getElementById('m-img').src = p.img;
+            document.getElementById('m-title').innerText = p.title;
+            document.getElementById('m-price').innerText = 'R$ ' + p.price;
+            document.getElementById('m-desc').innerText = p.desc;
             
-            const revList = document.getElementById('reviews-list');
-            revList.innerHTML = '';
-            if(p.reviews) {
-                Object.values(p.reviews).reverse().forEach(r => {
-                    revList.innerHTML += `<div style="padding:10px; border-bottom:1px solid #222"><small>${r.user}</small><p>${r.text}</p></div>`;
-                });
+            // Botão de Setup (Alternar)
+            const btn = document.getElementById('btn-setup-toggle');
+            const inSetup = mySetup.some(s => s.id === id);
+            btn.innerText = inSetup ? "Remover do meu Setup" : "Adicionar ao Setup";
+            btn.className = inSetup ? "btn-action btn-rem" : "btn-action btn-add";
+            btn.onclick = () => toggleSetup(p);
+
+            // Votos
+            const ups = p.votes ? Object.values(p.votes).filter(v => v==='up').length : 0;
+            const downs = p.votes ? Object.values(p.votes).filter(v => v==='down').length : 0;
+            const myV = p.votes ? p.votes[MY_UID] : null;
+            document.getElementById('vote-area').innerHTML = `
+                <button class="vote-btn ${myV==='up'?'active-up':''}" onclick="castVote('${id}','up')"><i data-lucide="thumbs-up"></i> ${ups}</button>
+                <button class="vote-btn ${myV==='down'?'active-down':''}" onclick="castVote('${id}','down')"><i data-lucide="thumbs-down"></i> ${downs}</button>
+            `;
+
+            // Reviews
+            const rDiv = document.getElementById('m-reviews');
+            rDiv.innerHTML = p.reviews ? Object.values(p.reviews).reverse().map(r => `<div style="padding:10px; border-bottom:1px solid #222"><small>${r.user}</small><p>${r.text}</p></div>`).join('') : '<p>Sem reviews.</p>';
+
+            document.getElementById('product-modal').style.display = 'block';
+            lucide.createIcons();
+        };
+
+        window.toggleSetup = (product) => {
+            const idx = mySetup.findIndex(s => s.id === product.id);
+            if(idx > -1) {
+                mySetup.splice(idx, 1);
+                showToast("Removido do Setup");
+            } else {
+                mySetup.push(product);
+                showToast("Adicionado ao Setup!");
             }
-            document.getElementById('product-page').style.display = 'block';
-            
-            // Botão Setup no Modal
-            const btn = document.querySelector('#product-page .btn-buy');
-            const inCart = mySetup.some(s => s.id === id);
-            btn.innerText = inCart ? "REMOVER DO SETUP" : "ADICIONAR AO SETUP";
-            btn.onclick = () => toggleSetup(id);
-        };
-
-        window.toggleSetup = (id) => {
-            const index = mySetup.findIndex(s => s.id === id);
-            if(index > -1) mySetup.splice(index, 1);
-            else mySetup.push(allProducts.find(p => p.id === id));
-            
             localStorage.setItem('my_setup', JSON.stringify(mySetup));
-            updateBadges();
-            openProduct(id);
-            if(document.getElementById('cart').classList.contains('active')) renderCart();
+            renderAll();
+            openModal(product.id);
         };
 
-        const renderCart = () => {
+        function renderSetup() {
             let total = 0;
             mySetup.forEach(i => total += parseFloat(i.price || 0));
-            document.getElementById('cart-total').innerText = total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-            renderGrid(mySetup, 'render-cart');
+            document.getElementById('setup-total').innerText = total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+            renderGrid(mySetup, 'grid-setup');
+        }
+
+        // --- AÇÕES FIREBASE ---
+        window.saveProduct = async () => {
+            const title = document.getElementById('p-title').value;
+            const price = document.getElementById('p-price').value;
+            const img = document.getElementById('p-img').value;
+            const desc = document.getElementById('p-desc').value;
+            if(!title || !price) return;
+            await push(ref(db, 'market'), { author: MY_UID, title, price, img, desc, ts: Date.now() });
+            tab('feed', document.querySelector('.nav-link'));
+            showToast("Publicado!");
         };
 
-        window.tab = (id, el) => {
+        window.deletePost = async (id) => {
+            if(confirm("Deseja apagar sua postagem definitiva?")) {
+                await remove(ref(db, `market/${id}`));
+                showToast("Apagado!");
+            }
+        };
+
+        window.castVote = async (id, type) => {
+            const vRef = ref(db, `market/${id}/votes/${MY_UID}`);
+            const snap = await get(vRef);
+            await set(vRef, snap.val() === type ? null : type);
+        };
+
+        window.postReview = async () => {
+            const text = document.getElementById('rev-input').value;
+            if(!text) return;
+            await push(ref(db, `market/${activeId}/reviews`), { user: MY_UID, text });
+            document.getElementById('rev-input').value = '';
+        };
+
+        // --- NAVEGAÇÃO ---
+        window.tab = (name, el) => {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            document.getElementById(name).classList.add('active');
             el.classList.add('active');
-            if(id === 'cart') renderCart();
         };
 
-        window.publishProduct = async () => {
-            const data = {
-                author: MY_UID, title: document.getElementById('p-title').value,
-                cat: document.getElementById('p-cat').value, price: document.getElementById('p-price').value,
-                img: document.getElementById('p-img').value, desc: document.getElementById('p-desc').value,
-            };
-            await push(ref(db, 'market'), data);
-            tab('feed', document.querySelector('.nav-link'));
-        };
-
-        window.sendReview = async () => {
-            const text = document.getElementById('rev-text').value;
-            if(!text) return;
-            await push(ref(db, `market/${activeProductId}/reviews`), { user: MY_UID, text });
-            document.getElementById('rev-text').value = '';
-        };
-
-        window.deleteItem = (id) => { event.stopPropagation(); if(confirm("Apagar?")) remove(ref(db, `market/${id}`)); };
-        window.closeProduct = () => document.getElementById('product-page').style.display = 'none';
-        const updateBadges = () => document.getElementById('cart-count').innerText = mySetup.length;
-        window.filterItems = () => {
-            const t = document.getElementById('main-search').value.toLowerCase();
-            renderGrid(allProducts.filter(p => p.title.toLowerCase().includes(t)));
-        };
+        window.closeModal = () => { document.getElementById('product-modal').style.display = 'none'; activeId = null; };
+        window.searchItems = (t) => renderGrid(allData.filter(p => p.title.toLowerCase().includes(t.toLowerCase())), 'grid-feed');
+        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.transform = 'translateX(0)'; setTimeout(() => t.style.transform = 'translateX(250%)', 3000); }
 
         lucide.createIcons();
     </script>
