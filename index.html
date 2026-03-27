@@ -3,275 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tá na Promo! | Gamer Hub</title>
+    <title>TÁ NA PROMO! | Gamer Deals</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         :root {
-            --bg-body: #050507;
-            --bg-side: #0d0d12;
-            --bg-card: rgba(22, 22, 28, 0.7);
-            --primary: #8b5cf6;
-            --primary-glow: rgba(139, 92, 246, 0.4);
-            --accent: #06b6d4;
-            --text-main: #ffffff;
-            --text-dim: #94a3b8;
-            --hot: #f43f5e;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            --sidebar-width: 260px;
+            --bg: #020205;
+            --side: #08080f;
+            --card: rgba(15, 15, 25, 0.7);
+            --primary: #bc13fe;
+            --secondary: #00f2ff;
+            --hot: #ff0055;
+            --text: #e2e8f0;
+            --dim: #64748b;
+            --glow: 0 0 15px rgba(188, 19, 254, 0.4);
         }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
+        
+        body { 
+            background: var(--bg); color: var(--text); overflow-x: hidden; 
+            display: flex; min-height: 100vh;
         }
 
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            overflow-x: hidden;
-            display: flex;
+        /* --- INTRO CINEMATOGRÁFICA --- */
+        #intro {
+            position: fixed; inset: 0; z-index: 9999; background: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: all 0.8s cubic-bezier(0.9, 0, 0.1, 1);
         }
 
-        /* --- INTRO ANIMATION --- */
-        #intro-loader {
-            position: fixed; inset: 0; z-index: 9999;
-            background: var(--bg-body);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            transition: opacity 0.8s ease;
-        }
-        .loader-logo {
-            font-size: 2.5rem; font-weight: 800;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
+        .intro-content { text-align: center; }
+        
+        .logo-glitch {
+            font-family: 'Syncopate', sans-serif; font-size: 3rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 20px; animation: pulse 2s infinite;
+            text-transform: uppercase; letter-spacing: 5px;
+            animation: glitch 1s infinite alternate;
         }
-        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.95); } }
 
-        /* --- SIDEBAR --- */
+        @keyframes glitch {
+            0% { text-shadow: 2px 0 var(--hot); transform: skew(0deg); }
+            20% { transform: skew(-2deg); }
+            100% { text-shadow: -2px 0 var(--secondary); transform: skew(0deg); }
+        }
+
+        .loader-bar {
+            width: 200px; height: 2px; background: rgba(255,255,255,0.1);
+            margin-top: 20px; position: relative; overflow: hidden;
+        }
+
+        .loader-progress {
+            position: absolute; width: 40%; height: 100%;
+            background: var(--primary); box-shadow: 0 0 15px var(--primary);
+            animation: loading 1.5s infinite ease-in-out;
+        }
+
+        @keyframes loading {
+            0% { left: -50%; } 100% { left: 100%; }
+        }
+
+        /* --- SIDEBAR SHARP --- */
         aside {
-            width: var(--sidebar-width);
-            height: 100vh; background: var(--bg-side);
-            border-right: 1px solid var(--border);
-            position: fixed; left: 0; top: 0;
-            padding: 30px 20px; display: flex; flex-direction: column;
-            z-index: 100;
+            width: 280px; background: var(--side); height: 100vh;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            position: fixed; display: flex; flex-direction: column; padding: 40px 20px;
         }
 
-        .side-logo {
-            font-size: 1.5rem; font-weight: 800; color: var(--primary);
-            display: flex; align-items: center; gap: 10px; margin-bottom: 40px;
+        .nav-link {
+            display: flex; align-items: center; gap: 15px; padding: 16px;
+            border-radius: 8px; color: var(--dim); cursor: pointer;
+            transition: 0.3s; margin-bottom: 5px; font-weight: 500;
         }
 
-        .nav-group { display: flex; flex-direction: column; gap: 8px; }
-
-        .nav-btn {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 15px; border-radius: 12px;
-            color: var(--text-dim); text-decoration: none;
-            cursor: pointer; transition: 0.3s; border: 1px solid transparent;
+        .nav-link:hover { background: rgba(255,255,255,0.03); color: white; }
+        .nav-link.active { 
+            background: linear-gradient(90deg, rgba(188, 19, 254, 0.1), transparent);
+            color: var(--primary); border-left: 3px solid var(--primary);
         }
 
-        .nav-btn:hover { background: var(--glass); color: white; }
-        .nav-btn.active {
-            background: var(--primary-glow);
-            color: white; border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        /* --- MAIN AREA --- */
+        main { flex: 1; margin-left: 280px; padding: 50px; }
+
+        .section { display: none; opacity: 0; transform: translateY(30px); }
+        .section.active { display: block; animation: appear 0.6s forwards; }
+
+        @keyframes appear { to { opacity: 1; transform: translateY(0); } }
+
+        /* --- CARDS NEON --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+
+        .card {
+            background: var(--card); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px; overflow: hidden; transition: 0.4s;
+            backdrop-filter: blur(10px); position: relative;
         }
 
-        /* --- MAIN CONTENT --- */
-        main {
-            margin-left: var(--sidebar-width);
-            width: calc(100% - var(--sidebar-width));
-            min-height: 100vh; padding: 40px;
+        .card:hover { 
+            border-color: var(--primary); transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), var(--glow);
+        }
+
+        .card-img { width: 100%; height: 220px; object-fit: cover; background: #000; }
+        
+        .badge {
+            position: absolute; top: 15px; right: 15px;
+            background: var(--hot); padding: 4px 12px; border-radius: 4px;
+            font-size: 0.7rem; font-weight: 700; color: white;
+            box-shadow: 0 0 10px var(--hot);
+        }
+
+        .card-content { padding: 20px; }
+        .price-tag { 
+            font-size: 1.8rem; font-weight: 700; color: var(--secondary);
+            margin: 10px 0; text-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+        }
+
+        .btn-buy {
+            width: 100%; background: var(--primary); color: white; border: none;
+            padding: 14px; border-radius: 6px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
             transition: 0.3s;
         }
 
-        .tab-content { display: none; animation: slideUp 0.5s ease forwards; }
-        .tab-content.active { display: block; }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- PROMO CARDS --- */
-        .promo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-        }
-
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px; overflow: hidden;
-            backdrop-filter: blur(10px);
-            transition: 0.4s cubic-bezier(0.2, 1, 0.3, 1);
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-            border-color: var(--primary);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px var(--primary-glow);
-        }
-
-        .card-banner {
-            width: 100%; height: 200px; background: #000;
-            position: relative; overflow: hidden;
-        }
-
-        .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .card:hover .card-img { transform: scale(1.1); }
-
-        .hot-badge {
-            position: absolute; top: 15px; left: 15px;
-            background: var(--hot); color: white;
-            padding: 5px 12px; border-radius: 8px;
-            font-size: 0.75rem; font-weight: 800;
-            display: flex; align-items: center; gap: 5px;
-            box-shadow: 0 0 15px var(--hot);
-        }
-
-        .card-body { padding: 20px; }
-        .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 15px; min-height: 2.8rem; }
-
-        .price-box { display: flex; align-items: baseline; gap: 10px; margin-bottom: 20px; }
-        .price-now { font-size: 1.5rem; font-weight: 800; color: var(--accent); text-shadow: 0 0 10px rgba(6, 182, 212, 0.3); }
-        .price-old { color: var(--text-dim); text-decoration: line-through; font-size: 0.9rem; }
-
-        .btn-action {
-            width: 100%; padding: 12px; border-radius: 12px;
-            border: none; background: var(--primary); color: white;
-            font-weight: 700; cursor: pointer; transition: 0.3s;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
-        .btn-action:hover { filter: brightness(1.2); transform: scale(1.02); }
+        .btn-buy:hover { filter: brightness(1.2); box-shadow: var(--glow); }
 
         /* --- FORM --- */
-        .glass-form {
-            max-width: 700px; margin: 0 auto;
-            background: var(--bg-card); padding: 40px;
-            border-radius: 24px; border: 1px solid var(--border);
+        .post-form { max-width: 600px; background: var(--side); padding: 40px; border-radius: 15px; border: 1px solid var(--primary); }
+        input, select { 
+            width: 100%; background: #000; border: 1px solid #333; 
+            padding: 12px; color: white; border-radius: 6px; margin: 10px 0 20px;
         }
-
-        .input-field {
-            width: 100%; padding: 14px; background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border); border-radius: 12px;
-            color: white; margin-top: 8px; margin-bottom: 20px;
-            outline: none; transition: 0.3s;
-        }
-        .input-field:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
 
         /* --- TOAST --- */
         #toast {
-            position: fixed; bottom: 30px; right: 30px;
-            background: var(--primary); color: white;
-            padding: 15px 30px; border-radius: 12px;
-            transform: translateY(200%); transition: 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            z-index: 1000; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--primary); color: white; padding: 15px 40px; border-radius: 50px;
+            font-weight: 700; transition: 0.5s; z-index: 10000;
         }
 
         /* --- MOBILE --- */
         @media (max-width: 900px) {
-            aside {
-                width: 100%; height: 70px; top: auto; bottom: 0;
-                flex-direction: row; padding: 0 10px; border-right: none;
-                border-top: 1px solid var(--border);
-            }
-            .side-logo { display: none; }
-            .nav-group { flex-direction: row; width: 100%; justify-content: space-around; align-items: center; }
-            .nav-btn span { display: none; }
-            main { margin-left: 0; width: 100%; padding: 20px; padding-bottom: 100px; }
+            aside { width: 100%; height: 70px; bottom: 0; top: auto; flex-direction: row; padding: 0; }
+            main { margin-left: 0; padding: 20px 20px 100px; }
+            .nav-link span { display: none; }
+            .nav-link { flex: 1; justify-content: center; }
+            .logo-glitch { font-size: 1.8rem; }
         }
     </style>
 </head>
 <body>
 
-    <div id="intro-loader">
-        <div class="loader-logo">Tá na Promo!</div>
-        <i data-lucide="loader-2" style="animation: spin 1s linear infinite; color: var(--primary)"></i>
+    <div id="intro">
+        <div class="intro-content">
+            <div class="logo-glitch">TÁ NA PROMO!</div>
+            <div class="loader-bar"><div class="loader-progress"></div></div>
+        </div>
     </div>
 
-    <div id="toast">Ação realizada!</div>
+    <div id="toast">Sucesso!</div>
 
     <aside>
-        <div class="side-logo">
-            <i data-lucide="zap" fill="currentColor"></i>
-            <span>GAMER HUB</span>
+        <div style="padding: 0 20px; margin-bottom: 30px;" class="mobile-hide">
+            <h2 style="color: var(--primary); font-family: 'Syncopate';">DEALS</h2>
         </div>
-        <nav class="nav-group">
-            <div class="nav-btn active" onclick="navigate('home')">
-                <i data-lucide="layout-grid"></i> <span>Feed</span>
-            </div>
-            <div class="nav-btn" onclick="navigate('post')">
-                <i data-lucide="plus-circle"></i> <span>Anunciar</span>
-            </div>
-            <div class="nav-btn" onclick="navigate('coupons')">
-                <i data-lucide="ticket"></i> <span>Cupons</span>
-            </div>
-            <div class="nav-btn" onclick="navigate('saved')">
-                <i data-lucide="heart"></i> <span>Favoritos</span>
-            </div>
-        </nav>
+        <div class="nav-link active" onclick="nav('feed', this)"><i data-lucide="flame"></i> <span>Feed</span></div>
+        <div class="nav-link" onclick="nav('post', this)"><i data-lucide="plus-square"></i> <span>Postar</span></div>
+        <div class="nav-link" onclick="nav('coupons', this)"><i data-lucide="ticket"></i> <span>Cupons</span></div>
+        <div class="nav-link" onclick="nav('favs', this)"><i data-lucide="heart"></i> <span>Salvos</span></div>
     </aside>
 
     <main>
-        <section id="home" class="tab-content active">
-            <header style="margin-bottom: 40px;">
-                <h1 style="font-size: 2.2rem; font-weight: 800;">Ofertas em Tempo Real</h1>
-                <p style="color: var(--text-dim);">Os melhores preços detectados pela comunidade.</p>
-            </header>
-            <div class="promo-grid" id="main-feed"></div>
-        </section>
+        <div id="feed" class="section active">
+            <h1 style="margin-bottom: 40px; font-size: 2.5rem;">Ofertas do Dia</h1>
+            <div class="grid" id="promo-list"></div>
+        </div>
 
-        <section id="post" class="tab-content">
-            <div class="glass-form">
-                <h2 style="margin-bottom: 30px; color: var(--primary)">Compartilhar Promoção</h2>
-                <form id="promo-form">
-                    <label>Título do Produto</label>
-                    <input type="text" id="f-title" class="input-field" placeholder="Ex: Teclado Mecânico Razer BlackWidow" required>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div>
-                            <label>Preço Promo (R$)</label>
-                            <input type="number" step="0.01" id="f-price" class="input-field" required>
-                        </div>
-                        <div>
-                            <label>Preço Original (R$)</label>
-                            <input type="number" step="0.01" id="f-old" class="input-field" required>
-                        </div>
+        <div id="post" class="section">
+            <div class="post-form">
+                <h2>Anunciar Promo</h2>
+                <form id="f-promo">
+                    <input type="text" id="title" placeholder="Nome do Produto" required>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" id="price" placeholder="Preço Promo" required>
+                        <input type="number" id="old" placeholder="Preço Antigo" required>
                     </div>
-
-                    <label>Link da Loja</label>
-                    <input type="url" id="f-link" class="input-field" placeholder="https://amazon.com.br/..." required>
-
-                    <label>URL da Imagem</label>
-                    <input type="url" id="f-img" class="input-field" placeholder="https://imgur.com/foto.jpg">
-
-                    <button type="submit" class="btn-action" id="submit-btn">
-                        <i data-lucide="send"></i> Publicar agora
-                    </button>
+                    <input type="url" id="link" placeholder="Link da Loja" required>
+                    <input type="url" id="img" placeholder="URL da Imagem">
+                    <button type="submit" class="btn-buy">POSTAR AGORA</button>
                 </form>
             </div>
-        </section>
+        </div>
 
-        <section id="coupons" class="tab-content">
-            <h2 style="margin-bottom: 30px;">Cupons Verificados</h2>
-            <div class="promo-grid" id="coupon-grid">
-                </div>
-        </section>
+        <div id="coupons" class="section">
+            <h1>Cupons Ativos</h1>
+            <div class="grid" id="coupon-list"></div>
+        </div>
 
-        <section id="saved" class="tab-content">
-            <h2 style="margin-bottom: 30px;">Seus Favoritos</h2>
-            <div class="promo-grid" id="saved-feed"></div>
-        </section>
+        <div id="favs" class="section">
+            <h1>Meus Favoritos</h1>
+            <div class="grid" id="fav-list"></div>
+        </div>
     </main>
 
     <script type="module">
@@ -292,49 +228,49 @@
         const db = getDatabase(app);
         const promosRef = ref(db, 'promos');
 
-        let allPromos = [];
-        let favorites = JSON.parse(localStorage.getItem('favs')) || [];
+        let allData = [];
+        let favorites = JSON.parse(localStorage.getItem('saved_deals')) || [];
 
-        // Navigation
-        window.navigate = (tab) => {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            
-            document.getElementById(tab).classList.add('active');
-            event.currentTarget.classList.add('active');
-            
-            if(tab === 'saved') renderSaved();
-            window.scrollTo(0,0);
+        // --- SEGURANÇA: SAIR DA INTRO SE O FIREBASE TRAVAR ---
+        const exitIntro = () => {
+            const intro = document.getElementById('intro');
+            if (intro) {
+                intro.style.opacity = '0';
+                intro.style.transform = 'scale(1.2)';
+                setTimeout(() => intro.remove(), 800);
+            }
+        };
+        setTimeout(exitIntro, 3500); // Força saída em 3.5s
+
+        // Navegação
+        window.nav = (id, el) => {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+            if(id === 'favs') renderFavs();
         };
 
-        // Render Function
-        const renderCards = (data, containerId) => {
-            const container = document.getElementById(containerId);
+        // Render Cards
+        const render = (data, targetId) => {
+            const container = document.getElementById(targetId);
             container.innerHTML = '';
-
             data.forEach(item => {
-                const off = Math.round(((item.oldPrice - item.price) / item.oldPrice) * 100);
-                const isFav = favorites.includes(item.id);
-
+                const discount = Math.round(((item.old - item.price) / item.old) * 100);
+                const isSaved = favorites.includes(item.id);
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div class="card-banner">
-                        ${off > 25 ? `<div class="hot-badge"><i data-lucide="flame" style="width:14px"></i> HOT ${off}% OFF</div>` : ''}
-                        <img src="${item.image || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500'}" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500'">
-                    </div>
-                    <div class="card-body">
-                        <h3 class="card-title">${item.title}</h3>
-                        <div class="price-box">
-                            <span class="price-now">R$ ${parseFloat(item.price).toLocaleString('pt-BR')}</span>
-                            <span class="price-old">R$ ${parseFloat(item.oldPrice).toLocaleString('pt-BR')}</span>
-                        </div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn-action" onclick="window.open('${item.link}', '_blank')">
-                                <i data-lucide="shopping-cart"></i> Pegar Promo
-                            </button>
-                            <button class="btn-action" style="background:var(--glass); width:60px;" onclick="toggleFav('${item.id}')">
-                                <i data-lucide="heart" ${isFav ? 'fill="#f43f5e" stroke="#f43f5e"' : ''}></i>
+                    ${discount > 20 ? `<div class="badge">-${discount}%</div>` : ''}
+                    <img src="${item.img || 'https://via.placeholder.com/400x300/000/fff?text=Gamer'}" class="card-img">
+                    <div class="card-content">
+                        <h3>${item.title}</h3>
+                        <div class="price-tag">R$ ${item.price}</div>
+                        <div style="color: var(--dim); text-decoration: line-through; margin-bottom: 15px;">R$ ${item.old}</div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-buy" onclick="window.open('${item.link}')"><i data-lucide="external-link"></i> LOJA</button>
+                            <button class="btn-buy" style="background: #1a1a1a; width: 60px;" onclick="toggleFav('${item.id}')">
+                                <i data-lucide="heart" ${isSaved ? 'fill="red" stroke="red"' : ''}></i>
                             </button>
                         </div>
                     </div>
@@ -344,98 +280,64 @@
             lucide.createIcons();
         };
 
-        // Listen to Firebase
-        onValue(promosRef, (snapshot) => {
-            const val = snapshot.val();
-            allPromos = val ? Object.entries(val).map(([id, data]) => ({ id, ...data })).reverse() : [];
-            renderCards(allPromos, 'main-feed');
-            
-            // Hide Loader
-            setTimeout(() => {
-                document.getElementById('intro-loader').style.opacity = '0';
-                setTimeout(() => document.getElementById('intro-loader').remove(), 800);
-            }, 1000);
+        // Escuta Firebase
+        onValue(promosRef, (snap) => {
+            const val = snap.val();
+            allData = val ? Object.entries(val).map(([id, d]) => ({ id, ...d })).reverse() : [];
+            render(allData, 'promo-list');
+            exitIntro();
         });
 
-        // Toggle Favorites
-        window.toggleFav = (id) => {
-            if(favorites.includes(id)) {
-                favorites = favorites.filter(f => f !== id);
-                showToast("Removido dos favoritos");
-            } else {
-                favorites.push(id);
-                showToast("Salvo nos favoritos!");
-            }
-            localStorage.setItem('favs', JSON.stringify(favorites));
-            renderCards(allPromos, 'main-feed');
-            if(document.getElementById('saved').classList.contains('active')) renderSaved();
-        };
-
-        const renderSaved = () => {
-            const favItems = allPromos.filter(p => favorites.includes(p.id));
-            renderCards(favItems, 'saved-feed');
-        };
-
-        // Submit Form
-        document.getElementById('promo-form').addEventListener('submit', async (e) => {
+        // Postar
+        document.getElementById('f-promo').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('submit-btn');
+            const btn = e.target.querySelector('button');
             btn.disabled = true;
-            btn.innerHTML = 'Publicando...';
-
-            const newPromo = {
-                title: document.getElementById('f-title').value,
-                price: document.getElementById('f-price').value,
-                oldPrice: document.getElementById('f-old').value,
-                link: document.getElementById('f-link').value,
-                image: document.getElementById('f-img').value,
-                date: Date.now()
+            
+            const data = {
+                title: document.getElementById('title').value,
+                price: document.getElementById('price').value,
+                old: document.getElementById('old').value,
+                link: document.getElementById('link').value,
+                img: document.getElementById('img').value,
+                ts: Date.now()
             };
 
-            await push(promosRef, newPromo);
-            showToast("Promoção postada com sucesso!");
+            await push(promosRef, data);
+            toast("PROMOÇÃO LANÇADA!");
             e.target.reset();
             btn.disabled = false;
-            btn.innerHTML = '<i data-lucide="send"></i> Publicar agora';
-            navigate('home');
-        });
-
-        // Coupons Data
-        const coupons = [
-            { shop: 'Kabum', code: 'PROMO10', off: '10% OFF' },
-            { shop: 'Amazon', code: 'GAMER20', off: 'R$ 20 OFF' },
-            { shop: 'Pichau', code: 'MONSTER', off: '5% OFF' },
-            { shop: 'AliExpress', code: 'BRL40', off: 'R$ 40 OFF' }
-        ];
-
-        const renderCoupons = () => {
-            const grid = document.getElementById('coupon-grid');
-            grid.innerHTML = coupons.map(c => `
-                <div class="card" style="padding: 25px; border: 2px dashed var(--primary); background: rgba(139, 92, 246, 0.05)">
-                    <p style="color:var(--text-dim); font-size: 0.8rem; text-transform: uppercase;">${c.shop}</p>
-                    <h2 style="margin: 10px 0; color: var(--accent)">${c.off}</h2>
-                    <div style="background: black; padding: 10px; border-radius: 8px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-                        <code style="color: var(--primary); font-weight: 800;">${c.code}</code>
-                        <i data-lucide="copy" style="cursor:pointer; width:18px" onclick="copyText('${c.code}')"></i>
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
+            nav('feed', document.querySelector('.nav-link'));
         };
 
-        window.copyText = (txt) => {
-            navigator.clipboard.writeText(txt);
-            showToast("Código copiado!");
+        window.toggleFav = (id) => {
+            if(favorites.includes(id)) favorites = favorites.filter(f => f !== id);
+            else favorites.push(id);
+            localStorage.setItem('saved_deals', JSON.stringify(favorites));
+            render(allData, 'promo-list');
+            if(document.getElementById('favs').classList.contains('active')) renderFavs();
+            toast("Favoritos atualizados!");
         };
 
-        window.showToast = (msg) => {
+        const renderFavs = () => {
+            const favItems = allData.filter(d => favorites.includes(d.id));
+            render(favItems, 'fav-list');
+        };
+
+        const toast = (msg) => {
             const t = document.getElementById('toast');
             t.innerText = msg;
-            t.style.transform = 'translateY(0)';
-            setTimeout(() => t.style.transform = 'translateY(200%)', 3000);
+            t.style.transform = 'translateX(-50%) translateY(0)';
+            setTimeout(() => t.style.transform = 'translateX(-50%) translateY(100px)', 3000);
         };
 
-        renderCoupons();
+        // Cupons estáticos
+        const coupons = [
+            { title: 'KABUM NINJA', price: '15% OFF', old: 'SITE TODO', link: '#', img: '' },
+            { title: 'AMAZON GAMER', price: 'R$ 50', old: 'ACIMA R$ 500', link: '#', img: '' }
+        ];
+        render(coupons, 'coupon-list');
+
         lucide.createIcons();
     </script>
 </body>
