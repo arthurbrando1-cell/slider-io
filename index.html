@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TÁ NA PROMO! | Oficial</title>
+    <title>TÁ NA PROMO! | Extreme Edition</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -11,129 +11,122 @@
     <style>
         :root { 
             --bg: #000; --glass: rgba(15, 15, 15, 0.98); --border: rgba(255, 255, 255, 0.1); 
-            --accent: #fff; --gray: #222; --red: #ff4757; --gold: #ffd700;
+            --accent: #fff; --red: #ff4757; --gold: #ffd700;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: #fff; display: flex; min-height: 100vh; overflow-x: hidden; }
 
-        /* --- INTRO GIGANTE --- */
-        #intro-screen { 
-            position: fixed; inset: 0; background: #000; z-index: 9999; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 1s ease-in-out; 
+        /* --- INTRO --- */
+        #intro-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 1s; }
+        .intro-logo { width: 300px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
+
+        /* --- PERFIL UI --- */
+        .user-profile { 
+            display: flex; align-items: center; gap: 12px; padding: 15px; 
+            border: 1px solid var(--border); border-radius: 15px; margin-bottom: 25px; background: #080808;
         }
-        .intro-logo { width: 450px; animation: superPulse 2s infinite; filter: drop-shadow(0 0 30px rgba(255,255,255,0.2)); }
-        @keyframes superPulse { 
-            0% { transform: scale(0.9); opacity: 0.6; } 
-            50% { transform: scale(1); opacity: 1; } 
-            100% { transform: scale(0.9); opacity: 0.6; } 
-        }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; }
 
         /* --- SIDEBAR --- */
-        aside { 
-            width: 280px; background: var(--glass); border-right: 1px solid var(--border); 
-            height: 100vh; position: fixed; padding: 40px 20px; z-index: 100; backdrop-filter: blur(15px);
-        }
-        .nav-link { 
-            display: flex; align-items: center; gap: 15px; padding: 18px; border-radius: 12px; 
-            color: #555; cursor: pointer; transition: 0.3s; margin-bottom: 10px; font-weight: 800; text-transform: uppercase; font-size: 0.7rem;
-        }
-        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
-        .nav-link.active { color: #000; background: #fff; box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
+        aside { width: 280px; background: var(--glass); border-right: 1px solid var(--border); height: 100vh; position: fixed; padding: 30px 20px; z-index: 100; }
+        .nav-link { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 12px; color: #555; cursor: pointer; transition: 0.3s; margin-bottom: 8px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; }
+        .nav-link.active { color: #000; background: #fff; }
 
-        /* --- CONTENT --- */
+        /* --- MAIN --- */
         main { flex: 1; margin-left: 280px; padding: 40px; }
-        .section { display: none; animation: fadeIn 0.8s ease; }
+        .section { display: none; }
         .section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- GRID DE PRODUTOS --- */
+        /* --- GRID --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-        
-        .card-p { background: #080808; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; transition: 0.3s; position: relative; }
+        .card-p { background: #080808; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: 0.3s; }
         .card-p:hover { border-color: #fff; transform: translateY(-5px); }
         .card-p img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        
-        /* Badge de Popular */
-        .badge-popular { position: absolute; top: 10px; left: 10px; background: var(--gold); color: #000; padding: 5px 10px; border-radius: 20px; font-size: 0.6rem; font-weight: 900; z-index: 10; }
 
-        /* --- INTERAÇÕES --- */
-        .card-body { padding: 20px; }
-        .price { font-size: 1.4rem; font-weight: 900; margin-bottom: 5px; }
-        .actions { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); }
-        .btn-like { background: none; border: none; color: #444; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
-        .btn-like:hover { color: var(--red); }
-        .btn-like.active { color: var(--red); }
+        /* --- MODAL DETALHES --- */
+        #modal-product { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; 
+            display: none; padding: 40px; overflow-y: auto; backdrop-filter: blur(10px);
+        }
+        .modal-content { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .modal-close { position: fixed; top: 30px; right: 30px; cursor: pointer; background: #fff; color: #000; border-radius: 50%; padding: 10px; z-index: 2001; }
 
-        /* --- MURAL DE CUPONS --- */
-        .card-c { background: #111; padding: 30px; border-radius: 15px; border: 2px dashed #333; text-align: center; }
-        .code-box { background: #fff; color: #000; padding: 12px; border-radius: 8px; font-weight: 900; margin: 15px 0; letter-spacing: 2px; cursor: pointer; }
+        /* --- REVIEW SYSTEM --- */
+        .review-box { background: #111; padding: 20px; border-radius: 15px; margin-top: 20px; }
+        .review-item { padding: 15px 0; border-bottom: 1px solid var(--border); }
+        .review-img { width: 100px; border-radius: 8px; margin-top: 10px; display: block; }
 
-        /* --- FORMS --- */
-        .form-container { max-width: 700px; margin: 0 auto; background: #0a0a0a; padding: 40px; border-radius: 25px; border: 1px solid var(--border); }
-        .post-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
-        .tab-btn { flex: 1; padding: 12px; background: #111; border: 1px solid var(--border); color: #fff; border-radius: 10px; cursor: pointer; font-weight: 700; }
-        .tab-btn.active { background: #fff; color: #000; }
-        
-        input, select, textarea { width: 100%; background: #000; border: 1px solid #222; padding: 15px; color: #fff; border-radius: 12px; margin-bottom: 15px; }
-        .btn-post { width: 100%; padding: 20px; background: #fff; color: #000; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        /* --- FORM --- */
+        input, textarea, select { width: 100%; background: #111; border: 1px solid #222; padding: 15px; color: #fff; border-radius: 10px; margin-bottom: 15px; }
+        .btn-main { width: 100%; padding: 18px; background: #fff; color: #000; border: none; border-radius: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
 
         @media (max-width: 900px) {
-            aside { width: 100%; height: 70px; bottom: 0; top: auto; flex-direction: row; padding: 10px; border-right: none; border-top: 1px solid var(--border); }
+            aside { width: 100%; height: 70px; bottom: 0; top: auto; flex-direction: row; padding: 5px; }
             main { margin-left: 0; padding-bottom: 100px; }
-            .intro-logo { width: 80%; }
+            .modal-content { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
     <div id="intro-screen">
-        <img src="logo.png" alt="TÁ NA PROMO!" class="intro-logo">
-        <p style="margin-top: 20px; letter-spacing: 5px; font-size: 0.7rem; opacity: 0.5;">CARREGANDO OFERTAS...</p>
+        <img src="logo.png" class="intro-logo">
+    </div>
+
+    <div id="modal-product">
+        <div class="modal-close" onclick="closeModal()"><i data-lucide="x"></i></div>
+        <div class="modal-content" id="modal-data">
+            </div>
     </div>
 
     <aside>
-        <div style="text-align: center; margin-bottom: 30px;" class="hide-mobile">
-            <img src="logo.png" style="width: 140px;">
+        <div class="user-profile">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" id="my-avatar" class="user-avatar">
+            <div>
+                <div style="font-size: 0.8rem; font-weight: 800;" id="my-name">Usuário Alpha</div>
+                <div style="font-size: 0.6rem; opacity: 0.5;">Membro Oficial</div>
+            </div>
         </div>
-        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="zap"></i> <span>Populares</span></div>
-        <div class="nav-link" onclick="tab('feed', this)"><i data-lucide="shopping-bag"></i> <span>Produtos</span></div>
+        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="layout-grid"></i> <span>Mural</span></div>
         <div class="nav-link" onclick="tab('cupons', this)"><i data-lucide="ticket"></i> <span>Cupons</span></div>
         <div class="nav-link" onclick="tab('post', this)"><i data-lucide="plus-circle"></i> <span>Postar</span></div>
     </aside>
 
     <main>
         <section id="feed" class="section active">
-            <h2 style="font-family:'Syncopate'; margin-bottom: 25px;">OFERTAS DA COMUNIDADE</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="font-family:'Syncopate';">🔥 TRENDING</h2>
+                <input type="text" placeholder="Buscar..." style="width: 250px; margin: 0;">
+            </div>
             <div class="grid" id="grid-p"></div>
         </section>
 
         <section id="cupons" class="section">
-            <h2 style="font-family:'Syncopate'; margin-bottom: 30px;">CUPONS ATIVOS</h2>
+            <h2 style="font-family:'Syncopate'; margin-bottom: 30px;">CUPONS</h2>
             <div class="grid" id="grid-c"></div>
         </section>
 
         <section id="post" class="section">
-            <div class="form-container">
-                <div class="post-tabs">
-                    <button class="tab-btn active" onclick="switchPostType('p', this)">PRODUTO</button>
-                    <button class="tab-btn" onclick="switchPostType('c', this)">CUPOM</button>
-                </div>
-
-                <div id="form-p">
+            <div style="max-width: 600px; margin: 0 auto;">
+                <h2 style="text-align: center; margin-bottom: 30px;">O QUE VAI POSTAR?</h2>
+                <select id="post-type" onchange="togglePostFields()">
+                    <option value="p">Produto em Promoção</option>
+                    <option value="c">Cupom de Desconto</option>
+                </select>
+                <div id="fields-p">
                     <input type="text" id="p-title" placeholder="Nome do Produto">
                     <input type="text" id="p-price" placeholder="Preço R$">
-                    <input type="url" id="p-img" placeholder="Link da Imagem (URL)">
+                    <textarea id="p-desc" placeholder="Descrição, detalhes e especificações..."></textarea>
+                    <input type="url" id="p-img" placeholder="URL da Imagem ou GIF">
                     <input type="url" id="p-link" placeholder="Link da Loja">
                 </div>
-
-                <div id="form-c" style="display:none;">
+                <div id="fields-c" style="display:none;">
                     <input type="text" id="c-store" placeholder="Loja">
-                    <input type="text" id="c-code" placeholder="CÓDIGO DO CUPOM">
-                    <input type="text" id="c-desc" placeholder="Regras/Descrição">
+                    <input type="text" id="c-code" placeholder="CÓDIGO">
                 </div>
-                
-                <button class="btn-post" onclick="sendPost()">PUBLICAR AGORA</button>
+                <button class="btn-main" onclick="sendToFirebase()">PUBLICAR AGORA</button>
             </div>
         </section>
     </main>
@@ -153,25 +146,45 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Intro
+        // --- INICIALIZAÇÃO ---
         window.onload = () => {
-            setTimeout(() => {
-                document.getElementById('intro-screen').style.opacity = '0';
-                setTimeout(() => document.getElementById('intro-screen').style.display = 'none', 1000);
-            }, 2000);
+            setTimeout(() => document.getElementById('intro-screen').style.display = 'none', 1500);
+            lucide.createIcons();
         };
 
-        // Troca tipo de Post
-        window.switchPostType = (type, el) => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('form-p').style.display = type === 'p' ? 'block' : 'none';
-            document.getElementById('form-c').style.display = type === 'c' ? 'block' : 'none';
-            window.currentPostType = type;
-        }
-        window.currentPostType = 'p';
+        // --- LÓGICA DE POSTAGEM ---
+        window.togglePostFields = () => {
+            const type = document.getElementById('post-type').value;
+            document.getElementById('fields-p').style.display = type === 'p' ? 'block' : 'none';
+            document.getElementById('fields-c').style.display = type === 'c' ? 'block' : 'none';
+        };
 
-        // Sync e Render (Com Lógica de Populares)
+        window.sendToFirebase = async () => {
+            const type = document.getElementById('post-type').value;
+            const payload = { 
+                type, 
+                likes: 0, 
+                user: document.getElementById('my-name').innerText,
+                avatar: document.getElementById('my-avatar').src
+            };
+
+            if(type === 'p') {
+                payload.title = document.getElementById('p-title').value;
+                payload.price = document.getElementById('p-price').value;
+                payload.desc = document.getElementById('p-desc').value;
+                payload.img = document.getElementById('p-img').value;
+                payload.link = document.getElementById('p-link').value;
+            } else {
+                payload.store = document.getElementById('c-store').value;
+                payload.code = document.getElementById('c-code').value;
+            }
+
+            await push(ref(db, 'tnp_posts'), payload);
+            alert("Postado!");
+            location.reload();
+        };
+
+        // --- RENDER FEED ---
         onValue(ref(db, 'tnp_posts'), (snap) => {
             const data = snap.val();
             const gp = document.getElementById('grid-p');
@@ -180,68 +193,92 @@
 
             if(!data) return;
 
-            const items = Object.entries(data).map(([id, val]) => ({ id, ...val }));
-            
-            // Ordenar por Populares (Mais likes primeiro)
-            items.sort((a, b) => (b.likes || 0) - (a.likes || 0));
-
-            items.forEach((p) => {
-                if(p.type === 'c') {
-                    gc.innerHTML += `
-                        <div class="card-c">
-                            <div style="font-size:0.7rem; color:#888">${p.store}</div>
-                            <div class="code-box" onclick="copy('${p.code}')">${p.code}</div>
-                            <div style="font-size:0.8rem;">${p.desc}</div>
+            Object.entries(data).reverse().forEach(([id, p]) => {
+                if(p.type === 'p') {
+                    const card = document.createElement('div');
+                    card.className = 'card-p';
+                    card.onclick = () => openModal(id, p);
+                    card.innerHTML = `
+                        <img src="${p.img}">
+                        <div style="padding:15px">
+                            <div style="font-weight:900; font-size:1.2rem">R$ ${p.price}</div>
+                            <div style="font-size:0.8rem; color:#888">${p.title}</div>
                         </div>
                     `;
+                    gp.appendChild(card);
                 } else {
-                    const isPopular = (p.likes > 5) ? '<div class="badge-popular">MAIS BUSCADO</div>' : '';
-                    gp.innerHTML += `
-                        <div class="card-p">
-                            ${isPopular}
-                            <img src="${p.img}">
-                            <div class="card-body">
-                                <div class="price">R$ ${p.price}</div>
-                                <div style="font-size:0.8rem; color:#666; height:40px; overflow:hidden;">${p.title}</div>
-                                <div class="actions">
-                                    <button class="btn-like" onclick="like('${p.id}')">
-                                        <i data-lucide="heart"></i> <span>${p.likes || 0}</span>
-                                    </button>
-                                    <div style="font-size:0.7rem; opacity:0.5">Reviews (12)</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
+                    gc.innerHTML += `<div class="card-p" style="padding:20px; border: 2px dashed #444; text-align:center;">
+                        <h2>${p.code}</h2>
+                        <p>${p.store}</p>
+                    </div>`;
                 }
             });
-            lucide.createIcons();
         });
 
-        window.like = (id) => {
-            update(ref(db, `tnp_posts/${id}`), { likes: increment(1) });
-        };
+        // --- SISTEMA DE MODAL & REVIEWS ---
+        window.openModal = (id, p) => {
+            const modal = document.getElementById('modal-product');
+            const container = document.getElementById('modal-data');
+            modal.style.display = 'block';
 
-        window.sendPost = async () => {
-            const type = window.currentPostType;
-            let payload = { type, likes: 0, date: Date.now() };
+            container.innerHTML = `
+                <div>
+                    <img src="${p.img}" style="width:100%; border-radius:20px;">
+                    <h1 style="margin-top:20px; font-family:'Syncopate'">${p.title}</h1>
+                    <h2 style="color:var(--gold)">R$ ${p.price}</h2>
+                    <p style="margin-top:20px; line-height:1.6; opacity:0.8">${p.desc || 'Sem descrição.'}</p>
+                    <a href="${p.link}" target="_blank"><button class="btn-main" style="margin-top:20px">IR PARA LOJA</button></a>
+                </div>
+                <div>
+                    <h3>REVIEWS DA GALERA</h3>
+                    <div class="review-box">
+                        <textarea id="rev-text" placeholder="O que achou desse produto?" style="height:80px"></textarea>
+                        <input type="url" id="rev-img" placeholder="Link de foto ou GIF do produto">
+                        <button class="btn-main" style="padding:10px" onclick="postReview('${id}')">ENVIAR REVIEW</button>
+                    </div>
+                    <div id="reviews-list-${id}" style="margin-top:20px"></div>
+                </div>
+            `;
             
-            if(type === 'p') {
-                payload.title = document.getElementById('p-title').value;
-                payload.price = document.getElementById('p-price').value;
-                payload.img = document.getElementById('p-img').value;
-                payload.link = document.getElementById('p-link').value;
-            } else {
-                payload.store = document.getElementById('c-store').value;
-                payload.code = document.getElementById('c-code').value;
-                payload.desc = document.getElementById('c-desc').value;
-            }
-
-            await push(ref(db, 'tnp_posts'), payload);
-            alert("Publicado com Sucesso!");
-            tab('feed', document.querySelector('.nav-link'));
+            // Carregar Reviews do Firebase
+            onValue(ref(db, `tnp_posts/${id}/reviews`), (revSnap) => {
+                const rList = document.getElementById(`reviews-list-${id}`);
+                rList.innerHTML = '';
+                if(revSnap.exists()) {
+                    Object.values(revSnap.val()).reverse().forEach(r => {
+                        rList.innerHTML += `
+                            <div class="review-item">
+                                <div style="display:flex; gap:10px; align-items:center">
+                                    <img src="${r.avatar}" style="width:30px; border-radius:50%">
+                                    <strong style="font-size:0.8rem">${r.user}</strong>
+                                </div>
+                                <p style="font-size:0.9rem; margin-top:5px">${r.text}</p>
+                                ${r.img ? `<img src="${r.img}" class="review-img">` : ''}
+                            </div>
+                        `;
+                    });
+                }
+            });
         };
 
-        window.copy = (t) => { navigator.clipboard.writeText(t); alert("Copiado!"); };
+        window.postReview = async (id) => {
+            const text = document.getElementById('rev-text').value;
+            const img = document.getElementById('rev-img').value;
+            if(!text) return alert("Escreva algo!");
+
+            const review = {
+                text,
+                img,
+                user: document.getElementById('my-name').innerText,
+                avatar: document.getElementById('my-avatar').src
+            };
+
+            await push(ref(db, `tnp_posts/${id}/reviews`), review);
+            document.getElementById('rev-text').value = '';
+            document.getElementById('rev-img').value = '';
+        };
+
+        window.closeModal = () => document.getElementById('modal-product').style.display = 'none';
 
         window.tab = (id, el) => {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
