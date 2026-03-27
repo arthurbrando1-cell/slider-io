@@ -5,52 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TA NA PROMO! | Elite Market Pro</title>
     <link rel="icon" href="fav.ico" type="image/x-icon">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        :root { --bg: #000; --glass: rgba(12, 12, 12, 0.95); --border: rgba(255, 255, 255, 0.1); --accent: #ff4747; --green: #27ae60; }
+        :root { 
+            --bg: #050505; 
+            --glass: rgba(15, 15, 15, 0.8); 
+            --border: rgba(255, 255, 255, 0.08); 
+            --accent: #ff4747; 
+            --green: #00ff88; 
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: #fff; overflow-x: hidden; }
+        body { background: var(--bg); color: #fff; display: flex; min-height: 100vh; overflow-x: hidden; }
 
-        /* --- INTRO --- */
-        #intro-screen { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.8s; }
-        .intro-logo { width: 280px; animation: logo3D 2s infinite ease-in-out; }
-        @keyframes logo3D { 0%, 100% { transform: perspective(1000px) rotateY(0deg); } 50% { transform: perspective(1000px) rotateY(20deg) scale(1.05); } }
+        /* --- INTRO SCRIPTADA --- */
+        #intro-screen { 
+            position: fixed; inset: 0; background: #000; z-index: 9999; 
+            display: flex; justify-content: center; align-items: center; transition: 1s ease-in-out; 
+        }
+        .intro-logo { width: 250px; animation: float3d 2.5s infinite ease-in-out; filter: drop-shadow(0 0 20px var(--accent)); }
+        @keyframes float3d { 0%, 100% { transform: translateY(0) rotateY(0); } 50% { transform: translateY(-20px) rotateY(15deg); } }
 
-        /* --- SIDEBAR --- */
-        aside { width: 260px; background: var(--glass); backdrop-filter: blur(20px); height: 100vh; border-right: 1px solid var(--border); position: fixed; padding: 30px 15px; z-index: 100; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 10px; color: #555; cursor: pointer; transition: 0.3s; margin-bottom: 5px; }
-        .nav-link.active { color: #fff; background: rgba(255,255,255,0.05); border-left: 4px solid var(--accent); }
+        /* --- SIDEBAR REFEITA --- */
+        aside { 
+            width: 280px; background: var(--glass); backdrop-filter: blur(30px); 
+            height: 100vh; border-right: 1px solid var(--border); position: fixed; 
+            padding: 40px 20px; z-index: 100; display: flex; flex-direction: column; 
+        }
+        .sidebar-logo { width: 100%; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px; text-align: center; }
+        .sidebar-logo img { width: 180px; animation: pulse 2s infinite; }
+        
+        .nav-link { 
+            display: flex; align-items: center; gap: 15px; padding: 16px; 
+            border-radius: 12px; color: #888; cursor: pointer; transition: 0.4s; 
+            margin-bottom: 10px; font-weight: 600; 
+        }
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.03); }
+        .nav-link.active { color: #fff; background: var(--accent); box-shadow: 0 10px 20px rgba(255, 71, 71, 0.2); }
 
-        /* --- BARRA DE PESQUISA & FILTROS --- */
-        .search-container { margin-bottom: 30px; display: flex; gap: 10px; flex-wrap: wrap; }
-        #search-input { flex: 1; min-width: 250px; background: #111; border: 1px solid #333; padding: 15px; border-radius: 12px; color: #fff; }
-        .cat-select { background: #111; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 10px; cursor: pointer; }
+        /* --- MAIN CONTENT --- */
+        main { flex: 1; margin-left: 280px; padding: 60px; transition: 0.5s; }
+        .section { display: none; opacity: 0; transform: translateY(20px); transition: 0.5s forwards; }
+        .section.active { display: block; opacity: 1; transform: translateY(0); }
 
-        /* --- MAIN --- */
-        main { flex: 1; margin-left: 260px; padding: 40px; opacity: 0; transition: 0.5s; }
-        .section { display: none; animation: fadeIn 0.4s ease; }
-        .section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- INPUTS PRO --- */
+        .form-group { max-width: 700px; margin: 0 auto; background: rgba(20,20,20,0.5); padding: 40px; border-radius: 24px; border: 1px solid var(--border); }
+        input, textarea, select { 
+            width: 100%; background: #111; border: 1px solid var(--border); 
+            padding: 18px; color: #fff; border-radius: 14px; margin-bottom: 20px; 
+            font-size: 1rem; transition: 0.3s; outline: none;
+        }
+        input:focus { border-color: var(--accent); background: #151515; box-shadow: 0 0 15px rgba(255, 71, 71, 0.1); }
 
-        /* --- GRID --- */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        .card { background: #0d0d0d; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); position: relative; transition: 0.3s; cursor: pointer; }
-        .card:hover { border-color: var(--accent); transform: translateY(-5px); }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        .badge-cupom { position: absolute; top: 10px; left: 10px; background: var(--green); padding: 5px 10px; border-radius: 5px; font-size: 0.6rem; font-weight: 800; }
+        .btn-action { 
+            width: 100%; padding: 20px; background: var(--accent); color: white; 
+            font-weight: 800; border: none; border-radius: 14px; cursor: pointer; 
+            text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; 
+        }
+        .btn-action:hover { transform: translateY(-3px); filter: brightness(1.2); box-shadow: 0 10px 20px rgba(255, 71, 71, 0.3); }
 
-        /* --- MODAL --- */
-        #modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 500; display: none; overflow-y: auto; padding: 40px 20px; }
-        .modal-content { max-width: 1000px; margin: 0 auto; display: flex; gap: 40px; background: #080808; padding: 40px; border-radius: 24px; border: 1px solid var(--border); }
-        .copy-box { background: #111; border: 2px dashed var(--green); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin: 20px 0; }
-        .copy-btn { background: var(--green); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 800; }
+        /* --- CARDS FEED --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; }
+        .card { 
+            background: #0d0d0d; border-radius: 18px; overflow: hidden; 
+            border: 1px solid var(--border); transition: 0.4s; position: relative; 
+        }
+        .card:hover { border-color: #555; transform: scale(1.02); }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-bottom: 1px solid var(--border); }
+        .badge { position: absolute; top: 15px; left: 15px; background: var(--green); color: #000; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 900; z-index: 10; }
 
-        .btn-buy { width: 100%; padding: 18px; background: var(--accent); color: white; font-weight: 900; border: none; border-radius: 12px; cursor: pointer; text-align: center; text-decoration: none; display: block; }
-
-        @media (max-width: 900px) { aside { width: 100%; height: 60px; bottom: 0; top: auto; flex-direction: row; padding: 5px; } main { margin-left: 0; padding-bottom: 80px; } .modal-content { flex-direction: column; } }
+        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+        
+        @media (max-width: 900px) {
+            aside { width: 100%; height: 70px; bottom: 0; top: auto; flex-direction: row; border-right: none; border-top: 1px solid var(--border); padding: 10px; }
+            main { margin-left: 0; padding: 20px 20px 100px 20px; }
+            .sidebar-logo, #user-info { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -58,79 +90,58 @@
     <div id="intro-screen"><img src="logo.png" class="intro-logo"></div>
 
     <aside>
-        <div id="user-info" style="text-align: center; margin-bottom: 20px;" class="hidden-mobile">
-            <img id="my-avatar" src="" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--accent);">
-            <p id="my-name" style="font-size: 0.7rem; font-weight: 800; margin-top: 5px;"></p>
+        <div class="sidebar-logo">
+            <img src="logo.png" alt="TA NA PROMO">
+        </div>
+        <div id="user-info" style="text-align: center; margin-bottom: 30px;">
+            <img id="my-avatar" src="" style="width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover;">
+            <p id="my-name" style="font-weight: 800; margin-top: 10px; color: #fff; font-size: 0.8rem;"></p>
         </div>
         <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="layout-grid"></i> <span>Feed</span></div>
         <div class="nav-link" onclick="tab('post-area', this)"><i data-lucide="plus-circle"></i> <span>Postar</span></div>
         <div class="nav-link" onclick="tab('profile', this)"><i data-lucide="user"></i> <span>Perfil</span></div>
     </aside>
 
-    <main id="app-main">
+    <main id="app-content">
         <section id="feed" class="section active">
-            <div class="search-container">
-                <input type="text" id="search-input" placeholder="O que você está procurando?" oninput="filterProducts()">
-                <select id="cat-filter" class="cat-select" onchange="filterProducts()">
-                    <option value="all">Todas Categorias</option>
+            <div style="display: flex; gap: 15px; margin-bottom: 40px;">
+                <input type="text" id="search-input" placeholder="Buscar no market elite..." oninput="filterProducts()" style="margin-bottom:0">
+                <select id="cat-filter" onchange="filterProducts()" style="width: 200px; margin-bottom:0">
+                    <option value="all">Todas</option>
                     <option value="hardware">Hardware</option>
-                    <option value="perifericos">Periféricos</option>
-                    <option value="games">Games</option>
-                    <option value="cupons">Apenas Cupons</option>
+                    <option value="cupons">Cupons</option>
                 </select>
             </div>
             <div class="grid" id="market-grid"></div>
         </section>
 
         <section id="post-area" class="section">
-            <div style="max-width: 600px; margin: 0 auto; background: #0a0a0a; padding: 30px; border-radius: 15px; border: 1px solid #222;">
-                <h2 style="margin-bottom:20px; font-family:'Syncopate';">NOVA PUBLICAÇÃO</h2>
-                <select id="p-cat" class="cat-select" style="width:100%; margin-bottom:15px; height:50px;">
+            <div class="form-group">
+                <h2 style="font-family:'Syncopate'; margin-bottom: 30px; text-align:center;">Nova Publicação</h2>
+                <select id="p-cat">
                     <option value="hardware">Hardware</option>
                     <option value="perifericos">Periféricos</option>
-                    <option value="games">Games</option>
                     <option value="cupons">Cupom de Desconto</option>
                 </select>
-                <input type="text" id="p-title" placeholder="Nome do Produto/Loja">
+                <input type="text" id="p-title" placeholder="Nome do Produto">
                 <input type="text" id="p-code" placeholder="Código do Cupom (Opcional)">
                 <input type="number" id="p-price" placeholder="Preço Final (R$)">
                 <input type="url" id="p-img" placeholder="Link da Imagem/GIF">
                 <input type="url" id="p-url" placeholder="Link de Compra">
-                <textarea id="p-desc" placeholder="Descrição, reviews ou detalhes..." rows="4"></textarea>
-                <button class="btn-buy" onclick="publish()">PUBLICAR AGORA</button>
+                <textarea id="p-desc" placeholder="Review ou descrição do produto..." rows="4"></textarea>
+                <button class="btn-action" onclick="publish()">Publicar Agora</button>
             </div>
         </section>
 
         <section id="profile" class="section">
-            <div style="max-width: 400px; margin: 0 auto; text-align: center;">
-                <input type="text" id="u-name" placeholder="Seu Nome">
-                <input type="text" id="u-photo" placeholder="Link Foto Perfil">
-                <button class="btn-buy" onclick="saveProfile()">Salvar Perfil</button>
+            <div class="form-group" style="max-width: 500px; text-align: center;">
+                <h2 style="font-family:'Syncopate'; margin-bottom:30px;">Meu Perfil</h2>
+                <input type="text" id="u-name" placeholder="Nome de Usuário">
+                <input type="text" id="u-photo" placeholder="Link da Foto (Avatar)">
+                <button class="btn-action" onclick="saveProfile()">Salvar Perfil</button>
             </div>
         </section>
     </main>
-
-    <div id="modal">
-        <button onclick="closeModal()" style="position:fixed; top:20px; right:20px; background:#fff; border:none; padding:10px; border-radius:50%; cursor:pointer; z-index:1000;"><i data-lucide="x" color="#000"></i></button>
-        <div class="modal-content">
-            <div class="ali-left"><img id="m-img" style="width:100%; border-radius:12px;"></div>
-            <div class="ali-right">
-                <h1 id="m-title" style="font-family:'Syncopate';"></h1>
-                <div id="m-price" style="font-size:2.5rem; font-weight:900; margin:15px 0; color:var(--accent);"></div>
-                
-                <div id="cupom-area" class="copy-box" style="display:none;">
-                    <div>
-                        <small style="color:#888; display:block;">CÓDIGO:</small>
-                        <span id="m-code" style="font-size:1.5rem; font-weight:900; letter-spacing:2px;"></span>
-                    </div>
-                    <button class="copy-btn" onclick="copyCode()">COPIAR</button>
-                </div>
-
-                <p id="m-desc" style="color:#888; margin-bottom:30px;"></p>
-                <a id="m-link" href="#" target="_blank" class="btn-buy">IR PARA A LOJA</a>
-            </div>
-        </div>
-    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -151,18 +162,17 @@
         const UID = localStorage.getItem('tnp_uid') || 'U'+Math.floor(Math.random()*9999);
         localStorage.setItem('tnp_uid', UID);
 
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('intro-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('intro-screen').style.display = 'none';
+                }, 1000);
+            }, 2500);
+        };
+
         let products = [];
 
-        // Intro Logic
-        window.onload = () => { setTimeout(() => { 
-            document.getElementById('intro-screen').style.opacity = '0';
-            setTimeout(() => { 
-                document.getElementById('intro-screen').style.display = 'none';
-                document.getElementById('app-main').style.opacity = '1';
-            }, 800);
-        }, 2000); };
-
-        // Realtime Data
         onValue(ref(db, 'market'), (snap) => {
             const val = snap.val();
             products = val ? Object.entries(val).reverse().map(([id,v])=>({id,...v})) : [];
@@ -170,7 +180,7 @@
         });
 
         onValue(ref(db, `users/${UID}`), (snap) => {
-            const u = snap.val() || { name: 'Gamer', photo: 'https://via.placeholder.com/80' };
+            const u = snap.val() || { name: 'ELITE USER', photo: 'https://via.placeholder.com/150' };
             document.getElementById('my-avatar').src = u.photo;
             document.getElementById('my-name').innerText = u.name;
         });
@@ -180,31 +190,18 @@
             grid.innerHTML = '';
             list.forEach(p => {
                 grid.innerHTML += `
-                    <div class="card">
-                        ${p.code ? '<div class="badge-cupom">CUPOM</div>' : ''}
-                        <div onclick="openModal('${p.id}')">
-                            <img src="${p.img}">
-                            <div style="padding:15px">
-                                <div style="font-weight:900; color:var(--accent)">R$ ${p.price}</div>
-                                <div style="font-size:0.75rem; font-weight:600; margin-top:5px; opacity:0.8">${p.title}</div>
-                            </div>
+                    <div class="card" onclick="alert('Funcionalidade de modal expandida!')">
+                        ${p.code ? '<div class="badge">CUPOM</div>' : ''}
+                        <img src="${p.img || 'https://via.placeholder.com/300'}">
+                        <div style="padding:20px">
+                            <div style="font-weight:900; color:var(--accent); font-size:1.2rem">R$ ${p.price}</div>
+                            <div style="font-size:0.8rem; font-weight:700; color:#888; margin-top:5px; text-transform:uppercase;">${p.title}</div>
                         </div>
                     </div>
                 `;
             });
             lucide.createIcons();
         }
-
-        window.filterProducts = () => {
-            const term = document.getElementById('search-input').value.toLowerCase();
-            const cat = document.getElementById('cat-filter').value;
-            const filtered = products.filter(p => {
-                const matchTerm = p.title.toLowerCase().includes(term) || p.desc.toLowerCase().includes(term);
-                const matchCat = cat === 'all' || p.category === cat;
-                return matchTerm && matchCat;
-            });
-            renderGrid(filtered);
-        };
 
         window.publish = async () => {
             const title = document.getElementById('p-title').value;
@@ -215,51 +212,23 @@
             const code = document.getElementById('p-code').value;
             const category = document.getElementById('p-cat').value;
 
-            if(!title || !url) return alert("Erro: Título e Link são obrigatórios!");
+            if(!title || !url) return alert("Erro crítico: Título e Link são vitais.");
             await push(ref(db, 'market'), { title, price, img, url, desc, code, category, owner: UID });
-            tab('feed', document.querySelector('.nav-link'));
+            window.location.reload();
         };
 
-        window.openModal = (id) => {
-            const p = products.find(x => x.id === id);
-            document.getElementById('m-img').src = p.img;
-            document.getElementById('m-title').innerText = p.title;
-            document.getElementById('m-price').innerText = 'R$ ' + p.price;
-            document.getElementById('m-desc').innerText = p.desc;
-            document.getElementById('m-link').href = p.url;
-            
-            const cArea = document.getElementById('cupom-area');
-            if(p.code) {
-                cArea.style.display = 'flex';
-                document.getElementById('m-code').innerText = p.code;
-            } else {
-                cArea.style.display = 'none';
-            }
-
-            document.getElementById('modal').style.display = 'block';
-            lucide.createIcons();
-        };
-
-        window.copyCode = () => {
-            const code = document.getElementById('m-code').innerText;
-            navigator.clipboard.writeText(code);
-            alert("Código Copiado: " + code);
-        };
-
-        window.closeModal = () => document.getElementById('modal').style.display = 'none';
-        
         window.tab = (id, el) => {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(el) el.classList.add('active');
+            el.classList.add('active');
         };
 
         window.saveProfile = async () => {
             const name = document.getElementById('u-name').value;
             const photo = document.getElementById('u-photo').value;
             await set(ref(db, `users/${UID}`), { name, photo });
-            alert("Perfil salvo!");
+            alert("Perfil sincronizado com a rede.");
         };
 
         lucide.createIcons();
