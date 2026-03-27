@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAMER SHOP | ULTRA EDITION</title>
+    <title>TA NA PROMO! | Ofertas Gamer</title>
     <link rel="icon" type="image/x-icon" href="fav.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
     <style>
         :root {
             --bg: #000; --side: #080808; --card: #111; --border: #222;
-            --primary: #fff; --secondary: #666; --text: #eee; --dim: #888;
+            --primary: #fff; --text: #eee; --dim: #888;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
@@ -25,8 +25,7 @@
             transition: transform 0.8s cubic-bezier(0.8, 0, 0.2, 1); perspective: 1000px;
         }
         .intro-logo {
-            width: 320px; height: auto; filter: drop-shadow(0 0 30px rgba(255,255,255,0.3));
-            animation: logo3D 3s infinite ease-in-out;
+            width: 320px; height: auto; animation: logo3D 3s infinite ease-in-out;
         }
         @keyframes logo3D {
             0%, 100% { transform: rotateY(-15deg) rotateX(10deg); }
@@ -50,27 +49,18 @@
         .section { display: none; opacity: 0; transition: 0.5s; }
         .section.active { display: block; opacity: 1; }
 
-        .search-bar { width: 100%; max-width: 500px; background: var(--card); border: 1px solid var(--border); padding: 12px 20px; border-radius: 50px; color: white; outline: none; margin-bottom: 25px; }
-
         /* --- GRID ALIEXPRESS --- */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
         .item-card {
-            background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid var(--border);
+            background: var(--card); border-radius: 4px; overflow: hidden; border: 1px solid var(--border);
             cursor: pointer; transition: 0.3s; position: relative;
         }
-        .item-card:hover { border-color: #555; transform: translateY(-5px); }
+        .item-card:hover { border-color: #fff; transform: translateY(-5px); }
         .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        .item-info { padding: 10px; }
-        .item-price { font-size: 1.1rem; font-weight: 700; color: #fff; }
-        .item-title { font-size: 0.8rem; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* --- EXCLUIR BUTTON --- */
-        .btn-del {
-            position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.7); 
-            color: white; border: none; padding: 6px; border-radius: 5px; cursor: pointer; z-index: 10;
-        }
-
-        /* --- MODAL PRODUTO --- */
+        .item-info { padding: 12px; }
+        .item-price { font-size: 1.2rem; font-weight: 700; color: #fff; }
+        
+        /* --- MODAL PRODUTO (TELA CHEIA) --- */
         #product-modal {
             position: fixed; inset: 0; background: #000; z-index: 200;
             display: none; overflow-y: auto; padding: 40px; animation: slideUp 0.4s ease;
@@ -78,24 +68,21 @@
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .close-modal { position: fixed; top: 20px; right: 20px; background: #222; border: none; color: white; padding: 10px; border-radius: 50%; cursor: pointer; z-index: 220; }
 
-        .prod-grid { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-        .prod-img { width: 100%; border-radius: 12px; border: 1px solid var(--border); }
+        .prod-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 1fr; gap: 50px; }
+        .prod-img-big { width: 100%; border-radius: 8px; border: 1px solid var(--border); }
 
-        /* --- VOTES & BUTTONS --- */
-        .vote-row { display: flex; gap: 15px; margin: 20px 0; align-items: center; }
-        .vote-btn { background: #111; border: 1px solid var(--border); color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; display: flex; gap: 5px; }
-        .vote-btn.active-up { border-color: #00ff88; color: #00ff88; }
-        .vote-btn.active-down { border-color: #ff4444; color: #ff4444; }
+        .coupon-tag { background: #1a1a1a; border: 1px dashed #555; padding: 10px; border-radius: 4px; display: inline-block; margin: 15px 0; color: #00ff88; font-weight: 700; }
 
-        .btn-action { width: 100%; padding: 15px; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; border: none; margin-top: 10px; }
-        .btn-add { background: white; color: black; }
-        .btn-rem { background: #222; color: #ff4444; border: 1px solid #ff4444; }
+        /* --- BUTTONS --- */
+        .btn-action { width: 100%; padding: 18px; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; border: none; margin-top: 10px; transition: 0.2s; }
+        .btn-save { background: white; color: black; }
+        .btn-remove { background: #111; color: #ff4444; border: 1px solid #ff4444; }
+        .btn-save:hover { background: #ccc; }
+
+        .vote-btn { background: #111; border: 1px solid var(--border); color: white; padding: 10px 20px; border-radius: 4px; cursor: pointer; display: flex; gap: 8px; }
 
         /* --- CALCULADORA --- */
-        .calc-box { background: #fff; color: #000; padding: 20px; border-radius: 12px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .total-price { font-size: 2rem; font-weight: 900; font-family: 'Syncopate'; }
-
-        #toast { position: fixed; bottom: 20px; right: 20px; background: white; color: black; padding: 12px 25px; border-radius: 6px; font-weight: 700; transform: translateX(250%); transition: 0.4s; z-index: 10000; }
+        .calc-header { background: #fff; color: #000; padding: 30px; border-radius: 4px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
 
         @media (max-width: 800px) {
             aside { width: 100%; height: 60px; bottom: 0; top: auto; flex-direction: row; padding: 5px; border-right: none; border-top: 1px solid var(--border); }
@@ -107,37 +94,43 @@
 </head>
 <body>
 
-    <div id="intro"><img src="logo.png" class="intro-logo"></div>
-    <div id="toast">Ação realizada!</div>
+    <div id="intro">
+        <h1 style="font-family: 'Syncopate'; margin-bottom: 20px; letter-spacing: 5px;">TA NA PROMO!</h1>
+        <img src="logo.png" class="intro-logo" onerror="this.style.display='none'">
+    </div>
 
     <aside>
-        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="layout"></i> <span>Feed</span></div>
-        <div class="nav-link" onclick="tab('setup', this)"><i data-lucide="shopping-cart"></i> <span>Meu Setup</span> <span class="badge" id="setup-count">0</span></div>
-        <div class="nav-link" onclick="tab('postar', this)"><i data-lucide="plus-square"></i> <span>Vender</span></div>
+        <h2 style="font-family: 'Syncopate'; font-size: 0.7rem; margin-bottom: 30px; text-align: center;">TA NA PROMO!</h2>
+        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="shopping-bag"></i> <span>Ofertas</span></div>
+        <div class="nav-link" onclick="tab('cart', this)"><i data-lucide="heart"></i> <span>Favoritos</span> <span class="badge" id="cart-badge">0</span></div>
+        <div class="nav-link" onclick="tab('post', this)"><i data-lucide="plus-circle"></i> <span>Anunciar</span></div>
     </aside>
 
     <main>
         <section id="feed" class="section active">
-            <input type="text" class="search-bar" placeholder="Buscar no mercado..." oninput="searchItems(this.value)">
+            <div style="margin-bottom: 30px;">
+                <input type="text" id="search" placeholder="O que você busca hoje?" style="width:100%; max-width:400px; padding:12px; background:#111; border:1px solid #333; color:white; border-radius:30px; outline:none;" oninput="search(this.value)">
+            </div>
             <div class="grid" id="grid-feed"></div>
         </section>
 
-        <section id="setup" class="section">
-            <div class="calc-box">
-                <div><p style="font-size: 0.8rem; font-weight: 700;">VALOR TOTAL DO SETUP</p><div class="total-price" id="setup-total">R$ 0,00</div></div>
-                <i data-lucide="calculator" size="40"></i>
+        <section id="cart" class="section">
+            <div class="calc-header">
+                <div><p style="font-size: 0.7rem; font-weight: 700;">TOTAL DO SETUP</p><div style="font-family:'Syncopate'; font-size:2rem;" id="total-price">R$ 0,00</div></div>
+                <i data-lucide="shopping-cart" size="40"></i>
             </div>
-            <div class="grid" id="grid-setup"></div>
+            <div class="grid" id="grid-cart"></div>
         </section>
 
-        <section id="postar" class="section">
-            <div style="max-width: 500px; margin: 0 auto; background: var(--side); padding: 30px; border-radius: 12px; border: 1px solid var(--border);">
-                <h2 style="margin-bottom: 20px;">Anunciar Produto</h2>
-                <input type="text" id="p-title" placeholder="Nome do Produto" style="width:100%; padding:12px; background:#111; border:1px solid var(--border); color:white; margin-bottom:10px;">
-                <input type="number" id="p-price" placeholder="Preço (R$)" style="width:100%; padding:12px; background:#111; border:1px solid var(--border); color:white; margin-bottom:10px;">
-                <input type="url" id="p-img" placeholder="URL da Imagem" style="width:100%; padding:12px; background:#111; border:1px solid var(--border); color:white; margin-bottom:10px;">
-                <textarea id="p-desc" placeholder="Descrição completa..." rows="5" style="width:100%; padding:12px; background:#111; border:1px solid var(--border); color:white; margin-bottom:15px; resize:none;"></textarea>
-                <button onclick="saveProduct()" class="btn-action btn-add">Publicar Agora</button>
+        <section id="post" class="section">
+            <div style="max-width: 500px; margin: 0 auto; background: var(--side); padding: 30px; border: 1px solid var(--border);">
+                <h3 style="margin-bottom: 20px; font-family:'Syncopate'; font-size:0.8rem;">NOVO ANÚNCIO</h3>
+                <input type="text" id="p-title" placeholder="Nome do Produto (ou GIF URL)">
+                <input type="number" id="p-price" placeholder="Preço (R$)">
+                <input type="text" id="p-coupon" placeholder="Cupom (Ex: GAMER10)">
+                <input type="url" id="p-img" placeholder="Link da Imagem ou GIF">
+                <textarea id="p-desc" placeholder="Descrição e detalhes..." rows="5" style="width:100%; background:#000; border:1px solid #333; color:white; padding:10px; margin-bottom:15px; resize:none;"></textarea>
+                <button onclick="publish()" class="btn-action btn-save">Postar Agora</button>
             </div>
         </section>
     </main>
@@ -145,21 +138,26 @@
     <div id="product-modal">
         <button class="close-modal" onclick="closeModal()"><i data-lucide="x"></i></button>
         <div class="prod-grid">
-            <div class="prod-left"><img id="m-img" class="prod-img"></div>
-            <div class="prod-right">
-                <h1 id="m-title" style="font-family: 'Syncopate'; font-size: 2rem;"></h1>
-                <p id="m-price" style="font-size: 1.8rem; color: #fff; margin: 15px 0;"></p>
-                <p id="m-desc" style="color: var(--dim); line-height: 1.6;"></p>
+            <div class="modal-left">
+                <img id="m-img" class="prod-img-big">
+            </div>
+            <div class="modal-right">
+                <h1 id="m-title" style="font-family:'Syncopate'; font-size: 1.8rem;"></h1>
+                <div id="m-coupon" class="coupon-tag"></div>
+                <p id="m-price" style="font-size: 2.5rem; font-weight: 700; margin: 10px 0;"></p>
+                <p id="m-desc" style="color: var(--dim); line-height: 1.6; margin-bottom: 20px;"></p>
                 
-                <div class="vote-row" id="vote-area">
-                    </div>
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <button class="vote-btn" onclick="vote('up')"><i data-lucide="thumbs-up"></i> <span id="m-up">0</span></button>
+                    <button class="vote-btn" onclick="vote('down')"><i data-lucide="thumbs-down"></i> <span id="m-down">0</span></button>
+                </div>
 
-                <button id="btn-setup-toggle" class="btn-action"></button>
-                
+                <button id="m-btn-save" class="btn-action"></button>
+
                 <div style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px;">
-                    <h3>Reviews</h3><br>
-                    <textarea id="rev-input" placeholder="O que achou deste item?" style="width:100%; background:#111; border:1px solid var(--border); color:white; padding:10px; border-radius:5px;"></textarea>
-                    <button onclick="postReview()" style="background:none; border: 1px solid white; color:white; padding:8px 15px; margin-top:10px; cursor:pointer;">Enviar</button>
+                    <h4>Reviews e Comentários</h4>
+                    <textarea id="rev-input" placeholder="Escreva o que achou..." style="width:100%; background:#111; border:1px solid #222; color:white; padding:10px; margin-top:15px; border-radius:4px;"></textarea>
+                    <button onclick="sendReview()" style="background:none; border:1px solid #fff; color:#fff; padding:8px 15px; margin-top:10px; cursor:pointer; font-size:0.7rem;">ENVIAR REVIEW</button>
                     <div id="m-reviews" style="margin-top: 20px;"></div>
                 </div>
             </div>
@@ -168,7 +166,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAMoxCYuvhRQtRzPm4KSpRo5qtPr3keu0I",
@@ -182,147 +180,133 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        
-        const MY_UID = localStorage.getItem('user_uid') || 'U-' + Math.random().toString(36).substr(2, 5);
-        localStorage.setItem('user_uid', MY_UID);
+        const UID = localStorage.getItem('user_id') || 'U-' + Math.random().toString(36).substr(2, 4).toUpperCase();
+        localStorage.setItem('user_id', UID);
 
-        let allData = [];
+        let data = [];
+        let saved = JSON.parse(localStorage.getItem('saved_promo')) || [];
         let activeId = null;
-        let mySetup = JSON.parse(localStorage.getItem('my_setup')) || [];
 
-        // --- CARREGAR DADOS ---
-        onValue(ref(db, 'market'), (snap) => {
+        // --- SYNC ---
+        onValue(ref(db, 'promo'), (snap) => {
             const val = snap.val();
-            allData = val ? Object.entries(val).map(([id,v])=>({id,...v})).reverse() : [];
-            renderAll();
+            data = val ? Object.entries(val).map(([id,v])=>({id,...v})).reverse() : [];
+            render();
             if(activeId) openModal(activeId);
             setTimeout(() => document.getElementById('intro').style.transform = 'translateY(-100%)', 2500);
         });
 
-        function renderAll() {
-            renderGrid(allData, 'grid-feed');
-            renderSetup();
-            document.getElementById('setup-count').innerText = mySetup.length;
-        }
-
-        function renderGrid(data, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            data.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'item-card';
-                card.onclick = () => openModal(p.id);
-                card.innerHTML = `
-                    ${p.author === MY_UID ? `<button class="btn-del" onclick="event.stopPropagation(); deletePost('${p.id}')"><i data-lucide="trash-2" size="14"></i></button>` : ''}
-                    <img src="${p.img}" class="item-img">
-                    <div class="item-info">
-                        <div class="item-price">R$ ${p.price}</div>
-                        <div class="item-title">${p.title}</div>
+        function render(filtered = data) {
+            const grid = document.getElementById('grid-feed');
+            grid.innerHTML = '';
+            filtered.forEach(p => {
+                grid.innerHTML += `
+                    <div class="item-card" onclick="openModal('${p.id}')">
+                        ${p.owner === UID ? `<button onclick="event.stopPropagation(); deletePost('${p.id}')" style="position:absolute; top:5px; right:5px; background:rgba(255,0,0,0.6); border:none; color:white; padding:5px; border-radius:4px; z-index:10;"><i data-lucide="trash-2" size="14"></i></button>` : ''}
+                        <img src="${p.img}" class="item-img">
+                        <div class="item-info">
+                            <div class="item-price">R$ ${p.price}</div>
+                            <div style="font-size:0.8rem; color:#888; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.title}</div>
+                        </div>
                     </div>
                 `;
-                container.appendChild(card);
             });
+            renderCart();
             lucide.createIcons();
         }
 
-        // --- MODAL & SETUP ---
+        // --- CARRINHO / SETUP ---
+        function renderCart() {
+            const grid = document.getElementById('grid-cart');
+            grid.innerHTML = '';
+            let total = 0;
+            saved.forEach(p => {
+                total += parseFloat(p.price || 0);
+                grid.innerHTML += `
+                    <div class="item-card" onclick="openModal('${p.id}')">
+                        <img src="${p.img}" class="item-img">
+                        <div class="item-info">
+                            <div class="item-price">R$ ${p.price}</div>
+                            <div style="font-size:0.8rem; color:#888;">${p.title}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('total-price').innerText = total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+            document.getElementById('cart-badge').innerText = saved.length;
+        }
+
         window.openModal = (id) => {
-            const p = allData.find(x => x.id === id);
+            const p = data.find(x => x.id === id);
             if(!p) return;
             activeId = id;
             document.getElementById('m-img').src = p.img;
             document.getElementById('m-title').innerText = p.title;
             document.getElementById('m-price').innerText = 'R$ ' + p.price;
             document.getElementById('m-desc').innerText = p.desc;
+            document.getElementById('m-coupon').innerText = p.coupon ? 'CUPOM: ' + p.coupon : 'SEM CUPOM ATIVO';
             
-            // Botão de Setup (Alternar)
-            const btn = document.getElementById('btn-setup-toggle');
-            const inSetup = mySetup.some(s => s.id === id);
-            btn.innerText = inSetup ? "Remover do meu Setup" : "Adicionar ao Setup";
-            btn.className = inSetup ? "btn-action btn-rem" : "btn-action btn-add";
-            btn.onclick = () => toggleSetup(p);
+            // Likes
+            const ups = p.votes ? Object.values(p.votes).filter(v => v === 'up').length : 0;
+            const downs = p.votes ? Object.values(p.votes).filter(v => v === 'down').length : 0;
+            document.getElementById('m-up').innerText = ups;
+            document.getElementById('m-down').innerText = downs;
 
-            // Votos
-            const ups = p.votes ? Object.values(p.votes).filter(v => v==='up').length : 0;
-            const downs = p.votes ? Object.values(p.votes).filter(v => v==='down').length : 0;
-            const myV = p.votes ? p.votes[MY_UID] : null;
-            document.getElementById('vote-area').innerHTML = `
-                <button class="vote-btn ${myV==='up'?'active-up':''}" onclick="castVote('${id}','up')"><i data-lucide="thumbs-up"></i> ${ups}</button>
-                <button class="vote-btn ${myV==='down'?'active-down':''}" onclick="castVote('${id}','down')"><i data-lucide="thumbs-down"></i> ${downs}</button>
-            `;
+            // Botão Salvar/Remover
+            const btn = document.getElementById('m-btn-save');
+            const isSaved = saved.some(s => s.id === id);
+            btn.innerText = isSaved ? 'REMOVER DO SETUP' : 'SALVAR NO SETUP';
+            btn.className = isSaved ? 'btn-action btn-remove' : 'btn-action btn-save';
+            btn.onclick = () => toggleSave(p);
 
             // Reviews
-            const rDiv = document.getElementById('m-reviews');
-            rDiv.innerHTML = p.reviews ? Object.values(p.reviews).reverse().map(r => `<div style="padding:10px; border-bottom:1px solid #222"><small>${r.user}</small><p>${r.text}</p></div>`).join('') : '<p>Sem reviews.</p>';
+            const revs = document.getElementById('m-reviews');
+            revs.innerHTML = p.reviews ? Object.values(p.reviews).reverse().map(r => `<div style="padding:15px; background:#080808; border-bottom:1px solid #111; margin-bottom:5px;"><small style="color:#555">${r.user}</small><p>${r.text}</p></div>`).join('') : '<p>Nenhuma review.</p>';
 
             document.getElementById('product-modal').style.display = 'block';
             lucide.createIcons();
         };
 
-        window.toggleSetup = (product) => {
-            const idx = mySetup.findIndex(s => s.id === product.id);
-            if(idx > -1) {
-                mySetup.splice(idx, 1);
-                showToast("Removido do Setup");
-            } else {
-                mySetup.push(product);
-                showToast("Adicionado ao Setup!");
-            }
-            localStorage.setItem('my_setup', JSON.stringify(mySetup));
-            renderAll();
-            openModal(product.id);
+        window.toggleSave = (p) => {
+            const idx = saved.findIndex(s => s.id === p.id);
+            if(idx > -1) saved.splice(idx, 1);
+            else saved.push(p);
+            localStorage.setItem('saved_promo', JSON.stringify(saved));
+            render();
+            openModal(p.id);
         };
 
-        function renderSetup() {
-            let total = 0;
-            mySetup.forEach(i => total += parseFloat(i.price || 0));
-            document.getElementById('setup-total').innerText = total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-            renderGrid(mySetup, 'grid-setup');
-        }
-
-        // --- AÇÕES FIREBASE ---
-        window.saveProduct = async () => {
+        window.publish = async () => {
             const title = document.getElementById('p-title').value;
             const price = document.getElementById('p-price').value;
             const img = document.getElementById('p-img').value;
             const desc = document.getElementById('p-desc').value;
-            if(!title || !price) return;
-            await push(ref(db, 'market'), { author: MY_UID, title, price, img, desc, ts: Date.now() });
+            const coupon = document.getElementById('p-coupon').value;
+            if(!title || !price) return alert("Preencha título e preço!");
+            await push(ref(db, 'promo'), { owner: UID, title, price, img, desc, coupon, ts: Date.now() });
             tab('feed', document.querySelector('.nav-link'));
-            showToast("Publicado!");
         };
 
-        window.deletePost = async (id) => {
-            if(confirm("Deseja apagar sua postagem definitiva?")) {
-                await remove(ref(db, `market/${id}`));
-                showToast("Apagado!");
-            }
+        window.vote = async (type) => {
+            await set(ref(db, `promo/${activeId}/votes/${UID}`), type);
         };
 
-        window.castVote = async (id, type) => {
-            const vRef = ref(db, `market/${id}/votes/${MY_UID}`);
-            const snap = await get(vRef);
-            await set(vRef, snap.val() === type ? null : type);
-        };
-
-        window.postReview = async () => {
+        window.sendReview = async () => {
             const text = document.getElementById('rev-input').value;
             if(!text) return;
-            await push(ref(db, `market/${activeId}/reviews`), { user: MY_UID, text });
+            await push(ref(db, `promo/${activeId}/reviews`), { user: UID, text });
             document.getElementById('rev-input').value = '';
         };
 
-        // --- NAVEGAÇÃO ---
-        window.tab = (name, el) => {
+        window.deletePost = async (id) => { if(confirm("Apagar post?")) await remove(ref(db, `promo/${id}`)); };
+        window.closeModal = () => { document.getElementById('product-modal').style.display = 'none'; activeId = null; };
+        window.tab = (id, el) => {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            document.getElementById(name).classList.add('active');
+            document.getElementById(id).classList.add('active');
             el.classList.add('active');
         };
-
-        window.closeModal = () => { document.getElementById('product-modal').style.display = 'none'; activeId = null; };
-        window.searchItems = (t) => renderGrid(allData.filter(p => p.title.toLowerCase().includes(t.toLowerCase())), 'grid-feed');
-        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.transform = 'translateX(0)'; setTimeout(() => t.style.transform = 'translateX(250%)', 3000); }
+        window.search = (t) => render(data.filter(p => p.title.toLowerCase().includes(t.toLowerCase())));
 
         lucide.createIcons();
     </script>
