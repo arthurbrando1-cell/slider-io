@@ -10,146 +10,124 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        :root { 
-            --bg: #000; 
-            --glass: rgba(12, 12, 12, 0.95); 
-            --border: rgba(255, 255, 255, 0.1); 
-            --accent: #ff4747;
-        }
+        :root { --bg: #000; --glass: rgba(12, 12, 12, 0.95); --border: rgba(255, 255, 255, 0.1); --accent: #ff4747; --green: #27ae60; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: #fff; overflow-x: hidden; }
 
-        /* --- INTRO ANIMADA --- */
-        #intro-screen {
-            position: fixed; inset: 0; background: #000; z-index: 9999;
-            display: flex; justify-content: center; align-items: center;
-            transition: opacity 1s ease;
-        }
-        .intro-logo {
-            width: 280px;
-            animation: logo3D 2.5s infinite ease-in-out;
-            filter: drop-shadow(0 0 30px rgba(255,255,255,0.2));
-        }
-        @keyframes logo3D {
-            0%, 100% { transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1); }
-            50% { transform: perspective(1000px) rotateX(10deg) rotateY(20deg) scale(1.1); }
-        }
+        /* --- INTRO --- */
+        #intro-screen { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.8s; }
+        .intro-logo { width: 280px; animation: logo3D 2s infinite ease-in-out; }
+        @keyframes logo3D { 0%, 100% { transform: perspective(1000px) rotateY(0deg); } 50% { transform: perspective(1000px) rotateY(20deg) scale(1.05); } }
 
         /* --- SIDEBAR --- */
         aside { width: 260px; background: var(--glass); backdrop-filter: blur(20px); height: 100vh; border-right: 1px solid var(--border); position: fixed; padding: 30px 15px; z-index: 100; }
         .nav-link { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 10px; color: #555; cursor: pointer; transition: 0.3s; margin-bottom: 5px; }
         .nav-link.active { color: #fff; background: rgba(255,255,255,0.05); border-left: 4px solid var(--accent); }
 
+        /* --- BARRA DE PESQUISA & FILTROS --- */
+        .search-container { margin-bottom: 30px; display: flex; gap: 10px; flex-wrap: wrap; }
+        #search-input { flex: 1; min-width: 250px; background: #111; border: 1px solid #333; padding: 15px; border-radius: 12px; color: #fff; }
+        .cat-select { background: #111; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 10px; cursor: pointer; }
+
         /* --- MAIN --- */
-        main { flex: 1; margin-left: 260px; padding: 40px; opacity: 0; transition: 1s ease; }
-        .section { display: none; animation: fadeIn 0.5s ease forwards; }
+        main { flex: 1; margin-left: 260px; padding: 40px; opacity: 0; transition: 0.5s; }
+        .section { display: none; animation: fadeIn 0.4s ease; }
         .section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- GRID & CARDS --- */
+        /* --- GRID --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        .card { background: #0d0d0d; border-radius: 12px; overflow: hidden; transition: 0.3s; cursor: pointer; border: 1px solid var(--border); position: relative; }
-        .card:hover { border-color: #fff; transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .card { background: #0d0d0d; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); position: relative; transition: 0.3s; cursor: pointer; }
+        .card:hover { border-color: var(--accent); transform: translateY(-5px); }
         .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        .delete-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.8); border: none; color: white; padding: 6px; border-radius: 6px; cursor: pointer; z-index: 10; display: none; }
+        .badge-cupom { position: absolute; top: 10px; left: 10px; background: var(--green); padding: 5px 10px; border-radius: 5px; font-size: 0.6rem; font-weight: 800; }
 
-        /* --- MODAL ALIEXPRESS STYLE --- */
-        #modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 500; display: none; overflow-y: auto; padding: 40px 20px; backdrop-filter: blur(10px); }
-        .modal-content { max-width: 1100px; margin: 0 auto; display: flex; gap: 40px; background: #080808; padding: 40px; border-radius: 24px; border: 1px solid var(--border); }
-        .ali-left { flex: 1; } 
-        .ali-right { flex: 1.2; }
-        .btn-buy { width: 100%; padding: 18px; background: #fff; color: #000; font-weight: 900; border: none; border-radius: 12px; cursor: pointer; text-transform: uppercase; margin-bottom: 12px; display: block; text-align: center; text-decoration: none; transition: 0.2s; }
-        .btn-buy:hover { transform: scale(1.02); }
-        .btn-shop { background: var(--accent); color: white; }
+        /* --- MODAL --- */
+        #modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 500; display: none; overflow-y: auto; padding: 40px 20px; }
+        .modal-content { max-width: 1000px; margin: 0 auto; display: flex; gap: 40px; background: #080808; padding: 40px; border-radius: 24px; border: 1px solid var(--border); }
+        .copy-box { background: #111; border: 2px dashed var(--green); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin: 20px 0; }
+        .copy-btn { background: var(--green); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 800; }
 
-        /* REVIEWS */
-        .review-box { margin-top: 30px; border-top: 1px solid #222; padding-top: 20px; }
-        .review-item { background: #111; padding: 15px; border-radius: 10px; margin-bottom: 10px; }
-        .review-imgs { display: flex; gap: 10px; margin-top: 10px; }
-        .review-imgs img { width: 60px; height: 60px; border-radius: 5px; object-fit: cover; }
+        .btn-buy { width: 100%; padding: 18px; background: var(--accent); color: white; font-weight: 900; border: none; border-radius: 12px; cursor: pointer; text-align: center; text-decoration: none; display: block; }
 
-        input, textarea { width: 100%; background: #111; border: 1px solid #333; padding: 14px; color: #fff; border-radius: 10px; margin-bottom: 15px; outline: none; }
-        input:focus { border-color: var(--accent); }
-
-        @media (max-width: 900px) {
-            aside { width: 100%; height: 70px; bottom: 0; top: auto; flex-direction: row; border-right: none; border-top: 1px solid var(--border); padding: 5px; display: flex; justify-content: space-around; }
-            main { margin-left: 0; padding: 20px; padding-bottom: 100px; }
-            .modal-content { flex-direction: column; padding: 20px; }
-        }
+        @media (max-width: 900px) { aside { width: 100%; height: 60px; bottom: 0; top: auto; flex-direction: row; padding: 5px; } main { margin-left: 0; padding-bottom: 80px; } .modal-content { flex-direction: column; } }
     </style>
 </head>
 <body>
 
-    <div id="intro-screen">
-        <img src="logo.png" class="intro-logo" alt="TA NA PROMO">
-    </div>
+    <div id="intro-screen"><img src="logo.png" class="intro-logo"></div>
 
     <aside>
-        <div id="user-info" style="margin-bottom: 20px; text-align: center;" class="hidden-mobile">
-            <img id="my-avatar" src="" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover;">
-            <p id="my-name" style="font-weight: 800; font-size: 0.8rem; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px;"></p>
+        <div id="user-info" style="text-align: center; margin-bottom: 20px;" class="hidden-mobile">
+            <img id="my-avatar" src="" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--accent);">
+            <p id="my-name" style="font-size: 0.7rem; font-weight: 800; margin-top: 5px;"></p>
         </div>
-        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="flame"></i> <span>Feed</span></div>
-        <div class="nav-link" onclick="tab('post-area', this)"><i data-lucide="plus-square"></i> <span>Postar</span></div>
-        <div class="nav-link" onclick="tab('profile', this)"><i data-lucide="settings"></i> <span>Perfil</span></div>
+        <div class="nav-link active" onclick="tab('feed', this)"><i data-lucide="layout-grid"></i> <span>Feed</span></div>
+        <div class="nav-link" onclick="tab('post-area', this)"><i data-lucide="plus-circle"></i> <span>Postar</span></div>
+        <div class="nav-link" onclick="tab('profile', this)"><i data-lucide="user"></i> <span>Perfil</span></div>
     </aside>
 
     <main id="app-main">
         <section id="feed" class="section active">
-            <h2 style="font-family:'Syncopate'; margin-bottom:30px; font-size: 1.8rem; border-left: 5px solid var(--accent); padding-left: 15px;">MURAL DE CUPONS</h2>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="O que você está procurando?" oninput="filterProducts()">
+                <select id="cat-filter" class="cat-select" onchange="filterProducts()">
+                    <option value="all">Todas Categorias</option>
+                    <option value="hardware">Hardware</option>
+                    <option value="perifericos">Periféricos</option>
+                    <option value="games">Games</option>
+                    <option value="cupons">Apenas Cupons</option>
+                </select>
+            </div>
             <div class="grid" id="market-grid"></div>
         </section>
 
         <section id="post-area" class="section">
-            <div style="max-width: 600px; margin: 0 auto; background: #0a0a0a; padding: 40px; border-radius: 20px; border: 1px solid #222; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
-                <h2 style="margin-bottom:25px; font-family:'Syncopate';">NOVA OFERTA</h2>
-                <input type="text" id="p-title" placeholder="Nome do Produto (Ex: Mouse Gamer 3D)">
-                <input type="number" id="p-price" placeholder="Preço (R$)">
-                <input type="url" id="p-img" placeholder="Link da Imagem ou GIF do Produto">
-                <input type="url" id="p-url" placeholder="Link Direto de Compra">
-                <textarea id="p-desc" placeholder="Detalhes técnicos, cupom de desconto ou review rápido..." rows="4"></textarea>
-                <button class="btn-buy btn-shop" onclick="publish()">PUBLICAR NO MURAL</button>
+            <div style="max-width: 600px; margin: 0 auto; background: #0a0a0a; padding: 30px; border-radius: 15px; border: 1px solid #222;">
+                <h2 style="margin-bottom:20px; font-family:'Syncopate';">NOVA PUBLICAÇÃO</h2>
+                <select id="p-cat" class="cat-select" style="width:100%; margin-bottom:15px; height:50px;">
+                    <option value="hardware">Hardware</option>
+                    <option value="perifericos">Periféricos</option>
+                    <option value="games">Games</option>
+                    <option value="cupons">Cupom de Desconto</option>
+                </select>
+                <input type="text" id="p-title" placeholder="Nome do Produto/Loja">
+                <input type="text" id="p-code" placeholder="Código do Cupom (Opcional)">
+                <input type="number" id="p-price" placeholder="Preço Final (R$)">
+                <input type="url" id="p-img" placeholder="Link da Imagem/GIF">
+                <input type="url" id="p-url" placeholder="Link de Compra">
+                <textarea id="p-desc" placeholder="Descrição, reviews ou detalhes..." rows="4"></textarea>
+                <button class="btn-buy" onclick="publish()">PUBLICAR AGORA</button>
             </div>
         </section>
 
         <section id="profile" class="section">
             <div style="max-width: 400px; margin: 0 auto; text-align: center;">
-                <h2 style="margin-bottom:20px; font-family:'Syncopate';">MEU PERFIL</h2>
                 <input type="text" id="u-name" placeholder="Seu Nome">
-                <input type="text" id="u-photo" placeholder="URL da sua Foto (Avatar)">
-                <button class="btn-buy" onclick="saveProfile()">ATUALIZAR DADOS</button>
+                <input type="text" id="u-photo" placeholder="Link Foto Perfil">
+                <button class="btn-buy" onclick="saveProfile()">Salvar Perfil</button>
             </div>
         </section>
     </main>
 
     <div id="modal">
-        <button onclick="closeModal()" style="position:fixed; top:30px; right:30px; background:#fff; border:none; padding:12px; border-radius:50%; cursor:pointer; z-index: 600;"><i data-lucide="x" color="#000"></i></button>
+        <button onclick="closeModal()" style="position:fixed; top:20px; right:20px; background:#fff; border:none; padding:10px; border-radius:50%; cursor:pointer; z-index:1000;"><i data-lucide="x" color="#000"></i></button>
         <div class="modal-content">
-            <div class="ali-left">
-                <img id="m-img" style="width:100%; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
-            </div>
+            <div class="ali-left"><img id="m-img" style="width:100%; border-radius:12px;"></div>
             <div class="ali-right">
-                <h1 id="m-title" style="font-family:'Syncopate'; line-height: 1.2;"></h1>
-                <div id="m-price" style="font-size:3rem; font-weight:900; margin:15px 0; color: var(--accent);"></div>
-                <p id="m-desc" style="color:#aaa; margin-bottom:30px; line-height: 1.6; font-size: 1.1rem;"></p>
+                <h1 id="m-title" style="font-family:'Syncopate';"></h1>
+                <div id="m-price" style="font-size:2.5rem; font-weight:900; margin:15px 0; color:var(--accent);"></div>
                 
-                <a id="m-link" href="#" target="_blank" class="btn-buy btn-shop">RESGATAR CUPOM / COMPRAR <i data-lucide="external-link" style="width:18px;"></i></a>
-                
-                <div class="review-box">
-                    <h3>REVIEWS DA GALERA (4.9⭐)</h3>
-                    <div id="reviews-container">
-                        <div class="review-item">
-                            <p><strong>@EliteUser:</strong> "Chegou em 10 dias, qualidade absurda!"</p>
-                            <div class="review-imgs">
-                                <img src="https://via.placeholder.com/60">
-                            </div>
-                        </div>
+                <div id="cupom-area" class="copy-box" style="display:none;">
+                    <div>
+                        <small style="color:#888; display:block;">CÓDIGO:</small>
+                        <span id="m-code" style="font-size:1.5rem; font-weight:900; letter-spacing:2px;"></span>
                     </div>
-                    <div style="display:flex; gap:10px; margin-top:15px;">
-                        <button class="btn-buy" style="font-size:0.7rem; padding:10px; background:#111; color:#fff; border:1px solid #333;"><i data-lucide="thumbs-up" size="14"></i> Útil (12)</button>
-                        <button class="btn-buy" style="font-size:0.7rem; padding:10px; background:#111; color:#fff; border:1px solid #333;"><i data-lucide="message-square" size="14"></i> Comentar</button>
-                    </div>
+                    <button class="copy-btn" onclick="copyCode()">COPIAR</button>
                 </div>
+
+                <p id="m-desc" style="color:#888; margin-bottom:30px;"></p>
+                <a id="m-link" href="#" target="_blank" class="btn-buy">IR PARA A LOJA</a>
             </div>
         </div>
     </div>
@@ -158,7 +136,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // SUA CONFIG DO FIREBASE (MANTIDA)
         const firebaseConfig = {
             apiKey: "AIzaSyAMoxCYuvhRQtRzPm4KSpRo5qtPr3keu0I",
             authDomain: "devgram-f7c0d.firebaseapp.com",
@@ -176,47 +153,58 @@
 
         let products = [];
 
-        // Lógica de Intro e Carregamento
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('intro-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('intro-screen').style.display = 'none';
-                    document.getElementById('app-main').style.opacity = '1';
-                }, 1000);
-            }, 2500);
+        // Intro Logic
+        window.onload = () => { setTimeout(() => { 
+            document.getElementById('intro-screen').style.opacity = '0';
+            setTimeout(() => { 
+                document.getElementById('intro-screen').style.display = 'none';
+                document.getElementById('app-main').style.opacity = '1';
+            }, 800);
+        }, 2000); };
+
+        // Realtime Data
+        onValue(ref(db, 'market'), (snap) => {
+            const val = snap.val();
+            products = val ? Object.entries(val).reverse().map(([id,v])=>({id,...v})) : [];
+            renderGrid(products);
         });
 
-        // Carregar Perfil
         onValue(ref(db, `users/${UID}`), (snap) => {
-            const u = snap.val() || { name: 'NOVO MEMBRO', photo: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' };
+            const u = snap.val() || { name: 'Gamer', photo: 'https://via.placeholder.com/80' };
             document.getElementById('my-avatar').src = u.photo;
             document.getElementById('my-name').innerText = u.name;
         });
 
-        // Carregar Feed com animação nos cards
-        onValue(ref(db, 'market'), (snap) => {
-            const val = snap.val();
-            products = val ? Object.entries(val).reverse().map(([id,v])=>({id,...v})) : [];
+        function renderGrid(list) {
             const grid = document.getElementById('market-grid');
             grid.innerHTML = '';
-            products.forEach(p => {
-                const isOwner = p.owner === UID;
+            list.forEach(p => {
                 grid.innerHTML += `
                     <div class="card">
-                        <button class="delete-btn" style="display:${isOwner?'block':'none'}" onclick="deleteItem('${p.id}', event)"><i data-lucide="trash-2"></i></button>
+                        ${p.code ? '<div class="badge-cupom">CUPOM</div>' : ''}
                         <div onclick="openModal('${p.id}')">
-                            <img src="${p.img || 'https://via.placeholder.com/300?text=Sem+Imagem'}">
+                            <img src="${p.img}">
                             <div style="padding:15px">
-                                <div style="font-weight:900; font-size:1.2rem; color:var(--accent)">R$ ${p.price}</div>
-                                <div style="font-size:0.8rem; color:#888; margin-top:5px; text-transform:uppercase; font-weight:600">${p.title}</div>
+                                <div style="font-weight:900; color:var(--accent)">R$ ${p.price}</div>
+                                <div style="font-size:0.75rem; font-weight:600; margin-top:5px; opacity:0.8">${p.title}</div>
                             </div>
                         </div>
                     </div>
                 `;
             });
             lucide.createIcons();
-        });
+        }
+
+        window.filterProducts = () => {
+            const term = document.getElementById('search-input').value.toLowerCase();
+            const cat = document.getElementById('cat-filter').value;
+            const filtered = products.filter(p => {
+                const matchTerm = p.title.toLowerCase().includes(term) || p.desc.toLowerCase().includes(term);
+                const matchCat = cat === 'all' || p.category === cat;
+                return matchTerm && matchCat;
+            });
+            renderGrid(filtered);
+        };
 
         window.publish = async () => {
             const title = document.getElementById('p-title').value;
@@ -224,10 +212,11 @@
             const img = document.getElementById('p-img').value;
             const url = document.getElementById('p-url').value;
             const desc = document.getElementById('p-desc').value;
-            if(!title || !url) return alert("Preencha os campos obrigatórios!");
-            
-            await push(ref(db, 'market'), { title, price, img, url, desc, owner: UID });
-            alert("Postado com sucesso!");
+            const code = document.getElementById('p-code').value;
+            const category = document.getElementById('p-cat').value;
+
+            if(!title || !url) return alert("Erro: Título e Link são obrigatórios!");
+            await push(ref(db, 'market'), { title, price, img, url, desc, code, category, owner: UID });
             tab('feed', document.querySelector('.nav-link'));
         };
 
@@ -238,34 +227,39 @@
             document.getElementById('m-price').innerText = 'R$ ' + p.price;
             document.getElementById('m-desc').innerText = p.desc;
             document.getElementById('m-link').href = p.url;
+            
+            const cArea = document.getElementById('cupom-area');
+            if(p.code) {
+                cArea.style.display = 'flex';
+                document.getElementById('m-code').innerText = p.code;
+            } else {
+                cArea.style.display = 'none';
+            }
+
             document.getElementById('modal').style.display = 'block';
-            document.body.style.overflow = 'hidden';
             lucide.createIcons();
         };
 
-        window.closeModal = () => {
-            document.getElementById('modal').style.display = 'none';
-            document.body.style.overflow = 'auto';
+        window.copyCode = () => {
+            const code = document.getElementById('m-code').innerText;
+            navigator.clipboard.writeText(code);
+            alert("Código Copiado: " + code);
         };
 
+        window.closeModal = () => document.getElementById('modal').style.display = 'none';
+        
         window.tab = (id, el) => {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             if(el) el.classList.add('active');
-            window.scrollTo(0,0);
         };
 
         window.saveProfile = async () => {
             const name = document.getElementById('u-name').value;
             const photo = document.getElementById('u-photo').value;
             await set(ref(db, `users/${UID}`), { name, photo });
-            alert("Perfil sincronizado!");
-        };
-
-        window.deleteItem = async (id, e) => {
-            e.stopPropagation();
-            if(confirm("Apagar promoção?")) await remove(ref(db, `market/${id}`));
+            alert("Perfil salvo!");
         };
 
         lucide.createIcons();
