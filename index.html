@@ -50,6 +50,8 @@
         .coupon-code:active { transform: scale(0.9); }
 
         .btn-action { width: 100%; padding: 18px; background: #fff; color: #000; border: none; border-radius: 15px; font-weight: 900; cursor: pointer; margin-top: 10px; }
+        .btn-upload { background: #111; border: 1px dashed #444; color: #888; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+        
         input, textarea, select { width: 100%; background: #0a0a0a; border: 1px solid #222; padding: 15px; color: #fff; border-radius: 12px; margin-bottom: 12px; outline: none; }
 
         @media (max-width: 900px) {
@@ -114,8 +116,21 @@
         <section id="settings" class="section">
             <div style="max-width: 400px; margin: 0 auto; text-align: center;">
                 <img src="" id="display-avatar" style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #fff; margin-bottom:20px;">
-                <h1 id="display-name">Exiled</h1>
-                <button class="btn-action" onclick="saveProfile()">MUDAR DADOS</button>
+                <h1 id="display-name" style="margin-bottom: 20px;">Exiled</h1>
+                
+                <input type="text" id="set-name" placeholder="Novo Nome">
+                
+                <p style="font-size: 0.7rem; color: #555; text-align: left; margin-bottom: 5px;">Link da Foto/GIF:</p>
+                <input type="url" id="set-avatar-url" placeholder="https://exemplo.com/foto.gif">
+                
+                <p style="font-size: 0.7rem; color: #555; margin-bottom: 10px;">OU</p>
+                
+                <label class="btn-action btn-upload">
+                    <i data-lucide="upload"></i> Upload Foto/GIF
+                    <input type="file" id="set-avatar-file" accept="image/*" style="display: none;" onchange="handleFileUpload(this)">
+                </label>
+
+                <button class="btn-action" onclick="saveProfile()">SALVAR ALTERAÇÕES</button>
             </div>
         </section>
     </main>
@@ -137,7 +152,47 @@
         const myToken = localStorage.getItem('userToken') || 'user_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('userToken', myToken);
 
-        window.addEventListener('load', () => setTimeout(() => document.getElementById('intro').style.display = 'none', 2000));
+        window.addEventListener('load', () => {
+            setTimeout(() => document.getElementById('intro').style.display = 'none', 2000);
+            loadProfileData();
+        });
+
+        // --- SISTEMA DE PERFIL ---
+        let uploadedAvatarBase64 = "";
+
+        window.handleFileUpload = (input) => {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedAvatarBase64 = e.target.result;
+                    document.getElementById('display-avatar').src = uploadedAvatarBase64;
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        function loadProfileData() {
+            const name = localStorage.getItem('tnp_name') || 'Exiled';
+            const avatar = localStorage.getItem('tnp_avatar') || 'https://media.giphy.com/media/L3Y45TZEmCcENHL2mg/giphy.gif';
+            document.getElementById('display-name').innerText = name;
+            document.getElementById('display-avatar').src = avatar;
+        }
+
+        window.saveProfile = () => {
+            const newName = document.getElementById('set-name').value;
+            const urlAvatar = document.getElementById('set-avatar-url').value;
+            
+            if (newName) localStorage.setItem('tnp_name', newName);
+            
+            if (uploadedAvatarBase64) {
+                localStorage.setItem('tnp_avatar', uploadedAvatarBase64);
+            } else if (urlAvatar) {
+                localStorage.setItem('tnp_avatar', urlAvatar);
+            }
+            
+            location.reload();
+        };
 
         // --- CORE RENDER ---
         let allPosts = [];
@@ -149,6 +204,7 @@
         window.renderGrid = () => {
             const feed = document.getElementById('main-grid');
             const cupons = document.getElementById('cupons-grid');
+            if(!feed || !cupons) return;
             feed.innerHTML = ''; cupons.innerHTML = '';
 
             allPosts.forEach(([id, p]) => {
@@ -156,7 +212,7 @@
                 if(p.type === 'p' || !p.type) {
                     feed.innerHTML += `
                         <div class="card-p">
-                            <div class="author-tag"><img src="${p.authorImg}" style="width:18px;height:18px;border-radius:50%"> <span style="font-size:0.6rem">${p.authorName}</span></div>
+                            <div class="author-tag"><img src="${p.authorImg}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;"> <span style="font-size:0.6rem">${p.authorName}</span></div>
                             <button class="save-btn" onclick='addToCart(${JSON.stringify(p).replace(/"/g, '&quot;')})'><i data-lucide="heart"></i></button>
                             <img src="${p.img}" class="card-img">
                             <div class="card-info">
